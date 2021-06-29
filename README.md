@@ -1,10 +1,12 @@
 ## 修改说明
 
+### 此项目 官网同步更新
 ### 基于 Postgresql 实现
 1.   代码自动生成
 2.   由mysql语法转换为Postgresql（对应文件为 postgresql.sql）
 ### 代码自动生成
-1. 执行sql文件夹下的view.sql
+1.   执行sql文件夹下的view.sql
+2.   操作一致
 
 
 ## 平台简介
