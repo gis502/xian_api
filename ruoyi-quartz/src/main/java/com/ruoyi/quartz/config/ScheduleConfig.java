@@ -24,6 +24,7 @@ public class ScheduleConfig
         Properties prop = new Properties();
         prop.put("org.quartz.scheduler.instanceName", "RuoyiScheduler");
         prop.put("org.quartz.scheduler.instanceId", "AUTO");
+        prop.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
         // 线程池配置
         prop.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
         prop.put("org.quartz.threadPool.threadCount", "20");
