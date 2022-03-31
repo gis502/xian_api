@@ -24,7 +24,7 @@
         <kaptcha.version>2.3.2</kaptcha.version>
         <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
         <pagehelper.boot.version>1.4.1</pagehelper.boot.version>
-        <fastjson.version>1.2.79</fastjson.version>
+        <fastjson.version>1.2.80</fastjson.version>
         <oshi.version>6.1.2</oshi.version>
         <jna.version>5.10.0</jna.version>
         <commons.io.version>2.11.0</commons.io.version>
@@ -43,7 +43,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.5.10</version>
+                <version>2.5.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
