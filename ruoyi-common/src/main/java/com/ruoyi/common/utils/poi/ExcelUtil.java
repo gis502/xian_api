@@ -993,7 +993,7 @@ public class ExcelUtil<T>
             {
                 // 创建cell
                 cell = row.createCell(column);
-                if (isSubListValue(vo) && attr.needMerge())
+                if (isSubListValue(vo) && getListCellValue(vo).size() > 1 && attr.needMerge())
                 {
                     CellRangeAddress cellAddress = new CellRangeAddress(subMergedFirstRowNum, subMergedLastRowNum, column, column);
                     sheet.addMergedRegion(cellAddress);
@@ -1020,7 +1020,7 @@ public class ExcelUtil<T>
                 }
                 else if (value instanceof BigDecimal && -1 != attr.scale())
                 {
-                    cell.setCellValue((((BigDecimal) value).setScale(attr.scale(), attr.roundingMode())).toString());
+                    cell.setCellValue((((BigDecimal) value).setScale(attr.scale(), attr.roundingMode())).doubleValue());
                 }
                 else if (!attr.handler().equals(ExcelHandlerAdapter.class))
                 {
