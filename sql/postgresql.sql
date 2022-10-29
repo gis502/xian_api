@@ -384,7 +384,7 @@ COMMENT ON TABLE "public"."sys_config" IS '参数配置表';
 INSERT INTO "public"."sys_config" VALUES (1, '主框架页-默认皮肤样式名称', 'sys.index.skinName', 'skin-blue', 'Y', 'admin', '2021-05-26 18:56:31', 'admin', '2021-05-27 09:07:43.532263', '蓝色 skin-blue、绿色 skin-green、紫色 skin-purple、红色 skin-red、黄色 skin-yellow');
 INSERT INTO "public"."sys_config" VALUES (2, '用户管理-账号初始密码', 'sys.user.initPassword', '123456', 'Y', 'admin', '2021-05-26 18:56:31', 'admin', '2021-05-27 10:15:52.394492', '初始化密码 123456');
 INSERT INTO "public"."sys_config" VALUES (3, '主框架页-侧边栏主题', 'sys.index.sideTheme', 'theme-dark', 'Y', 'admin', '2021-05-26 18:56:31', 'admin', NULL, '深色主题theme-dark，浅色主题theme-light');
-insert into "public"."sys_config" VALUES(4, '账号自助-验证码开关',  'sys.account.captchaOnOff', 'true', 'Y', 'admin', current_Timestamp, 'admin', null, '是否开启验证码功能（true开启，false关闭）');
+insert into "public"."sys_config" VALUES(4, '账号自助-验证码开关',  'sys.account.captchaEnabled', 'true', 'Y', 'admin', current_Timestamp, 'admin', null, '是否开启验证码功能（true开启，false关闭）');
 insert into "public"."sys_config" VALUES(5, '账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 'Y', 'admin', current_Timestamp, 'admin', null, '是否开启注册用户功能（true开启，false关闭）');
 
 -- ----------------------------
