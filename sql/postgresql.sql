@@ -854,7 +854,7 @@ CREATE TABLE "public"."sys_oper_log" (
   "status" int4,
   "error_msg" varchar(2000) COLLATE "pg_catalog"."default",
   "oper_time" timestamp(6),
-  cost_time         bigint(20)      default 0
+  cost_time    int8      default 0
 )
 ;
 COMMENT ON COLUMN "public"."sys_oper_log"."oper_id" IS '日志主键';
