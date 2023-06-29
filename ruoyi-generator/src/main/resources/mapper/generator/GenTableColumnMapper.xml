@@ -110,14 +110,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteGenTableColumnByIds" parameterType="Long">
-        delete from gen_table_column where table_id in
+        delete from gen_table_column where table_id::bigint in
         <foreach collection="array" item="tableId" open="(" separator="," close=")">
             #{tableId}
         </foreach>
     </delete>
 
     <delete id="deleteGenTableColumns">
-        delete from gen_table_column where column_id in
+        delete from gen_table_column where column_id::bigint in
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item.columnId}
         </foreach>
