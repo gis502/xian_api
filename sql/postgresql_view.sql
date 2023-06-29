@@ -47,3 +47,20 @@ FROM pg_class c
 WHERE (c.relkind = ANY (ARRAY['r'::"char", 'p'::"char"]))
   AND c.relname !~~ 'spatial_%'::text AND n.nspname = 'public'::name AND n.nspname <> ''::name;
 
+CREATE OR REPLACE FUNCTION substring_index(varchar, varchar, integer)
+RETURNS varchar AS $$
+DECLARE
+tokens varchar[];
+length integer ;
+indexnum integer;
+BEGIN
+tokens := pg_catalog.string_to_array($1, $2);
+length := pg_catalog.array_upper(tokens, 1);
+indexnum := length - ($3 * -1) + 1;
+IF $3 >= 0 THEN
+RETURN pg_catalog.array_to_string(tokens[1:$3], $2);
+ELSE
+RETURN pg_catalog.array_to_string(tokens[indexnum:length], $2);
+END IF;
+END;
+$$ IMMUTABLE STRICT LANGUAGE PLPGSQL;
