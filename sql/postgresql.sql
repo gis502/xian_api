@@ -28,6 +28,7 @@ CREATE TABLE "public"."gen_table" (
   "sub_table_fk_name" varchar(64) COLLATE "pg_catalog"."default",
   "class_name" varchar(100) COLLATE "pg_catalog"."default",
   "tpl_category" varchar(200) COLLATE "pg_catalog"."default",
+  "tpl_web_type" varchar(30)  COLLATE "pg_catalog"."default",
   "package_name" varchar(100) COLLATE "pg_catalog"."default",
   "module_name" varchar(30) COLLATE "pg_catalog"."default",
   "business_name" varchar(30) COLLATE "pg_catalog"."default",
@@ -50,6 +51,7 @@ COMMENT ON COLUMN "public"."gen_table"."sub_table_name" IS '关联子表的表�
 COMMENT ON COLUMN "public"."gen_table"."sub_table_fk_name" IS '子表关联的外键名';
 COMMENT ON COLUMN "public"."gen_table"."class_name" IS '实体类名称';
 COMMENT ON COLUMN "public"."gen_table"."tpl_category" IS '使用的模板（crud单表操作 tree树表操作）';
+COMMENT ON COLUMN "public"."gen_table"."tpl_web_type" IS '前端模板类型（element-ui模版 element-plus模版）';
 COMMENT ON COLUMN "public"."gen_table"."package_name" IS '生成包路径';
 COMMENT ON COLUMN "public"."gen_table"."module_name" IS '生成模块名';
 COMMENT ON COLUMN "public"."gen_table"."business_name" IS '生成业务名';
