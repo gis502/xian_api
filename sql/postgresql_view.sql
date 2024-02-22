@@ -35,6 +35,7 @@ FROM pg_attribute a
 WHERE (c.relkind = ANY (ARRAY['r'::"char", 'p'::"char"]))
   AND a.attnum > 0
   AND n.nspname = 'public'::name
+  AND not a.attisdropped
   ORDER BY c.relname, a.attnum;
 
 create view list_table as
