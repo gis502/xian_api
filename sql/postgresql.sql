@@ -92,7 +92,7 @@ CREATE TABLE "public"."gen_table_column" (
   "is_query" char(1) COLLATE "pg_catalog"."default",
   "query_type" varchar(200) COLLATE "pg_catalog"."default",
   "html_type" varchar(200) COLLATE "pg_catalog"."default",
-  "dict_type" varchar(200) COLLATE "pg_catalog"."default",
+  "dict_type" varchar(200) default '',
   "sort" int4,
   "create_by" varchar(64) COLLATE "pg_catalog"."default",
   "create_time" timestamp(6),
