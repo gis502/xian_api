@@ -1,12 +1,14 @@
 
 ## 修改说明
-1. **分支 springboot3 为springboot3.x版本**
-2. **此项目对应sql文件只需执行前两个. 为** 
+1. **分支 springboot3 为 本人自己修改的springboot3.x版本(未来可能会删除)**
+2. **分支 springboot3-ry 同步更新若依官网springboot3 版本**
+3. **分支 springboot3-mp 为 springboot3 + mybatis-plus版本**
+4. **此项目对应sql文件只需执行前两个. 为** 
    1. **[postgresql.sql](https://gitee.com/suxia2/RuoYi-Vue-Postgresql/blob/master/sql/postgresql.sql)**
    2. **[postgresql_view.sql](https://gitee.com/suxia2/RuoYi-Vue-Postgresql/blob/master/sql/postgresql_view.sql)**
    3. **[quartz.sql](https://gitee.com/suxia2/RuoYi-Vue-Postgresql/blob/master/sql/quartz.sql) 与[ry_20220822.sql](https://gitee.com/suxia2/RuoYi-Vue-Postgresql/blob/master/sql/ry_20220822.sql) 
    不需要执行 是mysql语法的,用于比对官方项目的sql文件更新.** 
-3. **如此项目报错请在 issue 中提问**
+5. **如此项目报错请在 issue 中提问**
 
 ### 此项目 官网同步更新
 ### 基于 Postgresql 实现
