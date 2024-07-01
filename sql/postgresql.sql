@@ -660,6 +660,7 @@ CREATE TABLE "public"."sys_menu" (
                                      "path" varchar(200) COLLATE "pg_catalog"."default",
                                      "component" varchar(255) COLLATE "pg_catalog"."default",
                                      "query" varchar(255) COLLATE "pg_catalog"."default",
+                                     route_name        varchar(50)     default '',
                                      "is_frame" int4,
                                      "is_cache" int4 default 0,
                                      "menu_type" char(1) COLLATE "pg_catalog"."default",
@@ -681,6 +682,7 @@ COMMENT ON COLUMN "public"."sys_menu"."order_num" IS '显示顺序';
 COMMENT ON COLUMN "public"."sys_menu"."path" IS '路由地址';
 COMMENT ON COLUMN "public"."sys_menu"."component" IS '组件路径';
 COMMENT ON COLUMN "public"."sys_menu"."query" IS '路由参数';
+COMMENT ON COLUMN "public"."sys_menu"."route_name" IS '路由名称';
 COMMENT ON COLUMN "public"."sys_menu"."is_frame" IS '是否为外链（0是 1否）';
 COMMENT ON COLUMN "public"."sys_menu"."is_cache" IS '是否缓存（0缓存 1不缓存）';
 COMMENT ON COLUMN "public"."sys_menu"."menu_type" IS '菜单类型（M目录 C菜单 F按钮）';
