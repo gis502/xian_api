@@ -21,27 +21,27 @@
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."gen_table";
 CREATE TABLE "public"."gen_table" (
-  "table_id" bigserial,
-  "table_name" varchar(200) COLLATE "pg_catalog"."default",
-  "table_comment" varchar(500) COLLATE "pg_catalog"."default",
-  "sub_table_name" varchar(64) COLLATE "pg_catalog"."default",
-  "sub_table_fk_name" varchar(64) COLLATE "pg_catalog"."default",
-  "class_name" varchar(100) COLLATE "pg_catalog"."default",
-  "tpl_category" varchar(200) COLLATE "pg_catalog"."default",
-  "tpl_web_type" varchar(30)  COLLATE "pg_catalog"."default",
-  "package_name" varchar(100) COLLATE "pg_catalog"."default",
-  "module_name" varchar(30) COLLATE "pg_catalog"."default",
-  "business_name" varchar(30) COLLATE "pg_catalog"."default",
-  "function_name" varchar(50) COLLATE "pg_catalog"."default",
-  "function_author" varchar(50) COLLATE "pg_catalog"."default",
-  "gen_type" char(1) COLLATE "pg_catalog"."default",
-  "gen_path" varchar(200) COLLATE "pg_catalog"."default",
-  "options" varchar(1000) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                      "table_id" bigserial,
+                                      "table_name" varchar(200) COLLATE "pg_catalog"."default",
+                                      "table_comment" varchar(500) COLLATE "pg_catalog"."default",
+                                      "sub_table_name" varchar(64) COLLATE "pg_catalog"."default",
+                                      "sub_table_fk_name" varchar(64) COLLATE "pg_catalog"."default",
+                                      "class_name" varchar(100) COLLATE "pg_catalog"."default",
+                                      "tpl_category" varchar(200) COLLATE "pg_catalog"."default",
+                                      "tpl_web_type" varchar(30)  COLLATE "pg_catalog"."default",
+                                      "package_name" varchar(100) COLLATE "pg_catalog"."default",
+                                      "module_name" varchar(30) COLLATE "pg_catalog"."default",
+                                      "business_name" varchar(30) COLLATE "pg_catalog"."default",
+                                      "function_name" varchar(50) COLLATE "pg_catalog"."default",
+                                      "function_author" varchar(50) COLLATE "pg_catalog"."default",
+                                      "gen_type" char(1) COLLATE "pg_catalog"."default",
+                                      "gen_path" varchar(200) COLLATE "pg_catalog"."default",
+                                      "options" varchar(1000) COLLATE "pg_catalog"."default",
+                                      "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                      "create_time" timestamp(6),
+                                      "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                      "update_time" timestamp(6),
+                                      "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."gen_table"."table_id" IS '编号';
@@ -76,28 +76,28 @@ COMMENT ON TABLE "public"."gen_table" IS '代码生成业务表';
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."gen_table_column";
 CREATE TABLE "public"."gen_table_column" (
-  "column_id" bigserial,
-  "table_id" varchar(64) COLLATE "pg_catalog"."default",
-  "column_name" varchar(200) COLLATE "pg_catalog"."default",
-  "column_comment" varchar(500) COLLATE "pg_catalog"."default",
-  "column_type" varchar(100) COLLATE "pg_catalog"."default",
-  "java_type" varchar(500) COLLATE "pg_catalog"."default",
-  "java_field" varchar(200) COLLATE "pg_catalog"."default",
-  "is_pk" char(1) COLLATE "pg_catalog"."default",
-  "is_increment" char(1) COLLATE "pg_catalog"."default",
-  "is_required" char(1) COLLATE "pg_catalog"."default",
-  "is_insert" char(1) COLLATE "pg_catalog"."default",
-  "is_edit" char(1) COLLATE "pg_catalog"."default",
-  "is_list" char(1) COLLATE "pg_catalog"."default",
-  "is_query" char(1) COLLATE "pg_catalog"."default",
-  "query_type" varchar(200) COLLATE "pg_catalog"."default",
-  "html_type" varchar(200) COLLATE "pg_catalog"."default",
-  "dict_type" varchar(200) default '',
-  "sort" int4,
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6)
+                                             "column_id" bigserial,
+                                             "table_id" varchar(64) COLLATE "pg_catalog"."default",
+                                             "column_name" varchar(200) COLLATE "pg_catalog"."default",
+                                             "column_comment" varchar(500) COLLATE "pg_catalog"."default",
+                                             "column_type" varchar(100) COLLATE "pg_catalog"."default",
+                                             "java_type" varchar(500) COLLATE "pg_catalog"."default",
+                                             "java_field" varchar(200) COLLATE "pg_catalog"."default",
+                                             "is_pk" char(1) COLLATE "pg_catalog"."default",
+                                             "is_increment" char(1) COLLATE "pg_catalog"."default",
+                                             "is_required" char(1) COLLATE "pg_catalog"."default",
+                                             "is_insert" char(1) COLLATE "pg_catalog"."default",
+                                             "is_edit" char(1) COLLATE "pg_catalog"."default",
+                                             "is_list" char(1) COLLATE "pg_catalog"."default",
+                                             "is_query" char(1) COLLATE "pg_catalog"."default",
+                                             "query_type" varchar(200) COLLATE "pg_catalog"."default",
+                                             "html_type" varchar(200) COLLATE "pg_catalog"."default",
+                                             "dict_type" varchar(200) default '',
+                                             "sort" int4,
+                                             "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                             "create_time" timestamp(6),
+                                             "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                             "update_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."gen_table_column"."column_id" IS '编号';
@@ -133,10 +133,10 @@ COMMENT ON TABLE "public"."gen_table_column" IS '代码生成业务表字段';
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_blob_triggers";
 CREATE TABLE "public"."qrtz_blob_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "blob_data" bytea
+                                               "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "blob_data" bytea
 )
 ;
 
@@ -149,9 +149,9 @@ CREATE TABLE "public"."qrtz_blob_triggers" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_calendars";
 CREATE TABLE "public"."qrtz_calendars" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "calendar_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "calendar" bytea NOT NULL
+                                           "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                           "calendar_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                           "calendar" bytea NOT NULL
 )
 ;
 
@@ -164,11 +164,11 @@ CREATE TABLE "public"."qrtz_calendars" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_cron_triggers";
 CREATE TABLE "public"."qrtz_cron_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "cron_expression" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "time_zone_id" varchar(80) COLLATE "pg_catalog"."default"
+                                               "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "cron_expression" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                               "time_zone_id" varchar(80) COLLATE "pg_catalog"."default"
 )
 ;
 
@@ -184,19 +184,19 @@ INSERT INTO "public"."qrtz_cron_triggers" VALUES ('RuoyiScheduler', 'TASK_CLASS_
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_fired_triggers";
 CREATE TABLE "public"."qrtz_fired_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "entry_id" varchar(95) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "instance_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "fired_time" int8 NOT NULL,
-  "sched_time" int8 NOT NULL,
-  "priority" int4 NOT NULL,
-  "state" varchar(16) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_name" varchar(200) COLLATE "pg_catalog"."default",
-  "job_group" varchar(200) COLLATE "pg_catalog"."default",
-  "is_nonconcurrent" varchar(20) COLLATE "pg_catalog"."default",
-  "requests_recovery" varchar(20) COLLATE "pg_catalog"."default"
+                                                "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "entry_id" varchar(95) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "instance_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "fired_time" int8 NOT NULL,
+                                                "sched_time" int8 NOT NULL,
+                                                "priority" int4 NOT NULL,
+                                                "state" varchar(16) COLLATE "pg_catalog"."default" NOT NULL,
+                                                "job_name" varchar(200) COLLATE "pg_catalog"."default",
+                                                "job_group" varchar(200) COLLATE "pg_catalog"."default",
+                                                "is_nonconcurrent" varchar(20) COLLATE "pg_catalog"."default",
+                                                "requests_recovery" varchar(20) COLLATE "pg_catalog"."default"
 )
 ;
 
@@ -209,16 +209,16 @@ CREATE TABLE "public"."qrtz_fired_triggers" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_job_details" cascade;
 CREATE TABLE "public"."qrtz_job_details" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "description" varchar(250) COLLATE "pg_catalog"."default",
-  "job_class_name" varchar(250) COLLATE "pg_catalog"."default" NOT NULL,
-  "is_durable" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "is_nonconcurrent" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "is_update_data" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "requests_recovery" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_data" bytea
+                                             "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "job_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "job_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "description" varchar(250) COLLATE "pg_catalog"."default",
+                                             "job_class_name" varchar(250) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "is_durable" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "is_nonconcurrent" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "is_update_data" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "requests_recovery" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                             "job_data" bytea
 )
 ;
 
@@ -234,8 +234,8 @@ INSERT INTO "public"."qrtz_job_details" VALUES ('RuoyiScheduler', 'TASK_CLASS_NA
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_locks";
 CREATE TABLE "public"."qrtz_locks" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "lock_name" varchar(40) COLLATE "pg_catalog"."default" NOT NULL
+                                       "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                       "lock_name" varchar(40) COLLATE "pg_catalog"."default" NOT NULL
 )
 ;
 
@@ -250,8 +250,8 @@ INSERT INTO "public"."qrtz_locks" VALUES ('RuoyiScheduler', 'STATE_ACCESS');
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_paused_trigger_grps";
 CREATE TABLE "public"."qrtz_paused_trigger_grps" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL
+                                                     "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                                     "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL
 )
 ;
 
@@ -264,10 +264,10 @@ CREATE TABLE "public"."qrtz_paused_trigger_grps" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_scheduler_state";
 CREATE TABLE "public"."qrtz_scheduler_state" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "instance_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "last_checkin_time" int8 NOT NULL,
-  "checkin_interval" int8 NOT NULL
+                                                 "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                                 "instance_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                 "last_checkin_time" int8 NOT NULL,
+                                                 "checkin_interval" int8 NOT NULL
 )
 ;
 
@@ -281,12 +281,12 @@ INSERT INTO "public"."qrtz_scheduler_state" VALUES ('RuoyiScheduler', 'LAPTOP-3M
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_simple_triggers";
 CREATE TABLE "public"."qrtz_simple_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "repeat_count" int8 NOT NULL,
-  "repeat_interval" int8 NOT NULL,
-  "times_triggered" int8 NOT NULL
+                                                 "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                                 "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                 "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                 "repeat_count" int8 NOT NULL,
+                                                 "repeat_interval" int8 NOT NULL,
+                                                 "times_triggered" int8 NOT NULL
 )
 ;
 
@@ -299,20 +299,20 @@ CREATE TABLE "public"."qrtz_simple_triggers" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_simprop_triggers";
 CREATE TABLE "public"."qrtz_simprop_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "str_prop_1" varchar(512) COLLATE "pg_catalog"."default",
-  "str_prop_2" varchar(512) COLLATE "pg_catalog"."default",
-  "str_prop_3" varchar(512) COLLATE "pg_catalog"."default",
-  "int_prop_1" int4,
-  "int_prop_2" int4,
-  "long_prop_1" int8,
-  "long_prop_2" int8,
-  "dec_prop_1" numeric(13,4),
-  "dec_prop_2" numeric(13,4),
-  "bool_prop_1" varchar(2) COLLATE "pg_catalog"."default",
-  "bool_prop_2" varchar(2) COLLATE "pg_catalog"."default"
+                                                  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                                  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                                  "str_prop_1" varchar(512) COLLATE "pg_catalog"."default",
+                                                  "str_prop_2" varchar(512) COLLATE "pg_catalog"."default",
+                                                  "str_prop_3" varchar(512) COLLATE "pg_catalog"."default",
+                                                  "int_prop_1" int4,
+                                                  "int_prop_2" int4,
+                                                  "long_prop_1" int8,
+                                                  "long_prop_2" int8,
+                                                  "dec_prop_1" numeric(13,4),
+                                                  "dec_prop_2" numeric(13,4),
+                                                  "bool_prop_1" varchar(2) COLLATE "pg_catalog"."default",
+                                                  "bool_prop_2" varchar(2) COLLATE "pg_catalog"."default"
 )
 ;
 
@@ -325,22 +325,22 @@ CREATE TABLE "public"."qrtz_simprop_triggers" (
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."qrtz_triggers";
 CREATE TABLE "public"."qrtz_triggers" (
-  "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
-  "description" varchar(250) COLLATE "pg_catalog"."default",
-  "next_fire_time" int8,
-  "prev_fire_time" int8,
-  "priority" int4,
-  "trigger_state" varchar(16) COLLATE "pg_catalog"."default" NOT NULL,
-  "trigger_type" varchar(8) COLLATE "pg_catalog"."default" NOT NULL,
-  "start_time" int8 NOT NULL,
-  "end_time" int8,
-  "calendar_name" varchar(200) COLLATE "pg_catalog"."default",
-  "misfire_instr" int2,
-  "job_data" bytea
+                                          "sched_name" varchar(120) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "trigger_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "trigger_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "job_name" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "job_group" varchar(200) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "description" varchar(250) COLLATE "pg_catalog"."default",
+                                          "next_fire_time" int8,
+                                          "prev_fire_time" int8,
+                                          "priority" int4,
+                                          "trigger_state" varchar(16) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "trigger_type" varchar(8) COLLATE "pg_catalog"."default" NOT NULL,
+                                          "start_time" int8 NOT NULL,
+                                          "end_time" int8,
+                                          "calendar_name" varchar(200) COLLATE "pg_catalog"."default",
+                                          "misfire_instr" int2,
+                                          "job_data" bytea
 )
 ;
 
@@ -356,16 +356,16 @@ INSERT INTO "public"."qrtz_triggers" VALUES ('RuoyiScheduler', 'TASK_CLASS_NAME2
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_config";
 CREATE TABLE "public"."sys_config" (
-  "config_id" bigserial,
-  "config_name" varchar(100) COLLATE "pg_catalog"."default",
-  "config_key" varchar(100) COLLATE "pg_catalog"."default",
-  "config_value" varchar(500) COLLATE "pg_catalog"."default",
-  "config_type" char(1) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                       "config_id" bigserial,
+                                       "config_name" varchar(100) COLLATE "pg_catalog"."default",
+                                       "config_key" varchar(100) COLLATE "pg_catalog"."default",
+                                       "config_value" varchar(500) COLLATE "pg_catalog"."default",
+                                       "config_type" char(1) COLLATE "pg_catalog"."default",
+                                       "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                       "create_time" timestamp(6),
+                                       "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                       "update_time" timestamp(6),
+                                       "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_config"."config_id" IS '参数主键';
@@ -394,20 +394,20 @@ insert into "public"."sys_config" VALUES(5, '账号自助-是否开启用户注�
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_dept";
 CREATE TABLE "public"."sys_dept" (
-  "dept_id" bigserial,
-  "parent_id" int8 default 0,
-  "ancestors" varchar(50) COLLATE "pg_catalog"."default",
-  "dept_name" varchar(30) COLLATE "pg_catalog"."default",
-  "order_num" int4,
-  "leader" varchar(20) COLLATE "pg_catalog"."default",
-  "phone" varchar(11) COLLATE "pg_catalog"."default",
-  "email" varchar(50) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT 0,
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6)
+                                     "dept_id" bigserial,
+                                     "parent_id" int8 default 0,
+                                     "ancestors" varchar(50) COLLATE "pg_catalog"."default",
+                                     "dept_name" varchar(30) COLLATE "pg_catalog"."default",
+                                     "order_num" int4,
+                                     "leader" varchar(20) COLLATE "pg_catalog"."default",
+                                     "phone" varchar(11) COLLATE "pg_catalog"."default",
+                                     "email" varchar(50) COLLATE "pg_catalog"."default",
+                                     "status" char(1) COLLATE "pg_catalog"."default",
+                                     "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT 0,
+                                     "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "create_time" timestamp(6),
+                                     "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "update_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_dept"."dept_id" IS '部门id';
@@ -445,20 +445,20 @@ INSERT INTO "public"."sys_dept" VALUES (100, 0, '0', '若依科技', 0, '若依'
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_dict_data";
 CREATE TABLE "public"."sys_dict_data" (
-  "dict_code" bigserial,
-  "dict_sort" int4,
-  "dict_label" varchar(100) COLLATE "pg_catalog"."default",
-  "dict_value" varchar(100) COLLATE "pg_catalog"."default",
-  "dict_type" varchar(100) COLLATE "pg_catalog"."default",
-  "css_class" varchar(100) COLLATE "pg_catalog"."default",
-  "list_class" varchar(100) COLLATE "pg_catalog"."default",
-  "is_default" char(1) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                          "dict_code" bigserial,
+                                          "dict_sort" int4,
+                                          "dict_label" varchar(100) COLLATE "pg_catalog"."default",
+                                          "dict_value" varchar(100) COLLATE "pg_catalog"."default",
+                                          "dict_type" varchar(100) COLLATE "pg_catalog"."default",
+                                          "css_class" varchar(100) COLLATE "pg_catalog"."default",
+                                          "list_class" varchar(100) COLLATE "pg_catalog"."default",
+                                          "is_default" char(1) COLLATE "pg_catalog"."default",
+                                          "status" char(1) COLLATE "pg_catalog"."default",
+                                          "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                          "create_time" timestamp(6),
+                                          "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                          "update_time" timestamp(6),
+                                          "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_dict_data"."dict_code" IS '字典编码';
@@ -514,15 +514,15 @@ insert into sys_dict_data values(28, 2,  '失败',     '1',       'sys_common_st
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_dict_type";
 CREATE TABLE "public"."sys_dict_type" (
-  "dict_id" bigserial,
-  "dict_name" varchar(100) COLLATE "pg_catalog"."default",
-  "dict_type" varchar(100) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                          "dict_id" bigserial,
+                                          "dict_name" varchar(100) COLLATE "pg_catalog"."default",
+                                          "dict_type" varchar(100) COLLATE "pg_catalog"."default",
+                                          "status" char(1) COLLATE "pg_catalog"."default",
+                                          "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                          "create_time" timestamp(6),
+                                          "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                          "update_time" timestamp(6),
+                                          "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_dict_type"."dict_id" IS '字典主键';
@@ -555,19 +555,19 @@ INSERT INTO "public"."sys_dict_type" VALUES (1, '用户性别', 'sys_user_sex', 
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_job";
 CREATE TABLE "public"."sys_job" (
-  "job_id" bigserial,
-  "job_name" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_group" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "invoke_target" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
-  "cron_expression" varchar(255) COLLATE "pg_catalog"."default",
-  "misfire_policy" varchar(20) COLLATE "pg_catalog"."default",
-  "concurrent" char(1) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                    "job_id" bigserial,
+                                    "job_name" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+                                    "job_group" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+                                    "invoke_target" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
+                                    "cron_expression" varchar(255) COLLATE "pg_catalog"."default",
+                                    "misfire_policy" varchar(20) COLLATE "pg_catalog"."default",
+                                    "concurrent" char(1) COLLATE "pg_catalog"."default",
+                                    "status" char(1) COLLATE "pg_catalog"."default",
+                                    "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                    "create_time" timestamp(6),
+                                    "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                    "update_time" timestamp(6),
+                                    "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_job"."job_id" IS '任务ID';
@@ -597,14 +597,14 @@ INSERT INTO "public"."sys_job" VALUES (3, '系统默认（多参）', 'DEFAULT',
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_job_log";
 CREATE TABLE "public"."sys_job_log" (
-  "job_log_id" bigserial,
-  "job_name" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_group" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "invoke_target" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
-  "job_message" varchar(500) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "exception_info" varchar(2000) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6)
+                                        "job_log_id" bigserial,
+                                        "job_name" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+                                        "job_group" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+                                        "invoke_target" varchar(500) COLLATE "pg_catalog"."default" NOT NULL,
+                                        "job_message" varchar(500) COLLATE "pg_catalog"."default",
+                                        "status" char(1) COLLATE "pg_catalog"."default",
+                                        "exception_info" varchar(2000) COLLATE "pg_catalog"."default",
+                                        "create_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_job_log"."job_log_id" IS '任务日志ID';
@@ -626,15 +626,15 @@ COMMENT ON TABLE "public"."sys_job_log" IS '定时任务调度日志表';
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_logininfor";
 CREATE TABLE "public"."sys_logininfor" (
-  "info_id" bigserial,
-  "user_name" varchar(50) COLLATE "pg_catalog"."default",
-  "ipaddr" varchar(128) COLLATE "pg_catalog"."default",
-  "login_location" varchar(255) COLLATE "pg_catalog"."default",
-  "browser" varchar(50) COLLATE "pg_catalog"."default",
-  "os" varchar(50) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "msg" varchar(255) COLLATE "pg_catalog"."default",
-  "login_time" timestamp(6)
+                                           "info_id" bigserial,
+                                           "user_name" varchar(50) COLLATE "pg_catalog"."default",
+                                           "ipaddr" varchar(128) COLLATE "pg_catalog"."default",
+                                           "login_location" varchar(255) COLLATE "pg_catalog"."default",
+                                           "browser" varchar(50) COLLATE "pg_catalog"."default",
+                                           "os" varchar(50) COLLATE "pg_catalog"."default",
+                                           "status" char(1) COLLATE "pg_catalog"."default",
+                                           "msg" varchar(255) COLLATE "pg_catalog"."default",
+                                           "login_time" timestamp(6)
 )
 ;
 COMMENT ON COLUMN "public"."sys_logininfor"."info_id" IS '访问ID';
@@ -701,122 +701,122 @@ COMMENT ON TABLE "public"."sys_menu" IS '菜单权限表';
 -- 初始化-菜单信息表数据
 -- ----------------------------
 -- 一级菜单
-insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', 1, 0, 'M', '0', '0', '', 'system',   'admin', current_timestamp, '', null, '系统管理目录');
-insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',          null, '', 1, 0, 'M', '0', '0', '', 'monitor',  'admin', current_timestamp, '', null, '系统监控目录');
-insert into sys_menu values('3', '系统工具', '0', '3', 'tool',             null, '', 1, 0, 'M', '0', '0', '', 'tool',     'admin', current_timestamp, '', null, '系统工具目录');
-insert into sys_menu values('4', '若依官网', '0', '4', 'http://ruoyi.vip', null, '', 0, 0, 'M', '0', '0', '', 'guide',    'admin', current_timestamp, '', null, '若依官网地址');
+insert into sys_menu values('1', '系统管理', '0', '1', 'system',           null, '', '', 1, 0, 'M', '0', '0', '', 'system',   'admin', current_timestamp, '', null, '系统管理目录');
+insert into sys_menu values('2', '系统监控', '0', '2', 'monitor',          null, '', '', 1, 0, 'M', '0', '0', '', 'monitor',  'admin', current_timestamp, '', null, '系统监控目录');
+insert into sys_menu values('3', '系统工具', '0', '3', 'tool',             null, '', '', 1, 0, 'M', '0', '0', '', 'tool',     'admin', current_timestamp, '', null, '系统工具目录');
+insert into sys_menu values('4', '若依官网', '0', '4', 'http://ruoyi.vip', null, '', '', 0, 0, 'M', '0', '0', '', 'guide',    'admin', current_timestamp, '', null, '若依官网地址');
 -- 二级菜单
-insert into sys_menu values('100',  '用户管理', '1',   '1', 'user',       'system/user/index',        '', 1, 0, 'C', '0', '0', 'system:user:list',        'user',          'admin', current_timestamp, '', null, '用户管理菜单');
-insert into sys_menu values('101',  '角色管理', '1',   '2', 'role',       'system/role/index',        '', 1, 0, 'C', '0', '0', 'system:role:list',        'peoples',       'admin', current_timestamp, '', null, '角色管理菜单');
-insert into sys_menu values('102',  '菜单管理', '1',   '3', 'menu',       'system/menu/index',        '', 1, 0, 'C', '0', '0', 'system:menu:list',        'tree-table',    'admin', current_timestamp, '', null, '菜单管理菜单');
-insert into sys_menu values('103',  '部门管理', '1',   '4', 'dept',       'system/dept/index',        '', 1, 0, 'C', '0', '0', 'system:dept:list',        'tree',          'admin', current_timestamp, '', null, '部门管理菜单');
-insert into sys_menu values('104',  '岗位管理', '1',   '5', 'post',       'system/post/index',        '', 1, 0, 'C', '0', '0', 'system:post:list',        'post',          'admin', current_timestamp, '', null, '岗位管理菜单');
-insert into sys_menu values('105',  '字典管理', '1',   '6', 'dict',       'system/dict/index',        '', 1, 0, 'C', '0', '0', 'system:dict:list',        'dict',          'admin', current_timestamp, '', null, '字典管理菜单');
-insert into sys_menu values('106',  '参数设置', '1',   '7', 'config',     'system/config/index',      '', 1, 0, 'C', '0', '0', 'system:config:list',      'edit',          'admin', current_timestamp, '', null, '参数设置菜单');
-insert into sys_menu values('107',  '通知公告', '1',   '8', 'notice',     'system/notice/index',      '', 1, 0, 'C', '0', '0', 'system:notice:list',      'message',       'admin', current_timestamp, '', null, '通知公告菜单');
-insert into sys_menu values('108',  '日志管理', '1',   '9', 'log',        '',                         '', 1, 0, 'M', '0', '0', '',                        'log',           'admin', current_timestamp, '', null, '日志管理菜单');
-insert into sys_menu values('109',  '在线用户', '2',   '1', 'online',     'monitor/online/index',     '', 1, 0, 'C', '0', '0', 'monitor:online:list',     'online',        'admin', current_timestamp, '', null, '在线用户菜单');
-insert into sys_menu values('110',  '定时任务', '2',   '2', 'job',        'monitor/job/index',        '', 1, 0, 'C', '0', '0', 'monitor:job:list',        'job',           'admin', current_timestamp, '', null, '定时任务菜单');
-insert into sys_menu values('111',  '数据监控', '2',   '3', 'druid',      'monitor/druid/index',      '', 1, 0, 'C', '0', '0', 'monitor:druid:list',      'druid',         'admin', current_timestamp, '', null, '数据监控菜单');
-insert into sys_menu values('112',  '服务监控', '2',   '4', 'server',     'monitor/server/index',     '', 1, 0, 'C', '0', '0', 'monitor:server:list',     'server',        'admin', current_timestamp, '', null, '服务监控菜单');
-insert into sys_menu values('113',  '缓存监控', '2',   '5', 'cache',      'monitor/cache/index',      '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis',         'admin', current_timestamp, '', null, '缓存监控菜单');
-insert into sys_menu values('114',  '缓存列表', '2',   '6', 'cacheList',  'monitor/cache/list',       '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis-list',    'admin', current_timestamp, '', null, '缓存列表菜单');
-insert into sys_menu values('115',  '表单构建', '3',   '1', 'build',      'tool/build/index',         '', 1, 0, 'C', '0', '0', 'tool:build:list',         'build',         'admin', current_timestamp, '', null, '表单构建菜单');
-insert into sys_menu values('116',  '代码生成', '3',   '2', 'gen',        'tool/gen/index',           '', 1, 0, 'C', '0', '0', 'tool:gen:list',           'code',          'admin', current_timestamp, '', null, '代码生成菜单');
-insert into sys_menu values('117',  '系统接口', '3',   '3', 'swagger',    'tool/swagger/index',       '', 1, 0, 'C', '0', '0', 'tool:swagger:list',       'swagger',       'admin', current_timestamp, '', null, '系统接口菜单');
+insert into sys_menu values('100',  '用户管理', '1',   '1', 'user',       'system/user/index',        '', '', 1, 0, 'C', '0', '0', 'system:user:list',        'user',          'admin', current_timestamp, '', null, '用户管理菜单');
+insert into sys_menu values('101',  '角色管理', '1',   '2', 'role',       'system/role/index',        '', '', 1, 0, 'C', '0', '0', 'system:role:list',        'peoples',       'admin', current_timestamp, '', null, '角色管理菜单');
+insert into sys_menu values('102',  '菜单管理', '1',   '3', 'menu',       'system/menu/index',        '', '', 1, 0, 'C', '0', '0', 'system:menu:list',        'tree-table',    'admin', current_timestamp, '', null, '菜单管理菜单');
+insert into sys_menu values('103',  '部门管理', '1',   '4', 'dept',       'system/dept/index',        '', '', 1, 0, 'C', '0', '0', 'system:dept:list',        'tree',          'admin', current_timestamp, '', null, '部门管理菜单');
+insert into sys_menu values('104',  '岗位管理', '1',   '5', 'post',       'system/post/index',        '', '', 1, 0, 'C', '0', '0', 'system:post:list',        'post',          'admin', current_timestamp, '', null, '岗位管理菜单');
+insert into sys_menu values('105',  '字典管理', '1',   '6', 'dict',       'system/dict/index',        '', '', 1, 0, 'C', '0', '0', 'system:dict:list',        'dict',          'admin', current_timestamp, '', null, '字典管理菜单');
+insert into sys_menu values('106',  '参数设置', '1',   '7', 'config',     'system/config/index',      '', '', 1, 0, 'C', '0', '0', 'system:config:list',      'edit',          'admin', current_timestamp, '', null, '参数设置菜单');
+insert into sys_menu values('107',  '通知公告', '1',   '8', 'notice',     'system/notice/index',      '', '', 1, 0, 'C', '0', '0', 'system:notice:list',      'message',       'admin', current_timestamp, '', null, '通知公告菜单');
+insert into sys_menu values('108',  '日志管理', '1',   '9', 'log',        '',                         '', '', 1, 0, 'M', '0', '0', '',                        'log',           'admin', current_timestamp, '', null, '日志管理菜单');
+insert into sys_menu values('109',  '在线用户', '2',   '1', 'online',     'monitor/online/index',     '', '', 1, 0, 'C', '0', '0', 'monitor:online:list',     'online',        'admin', current_timestamp, '', null, '在线用户菜单');
+insert into sys_menu values('110',  '定时任务', '2',   '2', 'job',        'monitor/job/index',        '', '', 1, 0, 'C', '0', '0', 'monitor:job:list',        'job',           'admin', current_timestamp, '', null, '定时任务菜单');
+insert into sys_menu values('111',  '数据监控', '2',   '3', 'druid',      'monitor/druid/index',      '', '', 1, 0, 'C', '0', '0', 'monitor:druid:list',      'druid',         'admin', current_timestamp, '', null, '数据监控菜单');
+insert into sys_menu values('112',  '服务监控', '2',   '4', 'server',     'monitor/server/index',     '', '', 1, 0, 'C', '0', '0', 'monitor:server:list',     'server',        'admin', current_timestamp, '', null, '服务监控菜单');
+insert into sys_menu values('113',  '缓存监控', '2',   '5', 'cache',      'monitor/cache/index',      '', '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis',         'admin', current_timestamp, '', null, '缓存监控菜单');
+insert into sys_menu values('114',  '缓存列表', '2',   '6', 'cacheList',  'monitor/cache/list',       '', '', 1, 0, 'C', '0', '0', 'monitor:cache:list',      'redis-list',    'admin', current_timestamp, '', null, '缓存列表菜单');
+insert into sys_menu values('115',  '表单构建', '3',   '1', 'build',      'tool/build/index',         '', '', 1, 0, 'C', '0', '0', 'tool:build:list',         'build',         'admin', current_timestamp, '', null, '表单构建菜单');
+insert into sys_menu values('116',  '代码生成', '3',   '2', 'gen',        'tool/gen/index',           '', '', 1, 0, 'C', '0', '0', 'tool:gen:list',           'code',          'admin', current_timestamp, '', null, '代码生成菜单');
+insert into sys_menu values('117',  '系统接口', '3',   '3', 'swagger',    'tool/swagger/index',       '', '', 1, 0, 'C', '0', '0', 'tool:swagger:list',       'swagger',       'admin', current_timestamp, '', null, '系统接口菜单');
 -- 三级菜单
-insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          'admin', current_timestamp, '', null, '操作日志菜单');
-insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor', 'monitor/logininfor/index', '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    'admin', current_timestamp, '', null, '登录日志菜单');
+insert into sys_menu values('500',  '操作日志', '108', '1', 'operlog',    'monitor/operlog/index',    '', '', 1, 0, 'C', '0', '0', 'monitor:operlog:list',    'form',          'admin', current_timestamp, '', null, '操作日志菜单');
+insert into sys_menu values('501',  '登录日志', '108', '2', 'logininfor', 'monitor/logininfor/index', '', '', 1, 0, 'C', '0', '0', 'monitor:logininfor:list', 'logininfor',    'admin', current_timestamp, '', null, '登录日志菜单');
 -- 用户管理按钮
-insert into sys_menu values('1000', '用户查询', '100', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1001', '用户新增', '100', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1002', '用户修改', '100', '3',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1003', '用户删除', '100', '4',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:remove',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1004', '用户导出', '100', '5',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:export',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1005', '用户导入', '100', '6',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:import',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1006', '重置密码', '100', '7',  '', '', '', 1, 0, 'F', '0', '0', 'system:user:resetPwd',       '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1000', '用户查询', '100', '1',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1001', '用户新增', '100', '2',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1002', '用户修改', '100', '3',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1003', '用户删除', '100', '4',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1004', '用户导出', '100', '5',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:export',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1005', '用户导入', '100', '6',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:import',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1006', '重置密码', '100', '7',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:user:resetPwd',       '#', 'admin', current_timestamp, '', null, '');
 -- 角色管理按钮
-insert into sys_menu values('1007', '角色查询', '101', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:role:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1008', '角色新增', '101', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:role:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1009', '角色修改', '101', '3',  '', '', '', 1, 0, 'F', '0', '0', 'system:role:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1010', '角色删除', '101', '4',  '', '', '', 1, 0, 'F', '0', '0', 'system:role:remove',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1011', '角色导出', '101', '5',  '', '', '', 1, 0, 'F', '0', '0', 'system:role:export',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1007', '角色查询', '101', '1',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:role:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1008', '角色新增', '101', '2',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:role:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1009', '角色修改', '101', '3',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:role:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1010', '角色删除', '101', '4',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:role:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1011', '角色导出', '101', '5',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:role:export',         '#', 'admin', current_timestamp, '', null, '');
 -- 菜单管理按钮
-insert into sys_menu values('1012', '菜单查询', '102', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:menu:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1013', '菜单新增', '102', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:menu:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1014', '菜单修改', '102', '3',  '', '', '', 1, 0, 'F', '0', '0', 'system:menu:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1015', '菜单删除', '102', '4',  '', '', '', 1, 0, 'F', '0', '0', 'system:menu:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1012', '菜单查询', '102', '1',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:menu:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1013', '菜单新增', '102', '2',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:menu:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1014', '菜单修改', '102', '3',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:menu:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1015', '菜单删除', '102', '4',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:menu:remove',         '#', 'admin', current_timestamp, '', null, '');
 -- 部门管理按钮
-insert into sys_menu values('1016', '部门查询', '103', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:dept:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1017', '部门新增', '103', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:dept:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1018', '部门修改', '103', '3',  '', '', '', 1, 0, 'F', '0', '0', 'system:dept:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1019', '部门删除', '103', '4',  '', '', '', 1, 0, 'F', '0', '0', 'system:dept:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1016', '部门查询', '103', '1',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:dept:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1017', '部门新增', '103', '2',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:dept:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1018', '部门修改', '103', '3',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:dept:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1019', '部门删除', '103', '4',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:dept:remove',         '#', 'admin', current_timestamp, '', null, '');
 -- 岗位管理按钮
-insert into sys_menu values('1020', '岗位查询', '104', '1',  '', '', '', 1, 0, 'F', '0', '0', 'system:post:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1021', '岗位新增', '104', '2',  '', '', '', 1, 0, 'F', '0', '0', 'system:post:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1022', '岗位修改', '104', '3',  '', '', '', 1, 0, 'F', '0', '0', 'system:post:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1023', '岗位删除', '104', '4',  '', '', '', 1, 0, 'F', '0', '0', 'system:post:remove',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1024', '岗位导出', '104', '5',  '', '', '', 1, 0, 'F', '0', '0', 'system:post:export',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1020', '岗位查询', '104', '1',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:post:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1021', '岗位新增', '104', '2',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:post:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1022', '岗位修改', '104', '3',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:post:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1023', '岗位删除', '104', '4',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:post:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1024', '岗位导出', '104', '5',  '', '', '', '', 1, 0, 'F', '0', '0', 'system:post:export',         '#', 'admin', current_timestamp, '', null, '');
 -- 字典管理按钮
-insert into sys_menu values('1025', '字典查询', '105', '1', '#', '', '', 1, 0, 'F', '0', '0', 'system:dict:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1026', '字典新增', '105', '2', '#', '', '', 1, 0, 'F', '0', '0', 'system:dict:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1027', '字典修改', '105', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:dict:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1028', '字典删除', '105', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:dict:remove',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1029', '字典导出', '105', '5', '#', '', '', 1, 0, 'F', '0', '0', 'system:dict:export',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1025', '字典查询', '105', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:dict:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1026', '字典新增', '105', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:dict:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1027', '字典修改', '105', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:dict:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1028', '字典删除', '105', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:dict:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1029', '字典导出', '105', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:dict:export',         '#', 'admin', current_timestamp, '', null, '');
 -- 参数设置按钮
-insert into sys_menu values('1030', '参数查询', '106', '1', '#', '', '', 1, 0, 'F', '0', '0', 'system:config:query',        '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1031', '参数新增', '106', '2', '#', '', '', 1, 0, 'F', '0', '0', 'system:config:add',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1032', '参数修改', '106', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:config:edit',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1033', '参数删除', '106', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:config:remove',       '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1034', '参数导出', '106', '5', '#', '', '', 1, 0, 'F', '0', '0', 'system:config:export',       '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1030', '参数查询', '106', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:config:query',        '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1031', '参数新增', '106', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:config:add',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1032', '参数修改', '106', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:config:edit',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1033', '参数删除', '106', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:config:remove',       '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1034', '参数导出', '106', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:config:export',       '#', 'admin', current_timestamp, '', null, '');
 -- 通知公告按钮
-insert into sys_menu values('1035', '公告查询', '107', '1', '#', '', '', 1, 0, 'F', '0', '0', 'system:notice:query',        '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1036', '公告新增', '107', '2', '#', '', '', 1, 0, 'F', '0', '0', 'system:notice:add',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1037', '公告修改', '107', '3', '#', '', '', 1, 0, 'F', '0', '0', 'system:notice:edit',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1038', '公告删除', '107', '4', '#', '', '', 1, 0, 'F', '0', '0', 'system:notice:remove',       '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1035', '公告查询', '107', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:notice:query',        '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1036', '公告新增', '107', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:notice:add',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1037', '公告修改', '107', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:notice:edit',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1038', '公告删除', '107', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'system:notice:remove',       '#', 'admin', current_timestamp, '', null, '');
 -- 操作日志按钮
-insert into sys_menu values('1039', '操作查询', '500', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:query',      '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1040', '操作删除', '500', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:remove',     '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1041', '日志导出', '500', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:export',     '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1039', '操作查询', '500', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:query',      '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1040', '操作删除', '500', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:remove',     '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1041', '日志导出', '500', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:operlog:export',     '#', 'admin', current_timestamp, '', null, '');
 -- 登录日志按钮
-insert into sys_menu values('1042', '登录查询', '501', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1043', '登录删除', '501', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1044', '日志导出', '501', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1045', '账户解锁', '501', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1042', '登录查询', '501', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:query',   '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1043', '登录删除', '501', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:remove',  '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1044', '日志导出', '501', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:export',  '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1045', '账户解锁', '501', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:logininfor:unlock',  '#', 'admin', current_timestamp, '', null, '');
 -- 在线用户按钮
-insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1048', '单条强退', '109', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:online:forceLogout', '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1046', '在线查询', '109', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:online:query',       '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1047', '批量强退', '109', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:online:batchLogout', '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1048', '单条强退', '109', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:online:forceLogout', '#', 'admin', current_timestamp, '', null, '');
 -- 定时任务按钮
-insert into sys_menu values('1049', '任务查询', '110', '1', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:query',          '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1050', '任务新增', '110', '2', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:add',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1051', '任务修改', '110', '3', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:edit',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1052', '任务删除', '110', '4', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:remove',         '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1053', '状态修改', '110', '5', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:changeStatus',   '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1054', '任务导出', '110', '6', '#', '', '', 1, 0, 'F', '0', '0', 'monitor:job:export',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1049', '任务查询', '110', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:query',          '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1050', '任务新增', '110', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:add',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1051', '任务修改', '110', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:edit',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1052', '任务删除', '110', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:remove',         '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1053', '状态修改', '110', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:changeStatus',   '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1054', '任务导出', '110', '6', '#', '', '', '', 1, 0, 'F', '0', '0', 'monitor:job:export',         '#', 'admin', current_timestamp, '', null, '');
 -- 代码生成按钮
-insert into sys_menu values('1055', '生成查询', '116', '1', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:query',             '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1056', '生成修改', '116', '2', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:edit',              '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1057', '生成删除', '116', '3', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:remove',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1058', '导入代码', '116', '4', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:import',            '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1059', '预览代码', '116', '5', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:preview',           '#', 'admin', current_timestamp, '', null, '');
-insert into sys_menu values('1060', '生成代码', '116', '6', '#', '', '', 1, 0, 'F', '0', '0', 'tool:gen:code',              '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1055', '生成查询', '116', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:query',             '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1056', '生成修改', '116', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:edit',              '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1057', '生成删除', '116', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:remove',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1058', '导入代码', '116', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:import',            '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1059', '预览代码', '116', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:preview',           '#', 'admin', current_timestamp, '', null, '');
+insert into sys_menu values('1060', '生成代码', '116', '6', '#', '', '', '', 1, 0, 'F', '0', '0', 'tool:gen:code',              '#', 'admin', current_timestamp, '', null, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_notice";
 CREATE TABLE "public"."sys_notice" (
-  "notice_id" bigserial,
-  "notice_title" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "notice_type" char(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "notice_content" text COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(255) COLLATE "pg_catalog"."default"
+                                       "notice_id" bigserial,
+                                       "notice_title" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                       "notice_type" char(1) COLLATE "pg_catalog"."default" NOT NULL,
+                                       "notice_content" text COLLATE "pg_catalog"."default",
+                                       "status" char(1) COLLATE "pg_catalog"."default",
+                                       "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                       "create_time" timestamp(6),
+                                       "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                       "update_time" timestamp(6),
+                                       "remark" varchar(255) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_notice"."notice_id" IS '公告ID';
@@ -842,23 +842,23 @@ INSERT INTO "public"."sys_notice" VALUES (1, '温馨提醒：2018-07-01 若依�
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_oper_log";
 CREATE TABLE "public"."sys_oper_log" (
-  "oper_id" bigserial,
-  "title" varchar(50) COLLATE "pg_catalog"."default",
-  "business_type" int4,
-  "method" varchar(100) COLLATE "pg_catalog"."default",
-  "request_method" varchar(10) COLLATE "pg_catalog"."default",
-  "operator_type" int4,
-  "oper_name" varchar(50) COLLATE "pg_catalog"."default",
-  "dept_name" varchar(50) COLLATE "pg_catalog"."default",
-  "oper_url" varchar(255) COLLATE "pg_catalog"."default",
-  "oper_ip" varchar(128) COLLATE "pg_catalog"."default",
-  "oper_location" varchar(255) COLLATE "pg_catalog"."default",
-  "oper_param" varchar(2000) COLLATE "pg_catalog"."default",
-  "json_result" varchar(2000) COLLATE "pg_catalog"."default",
-  "status" int4,
-  "error_msg" varchar(2000) COLLATE "pg_catalog"."default",
-  "oper_time" timestamp(6),
-  cost_time    int8      default 0
+                                         "oper_id" bigserial,
+                                         "title" varchar(50) COLLATE "pg_catalog"."default",
+                                         "business_type" int4,
+                                         "method" varchar(100) COLLATE "pg_catalog"."default",
+                                         "request_method" varchar(10) COLLATE "pg_catalog"."default",
+                                         "operator_type" int4,
+                                         "oper_name" varchar(50) COLLATE "pg_catalog"."default",
+                                         "dept_name" varchar(50) COLLATE "pg_catalog"."default",
+                                         "oper_url" varchar(255) COLLATE "pg_catalog"."default",
+                                         "oper_ip" varchar(128) COLLATE "pg_catalog"."default",
+                                         "oper_location" varchar(255) COLLATE "pg_catalog"."default",
+                                         "oper_param" varchar(2000) COLLATE "pg_catalog"."default",
+                                         "json_result" varchar(2000) COLLATE "pg_catalog"."default",
+                                         "status" int4,
+                                         "error_msg" varchar(2000) COLLATE "pg_catalog"."default",
+                                         "oper_time" timestamp(6),
+                                         cost_time    int8      default 0
 )
 ;
 COMMENT ON COLUMN "public"."sys_oper_log"."oper_id" IS '日志主键';
@@ -884,16 +884,16 @@ COMMENT ON TABLE "public"."sys_oper_log" IS '操作日志记录';
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_post";
 CREATE TABLE "public"."sys_post" (
-  "post_id" bigserial,
-  "post_code" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
-  "post_name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
-  "post_sort" int4 NOT NULL,
-  "status" char(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                     "post_id" bigserial,
+                                     "post_code" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "post_name" varchar(50) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "post_sort" int4 NOT NULL,
+                                     "status" char(1) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "create_time" timestamp(6),
+                                     "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "update_time" timestamp(6),
+                                     "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_post"."post_id" IS '岗位ID';
@@ -921,20 +921,20 @@ INSERT INTO "public"."sys_post" VALUES (1, 'ceo', '董事长', 1, '0', 'admin', 
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_role";
 CREATE TABLE "public"."sys_role" (
-  "role_id" bigserial,
-  "role_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
-  "role_key" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "role_sort" int4 NOT NULL,
-  "data_scope" char(1) COLLATE "pg_catalog"."default",
-  "menu_check_strictly" bool,
-  "dept_check_strictly" bool,
-  "status" char(1) COLLATE "pg_catalog"."default" NOT NULL,
-  "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT 0,
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                     "role_id" bigserial,
+                                     "role_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "role_key" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "role_sort" int4 NOT NULL,
+                                     "data_scope" char(1) COLLATE "pg_catalog"."default",
+                                     "menu_check_strictly" bool,
+                                     "dept_check_strictly" bool,
+                                     "status" char(1) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "del_flag" char(1) COLLATE "pg_catalog"."default" DEFAULT 0,
+                                     "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "create_time" timestamp(6),
+                                     "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "update_time" timestamp(6),
+                                     "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_role"."role_id" IS '角色ID';
@@ -964,8 +964,8 @@ INSERT INTO "public"."sys_role" VALUES (2, '普通角色', 'common', 2, '2', 'f'
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_role_dept";
 CREATE TABLE "public"."sys_role_dept" (
-  "role_id" int8 NOT NULL,
-  "dept_id" int8 NOT NULL
+                                          "role_id" int8 NOT NULL,
+                                          "dept_id" int8 NOT NULL
 )
 ;
 COMMENT ON COLUMN "public"."sys_role_dept"."role_id" IS '角色ID';
@@ -984,8 +984,8 @@ INSERT INTO "public"."sys_role_dept" VALUES (2, 105);
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_role_menu";
 CREATE TABLE "public"."sys_role_menu" (
-  "role_id" int8 NOT NULL,
-  "menu_id" int8 NOT NULL
+                                          "role_id" int8 NOT NULL,
+                                          "menu_id" int8 NOT NULL
 )
 ;
 COMMENT ON COLUMN "public"."sys_role_menu"."role_id" IS '角色ID';
@@ -1084,25 +1084,25 @@ INSERT INTO "public"."sys_role_menu" VALUES (2, 4);
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_user";
 CREATE TABLE "public"."sys_user" (
-  "user_id" bigserial,
-  "dept_id" int8,
-  "user_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
-  "nick_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
-  "user_type" varchar(2) COLLATE "pg_catalog"."default",
-  "email" varchar(50) COLLATE "pg_catalog"."default",
-  "phonenumber" varchar(11) COLLATE "pg_catalog"."default",
-  "sex" char(1) COLLATE "pg_catalog"."default",
-  "avatar" varchar(100) COLLATE "pg_catalog"."default",
-  "password" varchar(100) COLLATE "pg_catalog"."default",
-  "status" char(1) COLLATE "pg_catalog"."default",
-  "del_flag" char(1) default '0',
-  "login_ip" varchar(128) COLLATE "pg_catalog"."default",
-  "login_date" timestamp(6),
-  "create_by" varchar(64) COLLATE "pg_catalog"."default",
-  "create_time" timestamp(6),
-  "update_by" varchar(64) COLLATE "pg_catalog"."default",
-  "update_time" timestamp(6),
-  "remark" varchar(500) COLLATE "pg_catalog"."default"
+                                     "user_id" bigserial,
+                                     "dept_id" int8,
+                                     "user_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "nick_name" varchar(30) COLLATE "pg_catalog"."default" NOT NULL,
+                                     "user_type" varchar(2) COLLATE "pg_catalog"."default",
+                                     "email" varchar(50) COLLATE "pg_catalog"."default",
+                                     "phonenumber" varchar(11) COLLATE "pg_catalog"."default",
+                                     "sex" char(1) COLLATE "pg_catalog"."default",
+                                     "avatar" varchar(100) COLLATE "pg_catalog"."default",
+                                     "password" varchar(100) COLLATE "pg_catalog"."default",
+                                     "status" char(1) COLLATE "pg_catalog"."default",
+                                     "del_flag" char(1) default '0',
+                                     "login_ip" varchar(128) COLLATE "pg_catalog"."default",
+                                     "login_date" timestamp(6),
+                                     "create_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "create_time" timestamp(6),
+                                     "update_by" varchar(64) COLLATE "pg_catalog"."default",
+                                     "update_time" timestamp(6),
+                                     "remark" varchar(500) COLLATE "pg_catalog"."default"
 )
 ;
 COMMENT ON COLUMN "public"."sys_user"."user_id" IS '用户ID';
@@ -1137,8 +1137,8 @@ INSERT INTO "public"."sys_user" VALUES (1, 103, 'admin', '若依', '00', 'ry@163
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_user_post";
 CREATE TABLE "public"."sys_user_post" (
-  "user_id" int8 NOT NULL,
-  "post_id" int8 NOT NULL
+                                          "user_id" int8 NOT NULL,
+                                          "post_id" int8 NOT NULL
 )
 ;
 COMMENT ON COLUMN "public"."sys_user_post"."user_id" IS '用户ID';
@@ -1156,8 +1156,8 @@ INSERT INTO "public"."sys_user_post" VALUES (2, 2);
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."sys_user_role";
 CREATE TABLE "public"."sys_user_role" (
-  "user_id" int8 NOT NULL,
-  "role_id" int8 NOT NULL
+                                          "user_id" int8 NOT NULL,
+                                          "role_id" int8 NOT NULL
 )
 ;
 COMMENT ON COLUMN "public"."sys_user_role"."user_id" IS '用户ID';
@@ -1234,10 +1234,10 @@ ALTER TABLE "public"."qrtz_simprop_triggers" ADD CONSTRAINT "QRTZ_SIMPROP_TRIGGE
 -- Indexes structure for table qrtz_triggers
 -- ----------------------------
 CREATE INDEX "sched_name" ON "public"."qrtz_triggers" USING btree (
-  "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
-  "job_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
-  "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
-);
+                                                                   "sched_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+                                                                   "job_name" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST,
+                                                                   "job_group" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+    );
 
 -- ----------------------------
 -- Primary Key structure for table qrtz_triggers
@@ -1263,8 +1263,8 @@ ALTER TABLE "public"."sys_dict_data" ADD CONSTRAINT "sys_dict_data_pkey" PRIMARY
 -- Indexes structure for table sys_dict_type
 -- ----------------------------
 CREATE INDEX "dict_type" ON "public"."sys_dict_type" USING btree (
-  "dict_type" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
-);
+                                                                  "dict_type" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops" ASC NULLS LAST
+    );
 
 -- ----------------------------
 -- Primary Key structure for table sys_dict_type
@@ -1364,24 +1364,24 @@ ALTER TABLE "public"."qrtz_triggers" ADD CONSTRAINT "QRTZ_TRIGGERS_ibfk_1" FOREI
 
 
 CREATE OR REPLACE FUNCTION "public"."find_in_set"(int8, varchar)
-  RETURNS "pg_catalog"."bool" AS $BODY$
+    RETURNS "pg_catalog"."bool" AS $BODY$
 DECLARE
-  STR ALIAS FOR $1;
-  STRS ALIAS FOR $2;
-  POS INTEGER;
-  STATUS BOOLEAN;
+    STR ALIAS FOR $1;
+    STRS ALIAS FOR $2;
+    POS INTEGER;
+    STATUS BOOLEAN;
 BEGIN
-	SELECT POSITION( ','||STR||',' IN ','||STRS||',') INTO POS;
-	IF POS > 0 THEN
-	  STATUS = TRUE;
-	ELSE
-	  STATUS = FALSE;
-	END IF;
-	RETURN STATUS; 
+    SELECT POSITION( ','||STR||',' IN ','||STRS||',') INTO POS;
+    IF POS > 0 THEN
+        STATUS = TRUE;
+    ELSE
+        STATUS = FALSE;
+    END IF;
+    RETURN STATUS;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+    LANGUAGE plpgsql VOLATILE
+                     COST 100;
 
 
 alter sequence sys_user_user_id_seq  restart  3;
