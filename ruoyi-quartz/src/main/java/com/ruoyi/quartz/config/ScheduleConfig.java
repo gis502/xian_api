@@ -29,6 +29,7 @@
 //        prop.put("org.quartz.threadPool.threadCount", "20");
 //        prop.put("org.quartz.threadPool.threadPriority", "5");
 //        // JobStore配置
+//        prop.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
 //        prop.put("org.quartz.jobStore.class", "org.springframework.scheduling.quartz.LocalDataSourceJobStore");
 //        // 集群配置
 //        prop.put("org.quartz.jobStore.isClustered", "true");
