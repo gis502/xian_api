@@ -1,5 +1,12 @@
 # 数据源配置
 spring:
+    neo4j:
+        uri: bolt://47.92.216.173:7687
+        #    authentication:
+        #      username: neo4j
+        #      password: neo4j123456
+        pool:
+            metrics-enabled: true
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: org.postgresql.Driver
@@ -13,9 +20,9 @@ spring:
             slave:
                 # 从数据源开关/默认关闭
                 enabled: false
-                url: 
-                username: 
-                password: 
+                url:
+                username:
+                password:
             # 初始连接数
             initialSize: 5
             # 最小连接池数量
@@ -39,7 +46,7 @@ spring:
             testWhileIdle: true
             testOnBorrow: false
             testOnReturn: false
-            webStatFilter: 
+            webStatFilter:
                 enabled: true
             statViewServlet:
                 enabled: true
@@ -59,3 +66,4 @@ spring:
                 wall:
                     config:
                         multi-statement-allow: true
+
