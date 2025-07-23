@@ -13,13 +13,13 @@ import lombok.Data;
  */
 
 @Data
-@TableName("geological_disaster_hide")
+@TableName("xian_disaster_hide")
 public class GeologicalDisasterHide {
 
     @TableId
     private Integer id;
-    @TableField("field_id")
-    private String fieldId;
+    @TableField("field_code")
+    private String fieldCode;
     @TableField("province")
     private String province;
     @TableField("province_id")
@@ -44,14 +44,14 @@ public class GeologicalDisasterHide {
     private Double lon;
     @TableField("lat")
     private Double lat;
-    @TableField("location")
-    private String location;
+    @TableField("position")
+    private String position;
     @TableField("disaster_type")
     private String disasterType;
-    @TableField("disaster_scale")
-    private String disasterScale;
-    @TableField("risk_level")
-    private String riskLevel;
+    @TableField("scale_grade")
+    private String scaleGrade;
+    @TableField("risk_grade")
+    private String riskGrade;
 
 
 }

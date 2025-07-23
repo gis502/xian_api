@@ -12,7 +12,7 @@ import lombok.Data;
  */
 
 @Data
-@TableName("mountain_torrent_disaster")
+@TableName("xian_mountain_torrent_disaster")
 public class MountainTorrentDisaster {
 
     @TableId

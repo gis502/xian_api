@@ -12,15 +12,15 @@ import lombok.Data;
  */
 
 @Data
-@TableName("geological_disaster_risk")
+@TableName("xian_disaster_risk")
 public class GeologicalDisasterRisk {
 
     @TableId
     private Integer id;
-    @TableField("risk_name")
-    private String riskName;
-    @TableField("unified_id")
-    private String unifiedId;
+    @TableField("disaster_name")
+    private String disasterName;
+    @TableField("unit_code")
+    private String unitCode;
     @TableField("risk_level")
     private String riskLevel;
     @TableField("area")
@@ -35,22 +35,26 @@ public class GeologicalDisasterRisk {
     private String country;
     @TableField("village")
     private String village;
-    @TableField("location")
-    private String location;
-    @TableField("household")
-    private Integer household;
-    @TableField("house_people")
-    private Integer housePeople;
+    @TableField("position")
+    private String position;
+    @TableField("resident_counts")
+    private Integer residentCounts;
+    @TableField("address_population")
+    private Integer addressPopulation;
     @TableField("risk_property")
     private Integer riskProperty;
     @TableField("permanent_population")
     private Integer permanentPopulation;
-    @TableField("house")
-    private Integer house;
+    @TableField("housing")
+    private Integer housing;
     @TableField("inspector_name")
     private String inspectorName;
     @TableField("inspector_tele")
     private String inspectorTele;
+    @TableField("lon")
+    private Double lon;
+    @TableField("lat")
+    private Double lat;
 
 
 }
