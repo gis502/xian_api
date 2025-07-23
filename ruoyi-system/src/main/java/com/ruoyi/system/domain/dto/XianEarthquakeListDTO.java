@@ -1,7 +1,5 @@
 package com.ruoyi.system.domain.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 /**
@@ -35,6 +33,4 @@ public class XianEarthquakeListDTO {
     private String district;
     private String province;
     private String city;
-
-
 }
