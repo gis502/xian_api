@@ -1,5 +1,8 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ruoyi.system.domain.entity.XianEarthquakeList;
+import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import com.ruoyi.system.service.IXianEarthquakeListService;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,11 @@ import java.util.Map;
 
 @Service
 public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService {
-
-
+    @Resource
+    private XianEarthquakeListMapper xianEarthquakeListMapper;
+    @Override
+    public List<XianEarthquakeList> selectAllEq() {
+        System.out.println(xianEarthquakeListMapper.selectList()+",xianEarthquakeListMapper.selectList()");
+        return xianEarthquakeListMapper.selectList();
+    }
 }

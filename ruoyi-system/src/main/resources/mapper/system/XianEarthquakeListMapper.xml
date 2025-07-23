@@ -3,6 +3,29 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.XianEarthquakeListMapper">
-
+    <select id="selectList" resultType="com.ruoyi.system.domain.entity.XianEarthquakeList">
+        SELECT
+            eqid,
+            earthquake_name,
+            earthquake_full_name,
+            eq_addr,
+            ST_AsText(geom) AS geom,
+            intensity,
+            depth,
+            occurrence_time,
+            eq_type,
+            source,
+            eq_addr_code,
+            town_code,
+            is_deleted,
+            magnitude,
+            create_time,
+            update_time,
+            district,
+            province,
+            city
+        FROM xian_earthquake_list
+        ORDER BY occurrence_time DESC
+    </select>
 </mapper>
 
