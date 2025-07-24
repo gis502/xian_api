@@ -38,8 +38,6 @@ public class GeologicalDisasterRiskServiceImpl implements IGeologicalDisasterRis
     }
 
 
-
-
     // 格式化数据
     private Map<String, List> processDisasters(List<GeologicalDisasterRisk> disasters) {
 
