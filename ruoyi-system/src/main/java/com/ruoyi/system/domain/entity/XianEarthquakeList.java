@@ -21,9 +21,8 @@ public class XianEarthquakeList {
   private String earthquakeName;
   @TableField("earthquake_full_name")
   private String earthquakeFullName;
-  @TableField("eq_addr")
-  private String eqAddr;
-
+  @TableField("position")
+  private String position;
   @TableField("geom")
   private String geom;
 //
