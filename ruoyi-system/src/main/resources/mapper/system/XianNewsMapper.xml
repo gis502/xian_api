@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianNewsMapper">
+  <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.XianNews">
+    <!--@mbg.generated-->
+    <!--@Table xian_news-->
+    <id column="new_id" jdbcType="INTEGER" property="newId" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="image" jdbcType="VARCHAR" property="image" />
+    <result column="source_name" jdbcType="VARCHAR" property="sourceName" />
+    <result column="publish_name" jdbcType="VARCHAR" property="publishName" />
+    <result column="new_entity" jdbcType="VARCHAR" property="newEntity" />
+    <result column="earthquake_id" jdbcType="INTEGER" property="earthquakeId" />
+    <result column="disaster_id" jdbcType="INTEGER" property="disasterId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    new_id, url, title, publish_time, content, image, source_name, publish_name, new_entity, 
+    earthquake_id, disaster_id
+  </sql>
+</mapper>
