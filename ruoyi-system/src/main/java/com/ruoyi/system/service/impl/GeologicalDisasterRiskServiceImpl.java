@@ -34,7 +34,7 @@ public class GeologicalDisasterRiskServiceImpl implements IGeologicalDisasterRis
         Map<String, List> processedList = processDisasters(riskList);
         processedList.put("DangerAreaData", processedList.get("features"));
 
-        return null;
+        return (HashMap<String, List>) processedList;
     }
 
 
