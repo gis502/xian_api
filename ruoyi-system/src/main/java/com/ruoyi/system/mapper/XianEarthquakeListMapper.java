@@ -2,11 +2,14 @@ package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
-import org.springframework.stereotype.Service;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-@Service
+@Mapper
 public interface XianEarthquakeListMapper extends BaseMapper<XianEarthquakeList> {
-    List<XianEarthquakeList> selectList();
+    List<XianEarthquakeList> selectAllEq();
+
+    XianEarthquakeList getEarthquakeEventById(@Param("id") String id);
 }

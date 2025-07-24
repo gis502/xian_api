@@ -16,11 +16,4 @@ import java.util.List;
 
 @Service
 public class XianDisasterRainImpl implements IXianDisasterRainService {
-    @Resource
-    private XianDisasterRainMapper xianDisasterRainMapper;
-    @Override
-    public List<XianDisasterRain> selectAllEq() {
-        System.out.println(xianDisasterRainMapper.selectList()+",xianEarthquakeListMapper.selectList()");
-        return xianDisasterRainMapper.selectList();
-    }
 }

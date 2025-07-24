@@ -6,6 +6,4 @@ import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import java.util.List;
 
 public interface IXianEarthquakeListService {
-    List<XianEarthquakeList> selectAllEq();
-
 }

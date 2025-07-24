@@ -20,11 +20,4 @@ import java.util.Map;
 
 @Service
 public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService {
-    @Resource
-    private XianEarthquakeListMapper xianEarthquakeListMapper;
-    @Override
-    public List<XianEarthquakeList> selectAllEq() {
-        System.out.println(xianEarthquakeListMapper.selectList()+",xianEarthquakeListMapper.selectList()");
-        return xianEarthquakeListMapper.selectList();
-    }
 }
