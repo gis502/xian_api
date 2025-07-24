@@ -16,7 +16,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             is_deleted,
             ST_AsText(geom) AS geom
         FROM xian_disaster_rain
-        ORDER BY occur_time DESC
+        ORDER BY occurrence_time DESC
     </select>
     <select id="getDisasterRainById" resultType="com.ruoyi.system.domain.entity.XianDisasterRain">
         SELECT
