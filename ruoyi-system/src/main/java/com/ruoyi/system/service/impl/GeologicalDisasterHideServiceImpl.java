@@ -1,17 +1,24 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.system.domain.dto.FactorAttributeDTO;
+import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
+import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.vo.HideVO;
 import com.ruoyi.system.mapper.GeologicalDisasterHideMapper;
+import com.ruoyi.system.service.IFactorAttributeService;
+import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IGeologicalDisasterHideService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author: xiaodemos
@@ -19,85 +26,122 @@ import java.util.*;
  * @description: 获取地质灾害隐患点实现类
  */
 
+@Slf4j
 @Service
 public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHideService {
 
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
+    @Resource
+    private IFactorValueService factorValueService;
+    @Resource
+    private IFactorAttributeService factorAttributeService;
 
+    // 获取滑坡隐患点数据
     @Override
-    public HashMap<String,Map> getGeologicalDisasterHideList() {
+    public List<HideVO> getGeologicalDisasterHideByLandSlideList() {
 
-        QueryWrapper wrapper = new QueryWrapper();
-        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
-        wrapper.eq("disaster_type","滑坡");
-        // 滑坡数据
-        List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
-        // 泥石流数据
-        List<GeologicalDisasterHide> debrisFlow = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
-        // 合并后的数据
-        HashMap<String, Map> mergedData = mergeData(landSlide, debrisFlow);
+        // 获取滑坡隐患点数据
+        List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.
+                selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
+        // 滑坡数据传输对象
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+        // 隐患点视图对象
+        List<HideVO> hideVOlist = new ArrayList<>();
 
-        return mergedData;
-    }
+        // 获取因子值表中所有的 hideId
+        List<FactorValueDTO> factorValueDTOs = factorValueService.getAllHideId();
 
-    // 合并风险点数据
-    private HashMap<String,Map> mergeData(List<GeologicalDisasterHide> landSlide, List<GeologicalDisasterHide> debrisFlow) {
+        Set<Integer> hideIdSet = factorValueDTOs.stream()
+                // 过滤掉hideId为null的情况，避免空指针
+                .filter(dto -> dto.getHideId() != null)
+                .map(FactorValueDTO::getHideId)
+                .collect(Collectors.toSet());
 
-        HashMap<String, Map> hashMap = new HashMap<>();
-        Map<String, List> slidefeatures = processDisasters(landSlide, "滑坡");
-        Map<String, List> flowfeatures = processDisasters(debrisFlow, "泥石流");
+        // 筛选出所有存在因子的 hideId
+        for (GeologicalDisasterHide disaster : landSlide) {
+            Integer disasterId = disaster.getId();
 
-        hashMap.put("slide", slidefeatures);
-        hashMap.put("flow", flowfeatures);
-
-        return hashMap;
-    }
-
-    // 格式化数据
-    private Map<String, List> processDisasters(List<GeologicalDisasterHide> disasters, String disasterType) {
-
-        if (disasters == null || disasters.isEmpty()) {
-            return null;
+            if (disasterId != null && hideIdSet.contains(disasterId)) {
+                GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
+                BeanUtils.copyProperties(disaster, hideDTO);
+                hideDTOlist.add(hideDTO);
+            }
         }
 
-        List lists = new ArrayList<>();
-        Map<String, List> features = new HashMap<>();
+        // 根据隐患点Id查询对应的因子值
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            // 根据ID查询 value 中的值  联表查询
+            List<FactorVO> valueDTOList = factorValueService.getFactorValueByHideId(hideDTO.getId());
+            HideVO merged = mergeData(hideDTO, valueDTOList,"滑坡");
 
-        for (GeologicalDisasterHide disaster : disasters) {
-            // 创建特征对象
-            Map<String, Object> feature = new HashMap<>();
-
-            // 创建属性对象
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("fieldCode", disaster.getFieldCode());
-            properties.put("disasterName", disaster.getDisasterName());
-            properties.put("longitude", disaster.getLongitude());
-            properties.put("latitude", disaster.getLatitude());
-            properties.put("lon", disaster.getLon());
-            properties.put("lat", disaster.getLat());
-            properties.put("position", disaster.getPosition());
-            properties.put("disasterType", disasterType);
-            properties.put("scaleGrade", disaster.getScaleGrade());
-            properties.put("riskGrade", disaster.getRiskGrade());
-
-            Map<String, Object> geometry = new HashMap<>();
-            // coordinates为经度、纬度的数组
-            List<Double> coordinates = new ArrayList<>();
-            coordinates.add(disaster.getLon());  // 经度
-            coordinates.add(disaster.getLat());  // 纬度
-            geometry.put("coordinates", coordinates);
-
-            // 组装特征对象
-            feature.put("properties", properties);
-            feature.put("geometry", geometry);
-
-            lists.add(feature);
+            hideVOlist.add( merged);
         }
 
-        features.put("features", lists);
+        log.info("查询滑坡隐患点数据成功{}",hideVOlist);
 
-        return features;
+        // 返回视图对象
+        return hideVOlist;
+    }
+
+    // 获取泥石流隐患点数据
+    @Override
+    public List<HideVO> getGeologicalDisasterHideByFlowList() {
+
+        // 获取泥石流隐患点数据
+        List<GeologicalDisasterHide> debrisFlows = geologicalDisasterHideMapper.
+                selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
+//        // 创建传输对象
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+//        // 隐患点视图对象
+        List<HideVO> hideVOlist = new ArrayList<>();
+//
+//        // 获取因子值表中所有的 hideId
+//        List<FactorValueDTO> factorValueDTOs = factorValueService.getAllHideId();
+//
+//        Set<Integer> hideIdSet = factorValueDTOs.stream()
+//                // 过滤掉hideId为null的情况，避免空指针
+//                .filter(dto -> dto.getHideId() != null)
+//                .map(FactorValueDTO::getHideId)
+//                .collect(Collectors.toSet());
+//
+//        // 筛选出所有存在因子的 hideId
+        for (GeologicalDisasterHide disaster : debrisFlows) {
+//            Integer disasterId = disaster.getId();
+
+//            if (disasterId != null && hideIdSet.contains(disasterId)) {
+                GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
+                BeanUtils.copyProperties(disaster, hideDTO);
+                hideDTOlist.add(hideDTO);
+//            }
+        }
+
+        // 根据隐患点Id查询对应的因子值
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            // 根据ID查询 value 中的值  联表查询
+//            List<FactorVO> valueDTOList = factorValueService.getFactorValueByHideId(hideDTO.getId());
+            HideVO merged = mergeData(hideDTO, null,"泥石流");
+
+            hideVOlist.add(merged);
+        }
+
+        // 返回视图对象
+        return hideVOlist;
+    }
+
+    private HideVO mergeData(GeologicalDisasterHideDTO hideDTO,List<FactorVO> valueDTOList,String type){
+
+        HideVO hideVO = new HideVO();
+        if (type.equals("泥石流")){
+            hideVO.setGeologicalDisasterHideDTO(hideDTO);
+            hideVO.setFactorVoList(null);
+            return hideVO;
+        }
+        // TODO 目前只有滑坡有分析值
+        hideVO.setGeologicalDisasterHideDTO(hideDTO);
+        hideVO.setFactorVoList(valueDTOList);
+
+        return hideVO;
     }
 
 
