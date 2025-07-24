@@ -3,6 +3,7 @@ package com.ruoyi.web.controller.system;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.service.IGeologicalDisasterHideService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,19 +21,25 @@ import java.util.List;
 
 
 @RestController
+@RequestMapping("/hide")
 public class GeologicalDisasterHideController {
 
     @Resource
     private IGeologicalDisasterHideService geologicalDisasterHideService;
 
-
-    @GetMapping("/hide/disaster")
-    public AjaxResult getGeologicalDisasterHideList()
+    @GetMapping("/slide")
+    @ApiOperation(value = "获取滑坡隐患点数据")
+    public AjaxResult getGeologicalDisasterHideByLandSlideList()
     {
-        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideList());
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideByLandSlideList());
     }
 
-
+    @GetMapping("/flow")
+    @ApiOperation(value = "获取泥石流隐患点数据")
+    public AjaxResult getGeologicalDisasterHideByFlowList()
+    {
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideByFlowList());
+    }
 
 
 
