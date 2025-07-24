@@ -13,6 +13,7 @@ import lombok.Data;
 @Data
 public class GeologicalDisasterHideDTO {
 
+    private Integer id;
     // 野外编号
     private String fieldCode;
     // 县

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author: xiaodemos
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @description:
  */
 
-
+@EnableTransactionManagement(proxyTargetClass = true)
 @Configuration
 @MapperScan("com.ruoyi.system.mapper") // 确保扫描到 Mapper 接口
 public class MybatisPlusConfig
@@ -30,8 +31,10 @@ public class MybatisPlusConfig
         interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
         // 阻断插件
         interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
+
         // 自动填充插件
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+
 
         return interceptor;
     }
