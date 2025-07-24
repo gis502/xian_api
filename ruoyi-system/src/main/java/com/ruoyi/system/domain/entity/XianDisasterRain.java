@@ -10,8 +10,8 @@ import lombok.Data;
 public class XianDisasterRain {
   @TableField("disaster_name")
   private String disasterName;
-  @TableField("occur_time")
-  private java.sql.Timestamp occurTime;
+  @TableField("occurrence_time")
+  private java.sql.Timestamp occurrenceTime;
   @TableField("rainfall")
   private String rainfall;
   @TableField("duration")

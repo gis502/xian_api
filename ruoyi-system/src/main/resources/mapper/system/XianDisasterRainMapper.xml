@@ -7,7 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             disaster_id,
             disaster_name,
-            occur_time,
+            occurrence_time,
             rainfall,
             duration,
             position,
@@ -22,7 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             disaster_id,
             disaster_name,
-            occur_time,
+            occurrence_time,
             rainfall,
             duration,
             position,
