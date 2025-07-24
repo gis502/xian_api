@@ -144,5 +144,77 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         return hideVO;
     }
 
+    @Override
+    public HashMap<String,List> getGeologicalDisasterBySlideList() {
+
+        QueryWrapper wrapper = new QueryWrapper();
+        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
+        wrapper.eq("disaster_type","滑坡");
+        // 滑坡数据
+        List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
+        // 泥石流数据
+        Map<String,List> map = processDisasters(landSlide, "滑坡");
+
+        return (HashMap<String, List>) map;
+    }
+
+    @Override
+    public HashMap<String,List> getGeologicalDisasterByFlowList() {
+
+        QueryWrapper wrapper = new QueryWrapper();
+        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
+        wrapper.eq("disaster_type","泥石流");
+        // 滑坡数据
+        List<GeologicalDisasterHide> Flow = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
+        // 泥石流数据
+        Map<String,List> map = processDisasters(Flow, "泥石流");
+
+        return (HashMap<String, List>) map;
+    }
+
+    private Map<String, List> processDisasters(List<GeologicalDisasterHide> disasters, String disasterType) {
+
+        if (disasters == null || disasters.isEmpty()) {
+            return null;
+        }
+
+        List lists = new ArrayList<>();
+        Map<String, List> features = new HashMap<>();
+
+        for (GeologicalDisasterHide disaster : disasters) {
+            // 创建特征对象
+            Map<String, Object> feature = new HashMap<>();
+
+            // 创建属性对象
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("fieldCode", disaster.getFieldCode());
+            properties.put("disasterName", disaster.getDisasterName());
+            properties.put("longitude", disaster.getLongitude());
+            properties.put("latitude", disaster.getLatitude());
+            properties.put("lon", disaster.getLon());
+            properties.put("lat", disaster.getLat());
+            properties.put("position", disaster.getPosition());
+            properties.put("disasterType", disasterType);
+            properties.put("scaleGrade", disaster.getScaleGrade());
+            properties.put("riskGrade", disaster.getRiskGrade());
+
+            Map<String, Object> geometry = new HashMap<>();
+            // coordinates为经度、纬度的数组
+            List<Double> coordinates = new ArrayList<>();
+            coordinates.add(disaster.getLon());  // 经度
+            coordinates.add(disaster.getLat());  // 纬度
+            geometry.put("coordinates", coordinates);
+
+            // 组装特征对象
+            feature.put("properties", properties);
+            feature.put("geometry", geometry);
+
+            lists.add(feature);
+        }
+
+        features.put("features", lists);
+
+        return features;
+    }
 
 }
