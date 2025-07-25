@@ -29,6 +29,8 @@ public class FactorAnalysis {
     private Double probability;
     @TableField("predicted_occur")
     private Integer predictedOccur;
+    @TableField("level")
+    private String level;
     @TableField("actual_occur")
     private Integer actualOccur;
     @TableField("create_time")
@@ -37,8 +39,5 @@ public class FactorAnalysis {
     private LocalDateTime updateTime;
     @TableField("is_deleted")
     private Integer isDeleted;
-
-
-
 
 }

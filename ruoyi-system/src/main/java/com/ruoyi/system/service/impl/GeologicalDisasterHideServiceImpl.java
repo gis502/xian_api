@@ -78,8 +78,6 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
             hideVOlist.add( merged);
         }
 
-        log.info("查询滑坡隐患点数据成功{}",hideVOlist);
-
         // 返回视图对象
         return hideVOlist;
     }
