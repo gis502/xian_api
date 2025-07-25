@@ -41,6 +41,19 @@ public class GeologicalDisasterHideController {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideByFlowList());
     }
 
+    @GetMapping("/allslide")
+    @ApiOperation(value = "获取滑坡隐患点数据")
+    public AjaxResult getAllGeologicalDisasterHideByLandSlideList()
+    {
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalAllDisasterHideByLandSlideList());
+    }
+
+    @GetMapping("/allflow")
+    @ApiOperation(value = "获取全部泥石流点数据")
+    public AjaxResult getAllGeologicalDisasterHideByFlowList()
+    {
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalAllDisasterHideByFlowList());
+    }
 
 
 }

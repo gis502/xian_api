@@ -27,11 +27,7 @@ public class AroundAnalysisController {
         return AjaxResult.success(geologicalDisasterRiskService.getGeologicalDisasterRiskList());
     }
 
-    @GetMapping("/hide_disaster")
-    public AjaxResult getGeologicalDisasterHideList()
-    {
-        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideList());
-    }
+
 
     @GetMapping("/mountain_torrent")
     public AjaxResult getMountainTorrentDisasterList()
