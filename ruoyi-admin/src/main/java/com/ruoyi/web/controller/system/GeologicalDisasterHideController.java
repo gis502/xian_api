@@ -42,7 +42,7 @@ public class GeologicalDisasterHideController {
     }
 
     @GetMapping("/allslide")
-    @ApiOperation(value = "获取滑坡隐患点数据")
+    @ApiOperation(value = "获取全部滑坡隐患点数据")
     public AjaxResult getAllGeologicalDisasterHideByLandSlideList()
     {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalAllDisasterHideByLandSlideList());
