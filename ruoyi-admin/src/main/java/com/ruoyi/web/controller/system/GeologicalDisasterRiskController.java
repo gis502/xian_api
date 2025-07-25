@@ -30,6 +30,14 @@ public class GeologicalDisasterRiskController {
         return AjaxResult.success(geologicalDisasterRiskService.getGeologicalDisasterRiskList());
     }
 
+    @GetMapping("/getAllvillages")
+    @ApiOperation(value = "获取全部风险区村庄数据")
+    public AjaxResult getGeologicalDisasterAllRiskList()
+    {
+        return AjaxResult.success(geologicalDisasterRiskService.getGeologicalAllRisk());
+    }
+
+
 
 
 }
