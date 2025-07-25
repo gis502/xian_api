@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EarthquakeRainMapper">
+
+    <select id="selectEarthquakeRainPage" resultType="com.ruoyi.system.domain.dto.EarthquakeRainDTO">
+        SELECT
+        e.disaster_id AS earthquakeDisasterId,
+        NULL AS rainDisasterId,
+        e.disaster_name AS disasterName,
+        e.earthquake_full_name,
+        e.position AS earthquakeDisasterPosition,
+        NULL AS rainDisasterPosition,
+        e.magnitude,
+        e.intensity,
+        e.occurrence_time AS occurTime,
+        e.eq_type,
+        NULL AS rainfall,
+        NULL AS duration,
+        'earthquake' AS disasterType
+        FROM xian_earthquake_list e
+        WHERE e.is_deleted = 0
+
+        UNION ALL
+
+        SELECT
+        NULL AS earthquakeDisasterId,
+        d.disaster_id AS rainDisasterId,
+        d.disaster_name AS disasterName,
+        NULL AS earthquake_full_name,
+        NULL AS earthquakeDisasterPosition,
+        d.position AS rainDisasterPosition,
+        NULL AS magnitude,
+        NULL AS intensity,
+        d.occurrence_time AS occurTime,
+        NULL AS eq_type,
+        d.rainfall,
+        d.duration,
+        'rain' AS disasterType
+        FROM xian_disaster_rain d
+        WHERE d.is_deleted = '0'
+
+        ORDER BY occurTime DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+
+
+    <select id="countTotal" resultType="int">
+        SELECT
+                (SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0) +
+                (SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = '0')
+    </select>
+</mapper>
