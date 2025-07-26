@@ -2,9 +2,9 @@
 spring:
     neo4j:
         uri: bolt://47.92.216.173:7687
-        #    authentication:
-        #      username: neo4j
-        #      password: neo4j123456
+#        authentication:
+#              username: neo4j
+#              password: Zzw.0401
         pool:
             metrics-enabled: true
     datasource:

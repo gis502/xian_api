@@ -127,6 +127,20 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         return hideVOlist;
     }
 
+    // 获取全部滑坡点数据
+    @Override
+    public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByLandSlideList(){
+        List<GeologicalDisasterHide> debrisSlides = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
+        return debrisSlides;
+    }
+
+    //获取全部泥石流点数据
+    @Override
+    public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByFlowList(){
+        List<GeologicalDisasterHide> debrisFlows = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
+        return debrisFlows;
+    }
+
     private HideVO mergeData(GeologicalDisasterHideDTO hideDTO,List<FactorVO> valueDTOList,String type){
 
         HideVO hideVO = new HideVO();

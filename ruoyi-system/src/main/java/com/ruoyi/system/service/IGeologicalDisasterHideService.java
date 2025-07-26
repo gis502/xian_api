@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
 import com.ruoyi.system.domain.vo.HideVO;
 
 import java.util.HashMap;
@@ -13,5 +14,11 @@ public interface IGeologicalDisasterHideService {
 
     // 获取泥石流隐患点数据
     public List<HideVO> getGeologicalDisasterHideByFlowList();
+
+    // 获取全部滑坡点数据
+    public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByLandSlideList();
+
+    // 获取全部泥石流点数据
+    public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByFlowList();
 
 }

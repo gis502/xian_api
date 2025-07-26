@@ -37,7 +37,14 @@ public class GeologicalDisasterRiskServiceImpl implements IGeologicalDisasterRis
         return (HashMap<String, List>) processedList;
     }
 
+    @Override
+    public HashMap<String, List> getGeologicalAllRisk(){
 
+        List<GeologicalDisasterRisk> riskList = geologicalDisasterRiskMapper.selectList(null);
+        Map<String, List> processedList = processDisasters(riskList);
+
+        return (HashMap<String, List>) processedList;
+    }
 
 
     // 格式化数据

@@ -7,6 +7,7 @@ public interface IGeologicalDisasterRiskService {
 
     // 获取风险区数据
     public HashMap<String, List> getGeologicalDisasterRiskList();
+    public HashMap<String, List> getGeologicalAllRisk();
 
 
 }
