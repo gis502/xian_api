@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
@@ -13,7 +12,6 @@ import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.mapper.FactorAnalysisMapper;
 import com.ruoyi.system.mapper.FactorValueMapper;
 import com.ruoyi.system.mapper.GeologicalDisasterHideMapper;
-import com.ruoyi.system.mapper.GeologicalDisasterRiskMapper;
 import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,23 +21,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class IModelServiceImpl implements IModelService {
-    private static final double INTERCEPT = 1.308;          // 常量
-    private static final double ELEVATION_COEF = -2.327e-5; // 高程
-    private static final double SLOPE_COEF = -0.036;        // 坡度
-    private static final double SOIL_TYPE_COEF = -0.004;    // 岩土类型
-    private static final double LAND_USE_COEF = -0.034;     // 土地利用类型
-    private static final double VEGETATION_COEF = -0.008;   // 植被覆盖率
-    private static final double CURVATURE_COEF = 0.049;     // 坡面曲率
-    private static final double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
-    private static final double SLOPE_SHAPE_COEF = 0.018;    // 坡型
 
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
@@ -101,7 +87,7 @@ public class IModelServiceImpl implements IModelService {
                                                                 .map(factor -> (String) factor.getFactorValue())
                                                                 .findFirst()
                                                                 .orElse(null));
-            double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -168,7 +154,7 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -237,7 +223,7 @@ public class IModelServiceImpl implements IModelService {
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
-            double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -304,7 +290,7 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -322,6 +308,83 @@ public class IModelServiceImpl implements IModelService {
         return modelGetDataDTO;
     }
 
+    // 暴雨滑坡模型计算概率值
+    private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+        double INTERCEPT = 1.308;          // 常量
+        double ELEVATION_COEF = -2.327e-5; // 高程
+        double SLOPE_COEF = -0.036;        // 坡度
+        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
+        double LAND_USE_COEF = -0.034;     // 土地利用类型
+        double VEGETATION_COEF = -0.008;   // 植被覆盖率
+        double CURVATURE_COEF = 0.049;     // 坡面曲率
+        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
+        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+
+        // 计算各项的贡献值
+        double elevationTerm = ELEVATION_COEF * elevation;
+        double slopeTerm = SLOPE_COEF * slope;
+        double soilTypeTerm = SOIL_TYPE_COEF * soilType;
+        double landUseTerm = LAND_USE_COEF * landUseType;
+        double vegetationTerm = VEGETATION_COEF * vegetationCover;
+        double curvatureTerm = CURVATURE_COEF * curvature;
+        double sandContentTerm = SAND_CONTENT_COEF * sandContent;
+        double slopeShapeTerm = SLOPE_SHAPE_COEF * slopeShape;
+
+        // 计算总概率（使用线性组合）
+        double probability = INTERCEPT
+                + elevationTerm
+                + slopeTerm
+                + soilTypeTerm
+                + landUseTerm
+                + vegetationTerm
+                + curvatureTerm
+                + sandContentTerm
+                + slopeShapeTerm;
+
+        // 确保概率在合理范围内（0-1之间）
+        return Math.max(0, Math.min(1, probability));
+//        return probability;
+    }
+
+    // 地震滑坡模型计算概率值
+    private static double calculateEqLandslideProbability(double elevation, double slope, int soilType, int landUseType, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+        double INTERCEPT = 1.408;          // 常量
+        double ELEVATION_COEF = -2.327e-5; // 高程
+        double SLOPE_COEF = -0.036;        // 坡度
+        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
+        double LAND_USE_COEF = -0.034;     // 土地利用类型
+        double VEGETATION_COEF = -0.008;   // 植被覆盖率
+        double CURVATURE_COEF = 0.049;     // 坡面曲率
+        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
+        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+
+        // 计算各项的贡献值
+        double elevationTerm = ELEVATION_COEF * elevation;
+        double slopeTerm = SLOPE_COEF * slope;
+        double soilTypeTerm = SOIL_TYPE_COEF * soilType;
+        double landUseTerm = LAND_USE_COEF * landUseType;
+        double vegetationTerm = VEGETATION_COEF * vegetationCover;
+        double curvatureTerm = CURVATURE_COEF * curvature;
+        double sandContentTerm = SAND_CONTENT_COEF * sandContent;
+        double slopeShapeTerm = SLOPE_SHAPE_COEF * slopeShape;
+
+        // 计算总概率（使用线性组合）
+        double probability = INTERCEPT
+                + elevationTerm
+                + slopeTerm
+                + soilTypeTerm
+                + landUseTerm
+                + vegetationTerm
+                + curvatureTerm
+                + sandContentTerm
+                + slopeShapeTerm;
+
+        // 确保概率在合理范围内（0-1之间）
+        return Math.max(0, Math.min(1, probability));
+//        return probability;
+    }
+
+    // 更新FactorValue表数据
     private void updataFactorValue(List<FactorVO> factorVoList){
         for(FactorVO f:factorVoList){
             FactorValue factorValue = new FactorValue();
@@ -334,7 +397,6 @@ public class IModelServiceImpl implements IModelService {
             factorValueMapper.update(null, updateWrapper);
         }
     }
-
     // 插入数据到FactorAnalysis
     private void insertFactorAnalysis(List<FactorVO> factorVoList,FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability){
         for(FactorVO f:factorVoList){
@@ -367,34 +429,6 @@ public class IModelServiceImpl implements IModelService {
         modelGetDataDTO.setPredict(factorAnalysisLevelProbability);
 
         return modelGetDataDTO;
-    }
-    // 暴雨滑坡模型计算概率值
-    private static double calculateLandslideProbability(double elevation, double slope, int soilType, int landUseType, double vegetationCover, double curvature, double sandContent, int slopeShape) {
-
-        // 计算各项的贡献值
-        double elevationTerm = ELEVATION_COEF * elevation;
-        double slopeTerm = SLOPE_COEF * slope;
-        double soilTypeTerm = SOIL_TYPE_COEF * soilType;
-        double landUseTerm = LAND_USE_COEF * landUseType;
-        double vegetationTerm = VEGETATION_COEF * vegetationCover;
-        double curvatureTerm = CURVATURE_COEF * curvature;
-        double sandContentTerm = SAND_CONTENT_COEF * sandContent;
-        double slopeShapeTerm = SLOPE_SHAPE_COEF * slopeShape;
-
-        // 计算总概率（使用线性组合）
-        double probability = INTERCEPT
-                + elevationTerm
-                + slopeTerm
-                + soilTypeTerm
-                + landUseTerm
-                + vegetationTerm
-                + curvatureTerm
-                + sandContentTerm
-                + slopeShapeTerm;
-
-        // 确保概率在合理范围内（0-1之间）
-        return Math.max(0, Math.min(1, probability));
-//        return probability;
     }
     // 判断岩土类型
     private static int soilTypeToCode(String soilType) {
