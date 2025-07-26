@@ -110,14 +110,14 @@ public class IModelServiceImpl implements IModelService {
             }else{
                 level="高";
             }
-            FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability = new FactorAnalysisLevelProbabilityVO();
-            factorAnalysisLevelProbability.setLevel(level);
-            factorAnalysisLevelProbability.setProbability(probability);
+            FactorAnalysisLevelProbabilityVO predict = new FactorAnalysisLevelProbabilityVO();
+            predict.setLevel(level);
+            predict.setProbability(probability);
             List<FactorVO> factorVO = factorValueService.getFactorValueByHideId(hideId);
-            ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorVO);
+            ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,predict,factorVO);
 
             list.add(modelGetDataDTO);
-            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getFactorAnalysisLevelProbability());
+            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
         }
         return list;
     };
@@ -182,12 +182,13 @@ public class IModelServiceImpl implements IModelService {
         factorAnalysisLevelProbability.setProbability(probability);
         ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorList);
         updataFactorValue(modelGetDataDTO.getFactorVoList());
-        insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getFactorAnalysisLevelProbability());
+        insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
         return modelGetDataDTO;
     }
 
     @Override
-    public List<ModelGetDataDTO> eqSlideTrigger(List<ModelGetDataFactorListEntityIdDTO>  factorList){
+    public List<ModelGetDataDTO> eqSlideTrigger(List<ModelGetDataFactorListEntityIdDTO> factorList){
+
         List<ModelGetDataDTO> list = new ArrayList<>();
         String entityId = "";
         for(int i=0;i<factorList.size();i++){
@@ -252,11 +253,74 @@ public class IModelServiceImpl implements IModelService {
             ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorVO);
             modelGetDataDTO.setEntityId(entityId);
             list.add(modelGetDataDTO);
-            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getFactorAnalysisLevelProbability());
+            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
         }
         return list;
     }
 
+    @Override
+    public ModelGetDataDTO eqSlideFactorUpdata(List<FactorVO> factorList){
+        if(factorList==null||factorList.size()==0){
+            return null;
+        }
+        int hideId = factorList.get(0).getHideId();
+        double elevation = Double.parseDouble(factorList.stream()
+                .filter(factor -> "高程".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double slope = Double.parseDouble(factorList.stream()
+                .filter(factor -> "坡度".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        int soilType = soilTypeToCode(factorList.stream()
+                .filter(factor -> "岩土类型".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        int landUseType = landUseToCode(factorList.stream()
+                .filter(factor -> "土地利用类型".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double vegetationCover = Double.parseDouble(factorList.stream()
+                .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double curvature = Double.parseDouble(factorList.stream()
+                .filter(factor -> "坡面曲率".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double sandContent = Double.parseDouble(factorList.stream()
+                .filter(factor -> "土壤沙砾度".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        int slopeShape = slopeShapeToCode(factorList.stream()
+                .filter(factor -> "坡型".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+        String level;
+        if(probability<=0.3){
+            level="低";
+        }else if(probability<=0.7){
+            level="中";
+        }else{
+            level="高";
+        }
+        FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability = new FactorAnalysisLevelProbabilityVO();
+        factorAnalysisLevelProbability.setLevel(level);
+        factorAnalysisLevelProbability.setProbability(probability);
+        ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorList);
+        updataFactorValue(modelGetDataDTO.getFactorVoList());
+        insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
+        return modelGetDataDTO;
+    }
 
     private void updataFactorValue(List<FactorVO> factorVoList){
         for(FactorVO f:factorVoList){
@@ -300,7 +364,7 @@ public class IModelServiceImpl implements IModelService {
         // 组合拼接成ModelGetDataDTO
         modelGetDataDTO.setGeologicalDisasterHideDTO(hideDTO);
         modelGetDataDTO.setFactorVoList(fVO);
-        modelGetDataDTO.setFactorAnalysisLevelProbability(factorAnalysisLevelProbability);
+        modelGetDataDTO.setPredict(factorAnalysisLevelProbability);
 
         return modelGetDataDTO;
     }

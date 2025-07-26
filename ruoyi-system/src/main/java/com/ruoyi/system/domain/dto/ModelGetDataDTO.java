@@ -14,5 +14,7 @@ public class ModelGetDataDTO {
     // 因子值
     private List<FactorVO> factorVoList;
     // 预测结果
-    private FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability;
+    private FactorAnalysisLevelProbabilityVO predict;
+    // 实体id
+    private String entityId;
 }
