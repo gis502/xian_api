@@ -22,11 +22,20 @@ public class XianNewsController {
     private XianNewsService xianNewsService;
 
     @GetMapping("/list")
-    public R getNewsPage(@RequestParam int pageNum,
-                         @RequestParam int pageSize) {
-        IPage<XianNews> page = xianNewsService.getPageList(pageNum, pageSize);
-        return R.ok(page); // R 是统一返回对象
+    public R getNewsPage(
+            @RequestParam int pageNum,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String disasterType,
+            @RequestParam(required = false) Integer earthquakeDisasterId,
+            @RequestParam(required = false) Integer rainDisasterId) {
+        System.out.println(pageSize+ " " + pageNum);
+        System.out.println(disasterType + " " + earthquakeDisasterId + " " + rainDisasterId);
+
+        // 根据灾害类型及对应ID查询新闻
+        IPage<XianNews> page = xianNewsService.getFilteredNews(pageNum, pageSize, disasterType, earthquakeDisasterId, rainDisasterId);
+        return R.ok(page);
     }
+
 
 
 
