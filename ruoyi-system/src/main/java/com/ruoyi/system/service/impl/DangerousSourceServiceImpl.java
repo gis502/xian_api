@@ -22,7 +22,6 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
 
         List<DangerousSource> dangerousSourceList = dangerousSourceMapper.selectList(null);
         Map<String, List> dangerousSourceMap = processDangerous(dangerousSourceList);
-        dangerousSourceMap.put("DangerousSourceData", dangerousSourceMap.get("features"));
 
         return (HashMap<String, List>) dangerousSourceMap;
     }
@@ -37,16 +36,19 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", dangerousSource.getName());
-            properties.put("address", dangerousSource.getAddress());
+            properties.put("dangerName", dangerousSource.getName());
+            properties.put("unitCode", dangerousSource.getUnitCode());
+            properties.put("position", dangerousSource.getAddress());
             properties.put("province", dangerousSource.getProvince());
             properties.put("city", dangerousSource.getCity());
             properties.put("county", dangerousSource.getCounty());
             properties.put("country", dangerousSource.getCountry());
             properties.put("enterpriseType", dangerousSource.getEnterpriseType());
             properties.put("level", dangerousSource.getLevel());
+            properties.put("lon", dangerousSource.getLongitude());
+            properties.put("lat", dangerousSource.getLatitude());
             properties.put("unitHead", dangerousSource.getUnitHead());
-            properties.put("telephone", dangerousSource.getTelephone());
+            properties.put("phone", dangerousSource.getTelephone());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();

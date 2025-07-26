@@ -13,6 +13,8 @@ public class DangerousSource {
     private Integer id;
     @TableField("name")
     private String name;
+    @TableField("unit_code")
+    private String unitCode;
     @TableField("address")
     private String address;
     @TableField("enterprise_type")

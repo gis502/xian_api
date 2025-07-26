@@ -20,7 +20,6 @@ public class HospitalServiceImpl implements IHospitalService {
     public HashMap<String, List> getHospitalList() {
         List<Hospital> hospitalList = hospitalMapper.selectList(null);
         Map<String, List> hospitalMap = processHospital(hospitalList);
-        hospitalMap.put("HospitalData", hospitalMap.get("features"));
 
         return (HashMap<String, List>) hospitalMap;
     }
