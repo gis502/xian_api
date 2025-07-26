@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("analysis_dangerous_source")
-public class DangerousSource {
+@TableName("analysis_shelter")
+public class EmergencyShelter {
 
     @TableId
     private Integer id;
@@ -15,10 +15,16 @@ public class DangerousSource {
     private String name;
     @TableField("address")
     private String address;
-    @TableField("enterprise_type")
-    private String enterpriseType;
+    @TableField("type")
+    private String type;
     @TableField("level")
     private String level;
+    @TableField("volume")
+    private Integer volume;
+    @TableField("department")
+    private String department;
+    @TableField("store")
+    private String store;
     @TableField("province")
     private String province;
     @TableField("city")

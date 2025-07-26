@@ -45,7 +45,6 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
             properties.put("country", dangerousSource.getCountry());
             properties.put("enterpriseType", dangerousSource.getEnterpriseType());
             properties.put("level", dangerousSource.getLevel());
-            properties.put("position", dangerousSource.getPosition());
             properties.put("unitHead", dangerousSource.getUnitHead());
             properties.put("telephone", dangerousSource.getTelephone());
 

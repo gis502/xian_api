@@ -1,9 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.service.IDangerousSourceService;
-import com.ruoyi.system.service.IFireFighterService;
-import com.ruoyi.system.service.IHospitalService;
+import com.ruoyi.system.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Mapper;
@@ -24,6 +22,10 @@ public class AroundAnalysisController {
     private IFireFighterService fireFighterService;
     @Resource
     private IHospitalService hospitalService;
+    @Resource
+    private IEmergencyShelterService emergencyShelterService;
+    @Resource
+    private IStorePointsService storePointsService;
 
     @GetMapping("/getDangerousSource")
     @ApiOperation("获取全部风险源")
@@ -41,6 +43,18 @@ public class AroundAnalysisController {
     @ApiOperation("获取所有医院")
     public AjaxResult getHospitalList(){
         return AjaxResult.success(hospitalService.getHospitalList());
+    }
+
+    @GetMapping("/getEmergencyShelter")
+    @ApiOperation("获取所有避难所")
+    public AjaxResult getEmergencyShelterList(){
+        return AjaxResult.success(emergencyShelterService.getEmergencyShelterList());
+    }
+
+    @GetMapping("/getStorePoints")
+    @ApiOperation("获取所有物资储备点")
+    public AjaxResult getStorePointsList(){
+        return AjaxResult.success(storePointsService.getAllStorePointsList());
     }
 
 }

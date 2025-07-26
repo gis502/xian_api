@@ -31,8 +31,6 @@ public class Hospital {
     private Integer sumPeople;
     @TableField("beds")
     private Integer beds;
-    @TableField("position")
-    private String position;
     @TableField("province")
     private String province;
     @TableField("city")
