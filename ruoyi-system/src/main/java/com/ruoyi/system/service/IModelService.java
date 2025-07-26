@@ -1,10 +1,14 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.system.domain.dto.ModelGetDataDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
 
-import java.util.HashMap;
 import java.util.List;
 
 public interface IModelService {
-    public List<HashMap<String, String>> rainSlideTrigger(List<List<FactorVO>> factorList);
+
+    public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList);
+
+
+    public ModelGetDataDTO rainSlideFactorUpdata(List<FactorVO> factorList);
 }
