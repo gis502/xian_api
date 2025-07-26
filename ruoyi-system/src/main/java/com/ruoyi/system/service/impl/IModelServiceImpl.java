@@ -1,10 +1,8 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataDTO;
-import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
@@ -13,20 +11,15 @@ import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.mapper.FactorAnalysisMapper;
 import com.ruoyi.system.mapper.FactorValueMapper;
 import com.ruoyi.system.mapper.GeologicalDisasterHideMapper;
-import com.ruoyi.system.mapper.GeologicalDisasterRiskMapper;
 import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -186,76 +179,76 @@ public class IModelServiceImpl implements IModelService {
         return modelGetDataDTO;
     }
 
-    @Override
-    public List<ModelGetDataDTO> eqSlideTrigger(List<ModelGetDataFactorListEntityIdDTO>  factorList){
-        List<ModelGetDataDTO> list = new ArrayList<>();
-        String entityId = "";
-        for(int i=0;i<factorList.size();i++){
-            if(factorList.get(i)==null){
-                continue;
-            }
-            entityId =  factorList.get(i).getEntityId();
-            int hideId = factorList.get(i).getFactorVoList().get(0).getHideId();
-            double elevation = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "高程".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            double slope = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "坡度".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            int soilType = soilTypeToCode(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "岩土类型".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            int landUseType = landUseToCode(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "土地利用类型".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            double vegetationCover = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            double curvature = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "坡面曲率".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            double sandContent = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "土壤沙砾度".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            int slopeShape = slopeShapeToCode(factorList.get(i).getFactorVoList().stream()
-                    .filter(factor -> "坡型".equals(factor.getAttributeName()))
-                    .map(factor -> (String) factor.getFactorValue())
-                    .findFirst()
-                    .orElse(null));
-            double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
-            String level;
-            if(probability<=0.3){
-                level="低";
-            }else if(probability<=0.7){
-                level="中";
-            }else{
-                level="高";
-            }
-            FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability = new FactorAnalysisLevelProbabilityVO();
-            factorAnalysisLevelProbability.setLevel(level);
-            factorAnalysisLevelProbability.setProbability(probability);
-            List<FactorVO> factorVO = factorValueService.getFactorValueByHideId(hideId);
-            ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorVO);
-            modelGetDataDTO.setEntityId(entityId);
-            list.add(modelGetDataDTO);
-            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getFactorAnalysisLevelProbability());
-        }
-        return list;
-    }
+//    @Override
+//    public List<ModelGetDataDTO> eqSlideTrigger(List<ModelGetDataFactorListEntityIdDTO>  factorList){
+//        List<ModelGetDataDTO> list = new ArrayList<>();
+//        String entityId = "";
+//        for(int i=0;i<factorList.size();i++){
+//            if(factorList.get(i)==null){
+//                continue;
+//            }
+//            entityId =  factorList.get(i).getEntityId();
+//            int hideId = factorList.get(i).getFactorVoList().get(0).getHideId();
+//            double elevation = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "高程".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            double slope = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "坡度".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            int soilType = soilTypeToCode(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "岩土类型".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            int landUseType = landUseToCode(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "土地利用类型".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            double vegetationCover = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            double curvature = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "坡面曲率".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            double sandContent = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "土壤沙砾度".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            int slopeShape = slopeShapeToCode(factorList.get(i).getFactorVoList().stream()
+//                    .filter(factor -> "坡型".equals(factor.getAttributeName()))
+//                    .map(factor -> (String) factor.getFactorValue())
+//                    .findFirst()
+//                    .orElse(null));
+//            double probability = calculateLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+//            String level;
+//            if(probability<=0.3){
+//                level="低";
+//            }else if(probability<=0.7){
+//                level="中";
+//            }else{
+//                level="高";
+//            }
+//            FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability = new FactorAnalysisLevelProbabilityVO();
+//            factorAnalysisLevelProbability.setLevel(level);
+//            factorAnalysisLevelProbability.setProbability(probability);
+//            List<FactorVO> factorVO = factorValueService.getFactorValueByHideId(hideId);
+//            ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorVO);
+//            modelGetDataDTO.setEntityId(entityId);
+//            list.add(modelGetDataDTO);
+//            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getFactorAnalysisLevelProbability());
+//        }
+//        return list;
+//    }
 
 
     private void updataFactorValue(List<FactorVO> factorVoList){
