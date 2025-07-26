@@ -19,4 +19,5 @@ public class FactorVO {
     private String unit;    //因子单位
     private String attributeNameAlias;
 
+
 }
