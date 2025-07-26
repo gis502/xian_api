@@ -21,4 +21,8 @@ public interface IGeologicalDisasterHideService {
     // 获取全部泥石流点数据
     public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByFlowList();
 
+    public HashMap<String, List> getGeologicalDisasterBySlideList();
+
+    public HashMap<String, List> getGeologicalDisasterByFlowList();
+
 }
