@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.system.domain.entity.DangerousSource;
+import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
 import com.ruoyi.system.mapper.DangerousSourceMapper;
 import com.ruoyi.system.service.IDangerousSourceService;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,7 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
 
     @Override
     public HashMap<String, List> getDangerousSourceList() {
-
-        List<DangerousSource> dangerousSourceList = dangerousSourceMapper.selectList(null);
+        List<DangerousSource> dangerousSourceList = dangerousSourceMapper.selectList(new QueryWrapper<DangerousSource>().eq("city","西安市"));
         Map<String, List> dangerousSourceMap = processDangerous(dangerousSourceList);
 
         return (HashMap<String, List>) dangerousSourceMap;
