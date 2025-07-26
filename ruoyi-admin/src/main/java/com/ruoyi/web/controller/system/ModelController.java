@@ -24,9 +24,14 @@ public class ModelController {
     @PostMapping("/rainSlideTrigger")
     public AjaxResult rainSlideTrigger(@RequestBody List<List<FactorVO>> request)
     {
-        List<List<FactorVO>> list= request;
 
         return AjaxResult.success(modelService.rainSlideTrigger(request));
+    }
+
+    @PostMapping("/rainSlideFactorUpdata")
+    public AjaxResult rainSlideFactorUpdata(@RequestBody List<FactorVO> request)
+    {
+        return AjaxResult.success(modelService.rainSlideFactorUpdata(request));
     }
 
 }

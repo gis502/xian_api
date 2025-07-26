@@ -23,6 +23,10 @@ public class FactorValue {
     private Integer hideId;
     @TableField("attribute_id")
     private Integer attributeId;
+    @TableField("eq_disaster_id")
+    private Integer eqDisasterId;
+    @TableField("rain_disaster_id")
+    private String rainDisasterId;
     @TableField("factor_value")
     private String factorValue;
     @TableField("create_time")
