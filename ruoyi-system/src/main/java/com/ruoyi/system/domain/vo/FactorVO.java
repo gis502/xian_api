@@ -2,6 +2,8 @@ package com.ruoyi.system.domain.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author: xiaodemos
  * @date: 2025-07-24 17:29
@@ -9,7 +11,7 @@ import lombok.Data;
  */
 
 @Data
-public class FactorVO {
+public class FactorVO implements Serializable {
 
     private Integer hideId;
     private Integer attributeId;    //因子属性ID
