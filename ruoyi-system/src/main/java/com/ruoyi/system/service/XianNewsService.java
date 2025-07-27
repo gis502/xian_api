@@ -5,5 +5,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.domain.XianNews;
 public interface XianNewsService extends IService<XianNews> {
 
-    IPage<XianNews> getPageList(int pageNum, int pageSize);
+
+    IPage<XianNews> getFilteredNews(int pageNum, int pageSize, String disasterType, Integer earthquakeDisasterId, Integer rainDisasterId);
 }

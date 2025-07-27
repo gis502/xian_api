@@ -22,7 +22,6 @@ public class MountainTorrentDisasterServiceImpl implements IMountainTorrentDisas
     public HashMap<String, List> getMountainTorrentDisasterList() {
         List<MountainTorrentDisaster> disasterList = mountainTorrentDisasterMapper.selectList(null);
         Map<String, List> processedList = processDisasters(disasterList);
-        processedList.put("DangerAreaData", processedList.get("features"));
         return (HashMap<String, List>) processedList;
     }
 

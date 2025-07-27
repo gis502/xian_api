@@ -4,6 +4,7 @@ import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IFactorValueService {
 
@@ -13,5 +14,8 @@ public interface IFactorValueService {
 
     // 获取所有的 hideId
     public List<FactorValueDTO> getAllHideId();
+
+    // 获取因子可选列表值
+    public Map<String, List<String>> getFactorValueList();
 
 }

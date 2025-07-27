@@ -1,6 +1,8 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.system.domain.entity.DangerousSource;
+import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
 import com.ruoyi.system.mapper.DangerousSourceMapper;
 import com.ruoyi.system.service.IDangerousSourceService;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,8 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
 
     @Override
     public HashMap<String, List> getDangerousSourceList() {
-
-        List<DangerousSource> dangerousSourceList = dangerousSourceMapper.selectList(null);
+        List<DangerousSource> dangerousSourceList = dangerousSourceMapper.selectList(new QueryWrapper<DangerousSource>().eq("city","西安市"));
         Map<String, List> dangerousSourceMap = processDangerous(dangerousSourceList);
-        dangerousSourceMap.put("DangerousSourceData", dangerousSourceMap.get("features"));
 
         return (HashMap<String, List>) dangerousSourceMap;
     }
@@ -37,16 +37,19 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", dangerousSource.getName());
-            properties.put("address", dangerousSource.getAddress());
+            properties.put("dangerName", dangerousSource.getName());
+            properties.put("unitCode", dangerousSource.getUnitCode());
+            properties.put("position", dangerousSource.getAddress());
             properties.put("province", dangerousSource.getProvince());
             properties.put("city", dangerousSource.getCity());
             properties.put("county", dangerousSource.getCounty());
             properties.put("country", dangerousSource.getCountry());
             properties.put("enterpriseType", dangerousSource.getEnterpriseType());
             properties.put("level", dangerousSource.getLevel());
+            properties.put("lon", dangerousSource.getLongitude());
+            properties.put("lat", dangerousSource.getLatitude());
             properties.put("unitHead", dangerousSource.getUnitHead());
-            properties.put("telephone", dangerousSource.getTelephone());
+            properties.put("phone", dangerousSource.getTelephone());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();

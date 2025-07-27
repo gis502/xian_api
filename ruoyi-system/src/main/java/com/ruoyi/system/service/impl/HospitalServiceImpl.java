@@ -20,7 +20,6 @@ public class HospitalServiceImpl implements IHospitalService {
     public HashMap<String, List> getHospitalList() {
         List<Hospital> hospitalList = hospitalMapper.selectList(null);
         Map<String, List> hospitalMap = processHospital(hospitalList);
-        hospitalMap.put("HospitalData", hospitalMap.get("features"));
 
         return (HashMap<String, List>) hospitalMap;
     }
@@ -35,22 +34,24 @@ public class HospitalServiceImpl implements IHospitalService {
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", hospital.getName());
-            properties.put("address", hospital.getAddress());
+            properties.put("hospitalName", hospital.getName());
+            properties.put("position", hospital.getAddress());
             properties.put("hospitalTypeCode", hospital.getTypeCode());
             properties.put("hospitalType", hospital.getType());
             properties.put("level", hospital.getLevel());
             properties.put("institutionNature", hospital.getInstitutionNature());
-            properties.put("hospitalDevices", hospital.getHospitalDevices());
-            properties.put("hospitalWorkers", hospital.getHospitalWorkers());
+            properties.put("devices", hospital.getHospitalDevices());
+            properties.put("workers", hospital.getHospitalWorkers());
             properties.put("sumPeople", hospital.getSumPeople());
             properties.put("beds", hospital.getBeds());
             properties.put("province", hospital.getProvince());
             properties.put("city", hospital.getCity());
             properties.put("county", hospital.getCounty());
             properties.put("country", hospital.getCountry());
+            properties.put("lon", hospital.getLongitude());
+            properties.put("lat", hospital.getLatitude());
             properties.put("unitHead", hospital.getUnitHead());
-            properties.put("telephone", hospital.getTelephone());
+            properties.put("phone", hospital.getTelephone());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();

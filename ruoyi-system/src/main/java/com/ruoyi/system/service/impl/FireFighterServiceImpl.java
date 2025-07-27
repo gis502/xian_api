@@ -21,7 +21,6 @@ public class FireFighterServiceImpl implements IFireFighterService {
     public HashMap<String, List> getFireFighterList() {
         List<FireFighter> fireFighterList = fireFighterMapper.selectList(null);
         Map<String, List> fireFighterMap = processFireFighter(fireFighterList);
-        fireFighterMap.put("FireFighterData", fireFighterMap.get("features"));
 
         return (HashMap<String, List>) fireFighterMap;
     }

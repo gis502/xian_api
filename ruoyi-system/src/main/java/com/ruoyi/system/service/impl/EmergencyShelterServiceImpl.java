@@ -21,7 +21,6 @@ public class EmergencyShelterServiceImpl implements IEmergencyShelterService {
     public HashMap<String, List> getEmergencyShelterList() {
         List<EmergencyShelter> emergencyShelterList = emergencyShelterMapper.selectList(null);
         Map<String , List> emergencyShelterMap = processEmergencyShelter(emergencyShelterList);
-        emergencyShelterMap.put("EmergencyShelterData", emergencyShelterMap.get("features"));
         return (HashMap<String, List>) emergencyShelterMap;
     }
 

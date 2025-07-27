@@ -21,7 +21,6 @@ public class StorePointsServiceImpl implements IStorePointsService {
     public HashMap<String, List> getAllStorePointsList(){
         List<StorePoints> storePointsList = storePointsMapper.selectList(null);
         Map<String, List> storePointsMap = processStorePoints(storePointsList);
-        storePointsMap.put("StorePointsData", storePointsMap.get("features"));
         return (HashMap<String, List>) storePointsMap;
     }
 
