@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.entity.FactorValue;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 
 @Service
-public class FactorValueServiceImpl implements IFactorValueService {
+public class FactorValueServiceImpl  implements IFactorValueService {
 
     @Resource
     private FactorValueMapper factorValueMapper;
