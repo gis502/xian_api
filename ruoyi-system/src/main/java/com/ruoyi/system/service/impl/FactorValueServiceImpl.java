@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: xiaodemos
@@ -52,6 +54,25 @@ public class FactorValueServiceImpl implements IFactorValueService {
 
         // 返回hideId 列表
         return factorValueDTOList;
+    }
+
+    // 获取因子列表值
+    @Override
+    public Map<String, List<String>> getFactorValueList() {
+
+        // 获取岩土类型
+        List<String> rockType = factorValueMapper.getRockType();
+        // 获取坡型类别
+        List<String> slopeType = factorValueMapper.getSlopeType();
+        // 获取土地利用率类别
+        List<String> landUseType = factorValueMapper.getLandUseType();
+
+        Map <String, List<String>> factorValueList = new HashMap<>();
+        factorValueList.put("rock", rockType);
+        factorValueList.put("slope", slopeType);
+        factorValueList.put("landUse", landUseType);
+
+        return factorValueList;
     }
 
 
