@@ -1,6 +1,11 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.domain.dto.BatchHideIdsDTO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.utils.bean.BeanUtils;
+import com.ruoyi.system.domain.dto.FactorValueDTO;
+import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.mapper.FactorValueMapper;
 import com.ruoyi.system.service.IFactorValueService;

@@ -1,6 +1,9 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.dto.BatchHideIdsDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.system.domain.dto.FactorValueDTO;
+import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.vo.FactorVO;
 
 import java.util.List;
