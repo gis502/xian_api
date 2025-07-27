@@ -8,18 +8,19 @@
         e.disaster_id AS earthquakeDisasterId,
         NULL AS rainDisasterId,
         e.disaster_name AS disasterName,
-        e.earthquake_full_name,
+        e.earthquake_full_name AS earthquakeFullName,
         e.position AS earthquakeDisasterPosition,
         NULL AS rainDisasterPosition,
         e.magnitude,
         e.intensity,
         e.occurrence_time AS occurTime,
-        e.eq_type,
+        e.eq_type AS eqType,
         NULL AS rainfall,
         NULL AS duration,
         'earthquake' AS disasterType
         FROM xian_earthquake_list e
-        WHERE e.is_deleted = 0
+        WHERE e.eq_type = 'Z'
+        AND e.is_deleted = 0
 
         UNION ALL
 
@@ -27,7 +28,7 @@
         NULL AS earthquakeDisasterId,
         d.disaster_id AS rainDisasterId,
         d.disaster_name AS disasterName,
-        NULL AS earthquake_full_name,
+        NULL AS earthquakeFullName,
         NULL AS earthquakeDisasterPosition,
         d.position AS rainDisasterPosition,
         NULL AS magnitude,
@@ -46,9 +47,10 @@
 
 
 
+
     <select id="countTotal" resultType="int">
         SELECT
-                (SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0) +
+                (SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0 AND eq_type = 'Z') +
                 (SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = '0')
     </select>
 </mapper>
