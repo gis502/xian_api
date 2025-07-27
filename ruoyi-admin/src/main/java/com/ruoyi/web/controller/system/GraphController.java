@@ -41,11 +41,41 @@ public class GraphController {
                 .all());
     }
 
-    @GetMapping("/getGraphBy")
-    public List getGraphBy(@RequestParam("eqid") String eqid) {
-        // 查询特定 eqId 的最大知识图谱
-        String query = "MATCH (n {eqid: '" +eqid+ "'})-[r]->(m) RETURN n, r, m";
+//    @GetMapping("/getGraphBy")
+//    public List getGraphBy(@RequestParam("eqid") String eqid) {
+//        // 查询特定 eqId 的最大知识图谱
+//        String query = "MATCH (n {eqid: '" +eqid+ "'})-[r]->(m) RETURN n, r, m";
+//
+//        return new ArrayList<>(neo4jClient.query(query)
+//                .fetchAs(Map.class)
+//                .mappedBy((typeSystem, record) -> {
+//                    Map<String, Object> result = new HashMap<>();
+//                    result.put("source", record.get("n").asNode().asMap());
+//                    Relationship rel = record.get("r").asRelationship();
+//                    Map<String, Object> relMap = new HashMap<>(rel.asMap());
+//                    relMap.put("type", rel.type());
+//                    result.put("target", record.get("m").asNode().asMap());
+//                    result.put("value", relMap);
+//                    return result;
+//                })
+//                .all());
+//
+//    }
 
+    @GetMapping("/getGraphBy")
+    public List getGraphBy(
+            @RequestParam("eqid") String eqid,
+            @RequestParam(value = "disasterType") String disasterType) {
+        System.out.println(eqid+ " " + disasterType);
+
+        // 构建基础查询
+        String query = "";
+        // 你也可以根据 disasterType 修改 query，比如只查 earthquake 类型的图谱：
+        if ("earthquake".equals(disasterType)) {
+            query = "MATCH (n{earthquakeDisasterId: '" + eqid + "'})-[r]->(m) RETURN n, r, m";
+        } else if ("rain".equals(disasterType)) {
+            query = "MATCH (n{rainDisasterId: '" + eqid + "'})-[r]->(m) RETURN n, r, m";
+        }
         return new ArrayList<>(neo4jClient.query(query)
                 .fetchAs(Map.class)
                 .mappedBy((typeSystem, record) -> {
@@ -59,8 +89,8 @@ public class GraphController {
                     return result;
                 })
                 .all());
-
     }
+
 
 }
 

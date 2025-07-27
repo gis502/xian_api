@@ -17,6 +17,7 @@ import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -399,6 +400,7 @@ public class IModelServiceImpl implements IModelService {
     }
     // 插入数据到FactorAnalysis
     private void insertFactorAnalysis(List<FactorVO> factorVoList,FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability){
+
         for(FactorVO f:factorVoList){
             FactorAnalysis factorAnalysis = new FactorAnalysis();
             BeanUtils.copyProperties(f, factorAnalysis);
@@ -436,8 +438,10 @@ public class IModelServiceImpl implements IModelService {
         switch (soilType.trim()) {
             case "碎石土": return 1;
             case "黄土":   return 2;
-            case "石渣土": return 3;
-            case "砂类土": return 4;
+            case "砂类土": return 3;
+            case "粘性土": return 4;
+            case "红粘土": return 5;
+            case "膨胀土": return 6;
             default: throw new IllegalArgumentException("未知岩土类型: " + soilType);
         }
     }
@@ -448,6 +452,9 @@ public class IModelServiceImpl implements IModelService {
             case "林地": return 1;
             case "耕地": return 2;
             case "居民用地": return 3;
+            case "草地": return 4;
+            case "难利用土地": return 5;
+            case "园地": return 6;
             default: throw new IllegalArgumentException("未知土地利用类型: " + landUseType);
         }
     }

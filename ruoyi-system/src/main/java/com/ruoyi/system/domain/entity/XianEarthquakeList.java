@@ -15,8 +15,8 @@ import org.n52.jackson.datatype.jts.GeometrySerializer;
 @TableName("xian_earthquake_list")
 public class XianEarthquakeList {
   @TableId
-  @TableField("eqid")
-  private String eqid;
+  @TableField("disaster_id")
+  private Long disasterId;
   @TableField("earthquake_name")
   private String earthquakeName;
   @TableField("earthquake_full_name")

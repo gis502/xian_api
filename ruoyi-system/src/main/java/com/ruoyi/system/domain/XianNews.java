@@ -76,6 +76,6 @@ public class XianNews {
     /**
      * 暴雨id
      */
-    @TableField(value = "disaster_id")
-    private Integer disasterId;
+    @TableField(value = "rain_id")
+    private Integer rainId;
 }

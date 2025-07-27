@@ -25,8 +25,6 @@ public class XianEarthquakeListController {
     }
     @PostMapping("/getEarthquakeEventById")
     public XianEarthquakeList getEarthquakeEventById(@RequestParam(value = "id") String id) {
-        System.out.println(id+"getEarthquakeEventById id");
-        System.out.println(xianEarthquakeListMapper.getEarthquakeEventById(id)+"xianEarthquakeListMapper.getEarthquakeEventById(id)");
         return xianEarthquakeListMapper.getEarthquakeEventById(id);
     }
 
