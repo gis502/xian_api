@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
@@ -17,6 +18,7 @@ import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class IModelServiceImpl implements IModelService {
+public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAnalysis> implements IModelService {
 
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
@@ -67,6 +69,11 @@ public class IModelServiceImpl implements IModelService {
                                                                 .map(factor -> (String) factor.getFactorValue())
                                                                 .findFirst()
                                                                 .orElse(null));
+            double rain = Double.parseDouble(factorList.get(i).stream()
+                    .filter(factor -> "降雨量".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
             double vegetationCover = Double.parseDouble(factorList.get(i).stream()
                                                                             .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
                                                                             .map(factor -> (String) factor.getFactorValue())
@@ -87,7 +94,7 @@ public class IModelServiceImpl implements IModelService {
                                                                 .map(factor -> (String) factor.getFactorValue())
                                                                 .findFirst()
                                                                 .orElse(null));
-            double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -134,6 +141,11 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
+        double rain = Double.parseDouble(factorList.stream()
+                .filter(factor -> "降雨量".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
         double vegetationCover = Double.parseDouble(factorList.stream()
                 .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
                 .map(factor -> (String) factor.getFactorValue())
@@ -154,7 +166,7 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -203,6 +215,11 @@ public class IModelServiceImpl implements IModelService {
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
+            double rain = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+                    .filter(factor -> "降雨量".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
             double vegetationCover = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
                     .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
                     .map(factor -> (String) factor.getFactorValue())
@@ -223,7 +240,7 @@ public class IModelServiceImpl implements IModelService {
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
-            double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -270,6 +287,11 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
+        double rain = Double.parseDouble(factorList.stream()
+                .filter(factor -> "降雨量".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
         double vegetationCover = Double.parseDouble(factorList.stream()
                 .filter(factor -> "植被覆盖率".equals(factor.getAttributeName()))
                 .map(factor -> (String) factor.getFactorValue())
@@ -290,7 +312,7 @@ public class IModelServiceImpl implements IModelService {
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -309,12 +331,13 @@ public class IModelServiceImpl implements IModelService {
     }
 
     // 暴雨滑坡模型计算概率值
-    private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+    private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType, double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
         double INTERCEPT = 1.308;          // 常量
         double ELEVATION_COEF = -2.327e-5; // 高程
         double SLOPE_COEF = -0.036;        // 坡度
         double SOIL_TYPE_COEF = -0.004;    // 岩土类型
         double LAND_USE_COEF = -0.034;     // 土地利用类型
+        double RAIN = 0.000046;              // 降雨量
         double VEGETATION_COEF = -0.008;   // 植被覆盖率
         double CURVATURE_COEF = 0.049;     // 坡面曲率
         double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
@@ -325,6 +348,7 @@ public class IModelServiceImpl implements IModelService {
         double slopeTerm = SLOPE_COEF * slope;
         double soilTypeTerm = SOIL_TYPE_COEF * soilType;
         double landUseTerm = LAND_USE_COEF * landUseType;
+        double rainTerm = RAIN * rain;
         double vegetationTerm = VEGETATION_COEF * vegetationCover;
         double curvatureTerm = CURVATURE_COEF * curvature;
         double sandContentTerm = SAND_CONTENT_COEF * sandContent;
@@ -336,6 +360,7 @@ public class IModelServiceImpl implements IModelService {
                 + slopeTerm
                 + soilTypeTerm
                 + landUseTerm
+                + rainTerm
                 + vegetationTerm
                 + curvatureTerm
                 + sandContentTerm
@@ -347,12 +372,13 @@ public class IModelServiceImpl implements IModelService {
     }
 
     // 地震滑坡模型计算概率值
-    private static double calculateEqLandslideProbability(double elevation, double slope, int soilType, int landUseType, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+    private static double calculateEqLandslideProbability(double elevation, double slope, int soilType, int landUseType,double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
         double INTERCEPT = 1.408;          // 常量
         double ELEVATION_COEF = -2.327e-5; // 高程
         double SLOPE_COEF = -0.036;        // 坡度
         double SOIL_TYPE_COEF = -0.004;    // 岩土类型
         double LAND_USE_COEF = -0.034;     // 土地利用类型
+        double RAIN = 0.0046;              // 降雨量
         double VEGETATION_COEF = -0.008;   // 植被覆盖率
         double CURVATURE_COEF = 0.049;     // 坡面曲率
         double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
@@ -363,6 +389,7 @@ public class IModelServiceImpl implements IModelService {
         double slopeTerm = SLOPE_COEF * slope;
         double soilTypeTerm = SOIL_TYPE_COEF * soilType;
         double landUseTerm = LAND_USE_COEF * landUseType;
+        double rainTerm = RAIN * rain;
         double vegetationTerm = VEGETATION_COEF * vegetationCover;
         double curvatureTerm = CURVATURE_COEF * curvature;
         double sandContentTerm = SAND_CONTENT_COEF * sandContent;
@@ -374,6 +401,7 @@ public class IModelServiceImpl implements IModelService {
                 + slopeTerm
                 + soilTypeTerm
                 + landUseTerm
+                + rainTerm
                 + vegetationTerm
                 + curvatureTerm
                 + sandContentTerm
@@ -399,6 +427,7 @@ public class IModelServiceImpl implements IModelService {
     }
     // 插入数据到FactorAnalysis
     private void insertFactorAnalysis(List<FactorVO> factorVoList,FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability){
+        List<FactorAnalysis> factorAnalysisLeve = new ArrayList<>();
         for(FactorVO f:factorVoList){
             FactorAnalysis factorAnalysis = new FactorAnalysis();
             BeanUtils.copyProperties(f, factorAnalysis);
@@ -407,8 +436,9 @@ public class IModelServiceImpl implements IModelService {
             factorAnalysis.setIsDeleted(0);
             factorAnalysis.setProbability(factorAnalysisLevelProbability.getProbability());
             factorAnalysis.setLevel(factorAnalysisLevelProbability.getLevel());
-            factorAnalysisMapper.insert(factorAnalysis);
+            factorAnalysisLeve.add(factorAnalysis);
         }
+        saveBatch(factorAnalysisLeve);
     }
     // 拼接ModelGetDataDTO
     private ModelGetDataDTO getGeologicalDisasterHideByLandSlideById(Integer id, FactorAnalysisLevelProbabilityVO factorAnalysisLevelProbability,List<FactorVO> factorVO){
@@ -436,8 +466,10 @@ public class IModelServiceImpl implements IModelService {
         switch (soilType.trim()) {
             case "碎石土": return 1;
             case "黄土":   return 2;
-            case "石渣土": return 3;
-            case "砂类土": return 4;
+            case "砂类土": return 3;
+            case "粘性土": return 4;
+            case "红粘土": return 5;
+            case "膨胀土": return 6;
             default: throw new IllegalArgumentException("未知岩土类型: " + soilType);
         }
     }
@@ -448,6 +480,9 @@ public class IModelServiceImpl implements IModelService {
             case "林地": return 1;
             case "耕地": return 2;
             case "居民用地": return 3;
+            case "草地": return 4;
+            case "难利用土地": return 5;
+            case "园地": return 6;
             default: throw new IllegalArgumentException("未知土地利用类型: " + landUseType);
         }
     }
