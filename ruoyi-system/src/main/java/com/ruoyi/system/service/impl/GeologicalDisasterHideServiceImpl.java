@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ruoyi.system.domain.dto.BatchHideIdsDTO;
 import com.ruoyi.system.domain.dto.FactorAttributeDTO;
 import com.ruoyi.system.domain.dto.FactorValueDTO;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
@@ -40,47 +41,54 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     // 获取滑坡隐患点数据
     @Override
     public List<HideVO> getGeologicalDisasterHideByLandSlideList() {
-
         // 获取滑坡隐患点数据
-        List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.
-                selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
-        // 滑坡数据传输对象
-        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
-        // 隐患点视图对象
-        List<HideVO> hideVOlist = new ArrayList<>();
+        List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper
+                .selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
+
+        if (landSlide.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         // 获取因子值表中所有的 hideId
-        List<FactorValueDTO> factorValueDTOs = factorValueService.getAllHideId();
-
-        Set<Integer> hideIdSet = factorValueDTOs.stream()
-                // 过滤掉hideId为null的情况，避免空指针
-                .filter(dto -> dto.getHideId() != null)
-                .map(FactorValueDTO::getHideId)
-                .collect(Collectors.toSet());
+        Set<Integer> hideIds = factorValueService.getAllHideId();
 
         // 筛选出所有存在因子的 hideId
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+        List<Integer> qualifiedIds = new ArrayList<>();
+
         for (GeologicalDisasterHide disaster : landSlide) {
             Integer disasterId = disaster.getId();
-
-            if (disasterId != null && hideIdSet.contains(disasterId)) {
+            if (disasterId != null && hideIds.contains(disasterId)) {
                 GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
                 BeanUtils.copyProperties(disaster, hideDTO);
                 hideDTOlist.add(hideDTO);
+                qualifiedIds.add(disasterId);
             }
         }
 
-        // 根据隐患点Id查询对应的因子值
-        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
-            // 根据ID查询 value 中的值  联表查询
-            List<FactorVO> valueDTOList = factorValueService.getFactorValueByHideId(hideDTO.getId());
-            HideVO merged = mergeData(hideDTO, valueDTOList,"滑坡");
-
-            hideVOlist.add( merged);
+        // 批量查询所有因子值
+        Map<Integer, List<FactorVO>> factorValueMap = new HashMap<>();
+        if (!qualifiedIds.isEmpty()) {
+            // 一次性查询所有ID的因子值
+            List<FactorVO> factorValuesByHideIds = factorValueService.getFactorValuesByHideIds(qualifiedIds);
+            // 按hideId分组
+            for (FactorVO factorVO : factorValuesByHideIds) {
+                factorValueMap.computeIfAbsent(factorVO.getHideId(), k -> new ArrayList<>())
+                        .add(factorVO);
+            }
         }
 
-        // 返回视图对象
+        // 合并数据
+        List<HideVO> hideVOlist = new ArrayList<>(hideDTOlist.size());
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            List<FactorVO> factorVOs = factorValueMap.getOrDefault(hideDTO.getId(), Collections.emptyList());
+            HideVO merged = mergeData(hideDTO, factorVOs, "滑坡");
+            hideVOlist.add(merged);
+        }
+
         return hideVOlist;
     }
+
 
     // 获取泥石流隐患点数据
     @Override

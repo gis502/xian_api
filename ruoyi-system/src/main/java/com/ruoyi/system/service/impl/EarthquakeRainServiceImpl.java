@@ -17,7 +17,8 @@ public class EarthquakeRainServiceImpl implements EarthquakeRainService {
     @Override
     public List<EarthquakeRainDTO> getPagedList(int pageNum, int pageSize) {
         int offset = (pageNum - 1) * pageSize;
-        return earthquakeRainMapper.selectEarthquakeRainPage(offset, pageSize);
+        List<EarthquakeRainDTO> earthquakeRainDTOS = earthquakeRainMapper.selectEarthquakeRainPage(offset, pageSize);
+        return earthquakeRainDTOS;
     }
 
     @Override

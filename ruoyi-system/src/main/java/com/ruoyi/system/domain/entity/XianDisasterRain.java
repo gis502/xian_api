@@ -8,6 +8,9 @@ import lombok.Data;
 @Data
 @TableName("xian_disaster_rain")
 public class XianDisasterRain {
+  @TableId
+  @TableField("disaster_id")
+  private long disasterId;
   @TableField("disaster_name")
   private String disasterName;
   @TableField("occurrence_time")
@@ -26,8 +29,6 @@ public class XianDisasterRain {
   private String isDeleted;
   @TableField("geom")
   private String geom;
-  @TableId
-  @TableField("disaster_id")
-  private long disasterId;
+
 
 }
