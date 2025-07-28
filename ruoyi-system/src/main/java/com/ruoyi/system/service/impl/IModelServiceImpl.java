@@ -69,6 +69,16 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                                                                 .map(factor -> (String) factor.getFactorValue())
                                                                 .findFirst()
                                                                 .orElse(null));
+            double breakDistance = Double.parseDouble(factorList.get(i).stream()
+                    .filter(factor -> "断层距离".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
+            double waterDistance = Double.parseDouble(factorList.get(i).stream()
+                    .filter(factor -> "水系距离".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
             double rain = Double.parseDouble(factorList.get(i).stream()
                     .filter(factor -> "降雨量".equals(factor.getAttributeName()))
                     .map(factor -> (String) factor.getFactorValue())
@@ -94,7 +104,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                                                                 .map(factor -> (String) factor.getFactorValue())
                                                                 .findFirst()
                                                                 .orElse(null));
-            double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,breakDistance,waterDistance,rain,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -141,6 +151,16 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
+        double breakDistance = Double.parseDouble(factorList.stream()
+                .filter(factor -> "断层距离".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double waterDistance = Double.parseDouble(factorList.stream()
+                .filter(factor -> "水系距离".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
         double rain = Double.parseDouble(factorList.stream()
                 .filter(factor -> "降雨量".equals(factor.getAttributeName()))
                 .map(factor -> (String) factor.getFactorValue())
@@ -166,7 +186,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateRainLandslideProbability(elevation,slope,soilType,landUseType,breakDistance,waterDistance,rain,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -210,6 +230,16 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
+            double breakDistance = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+                    .filter(factor -> "断层距离".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
+            double waterDistance = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
+                    .filter(factor -> "水系距离".equals(factor.getAttributeName()))
+                    .map(factor -> (String) factor.getFactorValue())
+                    .findFirst()
+                    .orElse(null));
             int landUseType = landUseToCode(factorList.get(i).getFactorVoList().stream()
                     .filter(factor -> "土地利用类型".equals(factor.getAttributeName()))
                     .map(factor -> (String) factor.getFactorValue())
@@ -240,7 +270,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
-            double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
+            double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,breakDistance,waterDistance,rain,vegetationCover,curvature,sandContent,slopeShape);
             String level;
             if(probability<=0.3){
                 level="低";
@@ -287,6 +317,16 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
+        double breakDistance = Double.parseDouble(factorList.stream()
+                .filter(factor -> "断层距离".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
+        double waterDistance = Double.parseDouble(factorList.stream()
+                .filter(factor -> "水系距离".equals(factor.getAttributeName()))
+                .map(factor -> (String) factor.getFactorValue())
+                .findFirst()
+                .orElse(null));
         double rain = Double.parseDouble(factorList.stream()
                 .filter(factor -> "降雨量".equals(factor.getAttributeName()))
                 .map(factor -> (String) factor.getFactorValue())
@@ -312,7 +352,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 .map(factor -> (String) factor.getFactorValue())
                 .findFirst()
                 .orElse(null));
-        double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,rain,vegetationCover,curvature,sandContent,slopeShape);
+        double probability = calculateEqLandslideProbability(elevation,slope,soilType,landUseType,breakDistance,waterDistance,rain,vegetationCover,curvature,sandContent,slopeShape);
         String level;
         if(probability<=0.3){
             level="低";
@@ -331,23 +371,39 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     }
 
     // 暴雨滑坡模型计算概率值
-    private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType, double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
-        double INTERCEPT = 1.308;          // 常量
-        double ELEVATION_COEF = -2.327e-5; // 高程
-        double SLOPE_COEF = -0.036;        // 坡度
-        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
-        double LAND_USE_COEF = -0.034;     // 土地利用类型
-        double RAIN = 0.000046;              // 降雨量
-        double VEGETATION_COEF = -0.008;   // 植被覆盖率
-        double CURVATURE_COEF = 0.049;     // 坡面曲率
-        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
-        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+    private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType,double breakDistance,double waterDistance, double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+//        double INTERCEPT = 1.108;          // 常量
+//        double INTERCEPT = -0.644;          // 常量
+//        double ELEVATION_COEF = -2.327e-5; // 高程
+//        double SLOPE_COEF = 0.036;        // 坡度
+//        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
+//        double LAND_USE_COEF = -0.034;     // 土地利用类型
+//        double RAIN = 0.000046;              // 降雨量
+//        double VEGETATION_COEF = -0.008;   // 植被覆盖率
+//        double CURVATURE_COEF = 0.049;     // 坡面曲率
+//        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
+//        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+
+        double INTERCEPT = -0.41;          // 常量
+        double ELEVATION_COEF = 0.0002; // 高程
+        double SLOPE_COEF = 0.004;        // 坡度
+        double SOIL_TYPE_COEF = -0.009;    // 岩土类型
+        double LAND_USE_COEF = -0.006;     // 土地利用类型
+        double BREAK_DISTANCE_COEF = 1.777e-5;//断层距离
+        double WATER_DISTANCE_COEF = -3.111e-5;//水系距离
+        double RAIN = 0.004;              // 降雨量
+        double VEGETATION_COEF = 0.005;   // 植被覆盖率
+        double CURVATURE_COEF = 0.010;     // 坡面曲率
+        double SAND_CONTENT_COEF = 0.002;   // 土壤沙砾度
+        double SLOPE_SHAPE_COEF = 0.017;    // 坡型
 
         // 计算各项的贡献值
         double elevationTerm = ELEVATION_COEF * elevation;
         double slopeTerm = SLOPE_COEF * slope;
         double soilTypeTerm = SOIL_TYPE_COEF * soilType;
         double landUseTerm = LAND_USE_COEF * landUseType;
+        double breakDistanceTerm = BREAK_DISTANCE_COEF * breakDistance;
+        double waterDistanceTerm = WATER_DISTANCE_COEF * waterDistance;
         double rainTerm = RAIN * rain;
         double vegetationTerm = VEGETATION_COEF * vegetationCover;
         double curvatureTerm = CURVATURE_COEF * curvature;
@@ -360,6 +416,8 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 + slopeTerm
                 + soilTypeTerm
                 + landUseTerm
+                +breakDistanceTerm
+                + waterDistanceTerm
                 + rainTerm
                 + vegetationTerm
                 + curvatureTerm
@@ -372,23 +430,49 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     }
 
     // 地震滑坡模型计算概率值
-    private static double calculateEqLandslideProbability(double elevation, double slope, int soilType, int landUseType,double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
-        double INTERCEPT = 1.408;          // 常量
-        double ELEVATION_COEF = -2.327e-5; // 高程
-        double SLOPE_COEF = -0.036;        // 坡度
-        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
-        double LAND_USE_COEF = -0.034;     // 土地利用类型
-        double RAIN = 0.0046;              // 降雨量
-        double VEGETATION_COEF = -0.008;   // 植被覆盖率
-        double CURVATURE_COEF = 0.049;     // 坡面曲率
-        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
-        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+    private static double calculateEqLandslideProbability(double elevation, double slope, int soilType, int landUseType,double breakDistance,double waterDistance,double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
+//        double INTERCEPT = 1.308;          // 常量
+//        double INTERCEPT = -0.644;          // 常量
+//        double ELEVATION_COEF = -2.327e-5; // 高程
+//        double SLOPE_COEF = 0.036;        // 坡度
+//        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
+//        double LAND_USE_COEF = -0.034;     // 土地利用类型
+//        double RAIN = 0;              // 降雨量
+//        double VEGETATION_COEF = -0.008;   // 植被覆盖率
+//        double CURVATURE_COEF = 0.049;     // 坡面曲率
+//        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
+//        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+//        double INTERCEPT = -0.649;          // 常量
+//        double ELEVATION_COEF = -2.327e-5; // 高程
+//        double SLOPE_COEF = 0.036;        // 坡度
+//        double SOIL_TYPE_COEF = -0.004;    // 岩土类型
+//        double LAND_USE_COEF = -0.034;     // 土地利用类型
+//        double RAIN = 0.000046;              // 降雨量
+//        double VEGETATION_COEF = -0.008;   // 植被覆盖率
+//        double CURVATURE_COEF = 0.049;     // 坡面曲率
+//        double SAND_CONTENT_COEF = 0.026;   // 土壤沙砾度
+//        double SLOPE_SHAPE_COEF = 0.018;    // 坡型
+
+        double INTERCEPT = 0.368;          // 常量
+        double ELEVATION_COEF = 0.00002; // 高程
+        double SLOPE_COEF = 0.007;        // 坡度
+        double SOIL_TYPE_COEF = -0.014;    // 岩土类型
+        double LAND_USE_COEF = 0.001;     // 土地利用类型
+        double BREAK_DISTANCE_COEF = 2.736e-5;//断层距离
+        double WATER_DISTANCE_COEF = 0;//水系距离
+        double RAIN = 0;              // 降雨量
+        double VEGETATION_COEF = 0.0005;   // 植被覆盖率
+        double CURVATURE_COEF = 0.002;     // 坡面曲率
+        double SAND_CONTENT_COEF = 0.0001;   // 土壤沙砾度
+        double SLOPE_SHAPE_COEF = 0.022;    // 坡型
 
         // 计算各项的贡献值
         double elevationTerm = ELEVATION_COEF * elevation;
         double slopeTerm = SLOPE_COEF * slope;
         double soilTypeTerm = SOIL_TYPE_COEF * soilType;
         double landUseTerm = LAND_USE_COEF * landUseType;
+        double breakDistanceTerm = BREAK_DISTANCE_COEF * breakDistance;
+        double waterDistanceTerm = WATER_DISTANCE_COEF * waterDistance;
         double rainTerm = RAIN * rain;
         double vegetationTerm = VEGETATION_COEF * vegetationCover;
         double curvatureTerm = CURVATURE_COEF * curvature;
@@ -401,6 +485,8 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                 + slopeTerm
                 + soilTypeTerm
                 + landUseTerm
+                +breakDistanceTerm
+                + waterDistanceTerm
                 + rainTerm
                 + vegetationTerm
                 + curvatureTerm
