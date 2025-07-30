@@ -21,7 +21,7 @@ import java.util.*;
  */
 
 @Service
-public class FactorValueServiceImpl  implements IFactorValueService {
+public class FactorValueServiceImpl implements IFactorValueService {
 
     @Resource
     private FactorValueMapper factorValueMapper;
