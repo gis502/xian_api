@@ -1,0 +1,34 @@
+package com.ruoyi.web.controller.system;
+
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.service.IFactorValueService;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * @author: xiaodemos
+ * @date: 2025-07-26 11:38
+ * @description: 因子值控制层
+ */
+
+@RestController
+@RequestMapping("/factor")
+public class FactorValueController {
+
+
+    @Resource
+    private IFactorValueService factorValueService;
+
+    @GetMapping("/type")
+    @ApiOperation(value = "获取致灾因子可选值")
+    public AjaxResult getFactorValueList() {
+        return AjaxResult.success(factorValueService.getFactorValueList());
+    }
+
+
+
+}
