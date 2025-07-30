@@ -35,11 +35,11 @@ public class EmergencyShelterServiceImpl implements IEmergencyShelterService {
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", emergencyShelter.getName());
-            properties.put("address", emergencyShelter.getAddress());
-            properties.put("hospitalType", emergencyShelter.getType());
+            properties.put("shelterName", emergencyShelter.getName());
+            properties.put("position", emergencyShelter.getAddress());
+            properties.put("shelterType", emergencyShelter.getType());
             properties.put("level", emergencyShelter.getLevel());
-            properties.put("volume", emergencyShelter.getVolume());
+            properties.put("shelterVolume", emergencyShelter.getVolume());
             properties.put("department", emergencyShelter.getDepartment());
             properties.put("store", emergencyShelter.getStore());
             properties.put("province", emergencyShelter.getProvince());
@@ -47,7 +47,9 @@ public class EmergencyShelterServiceImpl implements IEmergencyShelterService {
             properties.put("county", emergencyShelter.getCounty());
             properties.put("country", emergencyShelter.getCountry());
             properties.put("unitHead", emergencyShelter.getUnitHead());
-            properties.put("telephone", emergencyShelter.getTelephone());
+            properties.put("phone", emergencyShelter.getTelephone());
+            properties.put("lon", emergencyShelter.getLongitude());
+            properties.put("lat", emergencyShelter.getLatitude());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();
