@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianDisasterRealMapper">
+    <select id="selectDisasterRealByDisasterId" resultType="com.ruoyi.system.domain.entity.XianDisasterReal">
+        SELECT disaster_id,
+               disaster_trigger,
+               id,
+               ST_AsText(geom) AS geom,
+               disaster_type,
+               occurrence_time,
+               end_time,
+               state,
+               disaster_name,
+               people_injure
+        FROM xian_disaster_real
+        WHERE disaster_id = CAST(#{param1, jdbcType=VARCHAR} AS INTEGER)
+          AND disaster_trigger = #{param2, jdbcType=VARCHAR}
+        ORDER BY occurrence_time DESC
+    </select>
+
+</mapper>
+
