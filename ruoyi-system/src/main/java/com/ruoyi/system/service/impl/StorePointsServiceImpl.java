@@ -35,15 +35,15 @@ public class StorePointsServiceImpl implements IStorePointsService {
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
-            properties.put("name", storePoints.getName());
-            properties.put("address", storePoints.getAddress());
-            properties.put("type", storePoints.getType());
+            properties.put("storeName", storePoints.getName());
+            properties.put("position", storePoints.getAddress());
+            properties.put("storeType", storePoints.getType());
             properties.put("level", storePoints.getLevel());
-            properties.put("volume", storePoints.getVolume());
+            properties.put("storeVolume", storePoints.getVolume());
             properties.put("department", storePoints.getDepartment());
             properties.put("tent", storePoints.getTent());
             properties.put("rubberBoat", storePoints.getRubberBoat());
-            properties.put("generator", storePoints.getGenerator());
+            properties.put("egenerator", storePoints.getGenerator());
             properties.put("emergencyLight", storePoints.getEmergencyLight());
             properties.put("saveTools", storePoints.getSaveTools());
             properties.put("province", storePoints.getProvince());
@@ -51,7 +51,9 @@ public class StorePointsServiceImpl implements IStorePointsService {
             properties.put("county", storePoints.getCounty());
             properties.put("country", storePoints.getCountry());
             properties.put("unitHead", storePoints.getUnitHead());
-            properties.put("telephone", storePoints.getTelephone());
+            properties.put("phone", storePoints.getTelephone());
+            properties.put("lon", storePoints.getLongitude());
+            properties.put("lat", storePoints.getLatitude());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Float> coordinates = new ArrayList<>();

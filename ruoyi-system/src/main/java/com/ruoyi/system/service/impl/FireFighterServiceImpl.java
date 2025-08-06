@@ -41,13 +41,15 @@ public class FireFighterServiceImpl implements IFireFighterService {
             properties.put("teamSumNum", fireFighter.getTeamNum());
             properties.put("fireCars", fireFighter.getFireCars());
             properties.put("fireDevices", fireFighter.getFireDevices());
-            properties.put("address", fireFighter.getAddress());
+            properties.put("position", fireFighter.getAddress());
             properties.put("province", fireFighter.getProvince());
             properties.put("city", fireFighter.getCity());
             properties.put("county", fireFighter.getCounty());
             properties.put("country", fireFighter.getCountry());
             properties.put("unitHead", fireFighter.getUnitHead());
-            properties.put("telephone", fireFighter.getTelephone());
+            properties.put("phone", fireFighter.getTelephone());
+            properties.put("lon", fireFighter.getLongitude());
+            properties.put("lat", fireFighter.getLatitude());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();
