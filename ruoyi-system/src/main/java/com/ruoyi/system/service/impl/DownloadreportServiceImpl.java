@@ -35,6 +35,7 @@ import java.util.Map;
 
 @Service
 public class DownloadreportServiceImpl implements DownloadreportService {
+    //保存图片
 
     @Override
     public R<String> saveCanvas(MultipartFile file) throws IOException {
@@ -56,6 +57,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         return R.ok("D:/img/" + fileName);
     }
+    //生成报告
 
     @Override
     public R<String> generateRainReport(String imgUrl) throws IOException, InvalidFormatException {
@@ -119,69 +121,64 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 {"上王村六组翠微宫园(C2)", "22%", "低"}
         };
 
-//        String MudslideTableName = "泥石流灾害预测概率统计表";
-//        String[] MudslideHead = {"序号", "位置", "泥石流发生概率", "风险等级"};
-//        int[] MudslideColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
-//        String[][] MudslideData = {
-//                {"沣峪村大门村组红草河以东(B3)", "81%", "高"},
-//                {"沣峪村石峡沟组原石峡沟村(B6)", "78%", "高"},
-//                {"喂子坪村鸡窝子组上鸡窝(B2)", "76%", "高"},
-//                {"喂子坪村北石槽组原北石槽村(B10)", "74%", "高"},
-//                {"喂子坪村北石槽组南石槽沟西口(B9)", "74%", "高"},
-//                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "73%", "高"},
-//                {"喂子坪村北石槽组南石槽沟内(B7)", "72%", "高"},
-//                {"喂子坪村青岗树组夭佛岩(B4)", "70%", "高"},
-//                {"喂子坪村大坪组大坪(B10)", "68%", "中"},
-//                {"上王村六组翠微宫园(C2)", "32%", "低"}
-//        };
-//
-//        String MountainTorrentTableName = "山洪灾害预测概率统计表";
-//        String[] MountainTorrentHead = {"序号", "位置", "山洪发生概率", "风险等级"};
-//        int[] MountainTorrentColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
-//        String[][] MountainTorrentData = {
-//                {"沣峪村大门村组红草河以东(B3)", "84%", "高"},
-//                {"沣峪村石峡沟组原石峡沟村(B6)", "82%", "高"},
-//                {"喂子坪村鸡窝子组上鸡窝(B2)", "63%", "中"},
-//                {"喂子坪村北石槽组原北石槽村(B10)", "62%", "中"},
-//                {"喂子坪村北石槽组南石槽沟西口(B9)", "62%", "中"},
-//                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "61%", "中"},
-//                {"喂子坪村北石槽组南石槽沟内(B7)", "61%", "中"},
-//                {"喂子坪村青岗树组夭佛岩(B4)", "60%", "中"},
-//                {"喂子坪村大坪组大坪(B10)", "58%", "中"},
-//                {"上王村六组翠微宫园(C2)", "25%", "低"}
-//        };
-//
-//        String UrbanFloodTableName = "城市内涝灾害预测概率统计表";
-//        String[] UrbanFloodHead = {"序号", "位置", "城市内涝发生概率", "风险等级"};
-//        int[] UrbanFloodColWidths = {2540, 14570, 7210, 3780}; // 序号 位置 概率 等级
-//        String[][] UrbanFloodData = {
-//                {"喂子坪村鸡窝子组上鸡窝(B2)", "83%", "高"},
-//                {"喂子坪村北石槽组原北石槽村(B10)", "78%", "高"},
-//                {"喂子坪村北石槽组南石槽沟西口(B9)", "76%", "高"},
-//                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "76%", "高"},
-//                {"喂子坪村北石槽组南石槽沟内(B7)", "75%", "高"},
-//                {"喂子坪村青岗树组夭佛岩(B4)", "74%", "高"},
-//                {"喂子坪村大坪组大坪(B10)", "74%", "高"},
-//                {"沣峪村石峡沟组原石峡沟村(B6)", "60%", "中"},
-//                {"沣峪村大门村组红草河以东(B3)", "62%", "中"},
-//                {"上王村六组翠微宫园(C2)", "22%", "低"}
-//        };
-//
-//        String LifelineProjectTableName = "生命线工程影响统计表";
-//        String[] LifelineProjectHead = {"序号", "类型", "位置"};
-//        int[] LifelineProjectColWidths = {2540, 7210, 7210, 3780}; // 序号 位置 概率 等级
-//        String[][] LifelineProjectData = {
-//                {"喂子坪村鸡窝子组上鸡窝(B2)", "83%", "高"},
-//                {"喂子坪村北石槽组原北石槽村(B10)", "78%", "高"},
-//                {"喂子坪村北石槽组南石槽沟西口(B9)", "76%", "高"},
-//                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "76%", "高"},
-//                {"喂子坪村北石槽组南石槽沟内(B7)", "75%", "高"},
-//                {"喂子坪村青岗树组夭佛岩(B4)", "74%", "高"},
-//                {"喂子坪村大坪组大坪(B10)", "74%", "高"},
-//                {"沣峪村石峡沟组原石峡沟村(B6)", "60%", "中"},
-//                {"沣峪村大门村组红草河以东(B3)", "62%", "中"},
-//                {"上王村六组翠微宫园(C2)", "22%", "低"}
-//        };
+        String MudslideTableName = "泥石流灾害预测概率统计表";
+        String[] MudslideHead = {"序号", "位置", "泥石流发生概率", "风险等级"};
+        int[] MudslideColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
+        String[][] MudslideData = {
+                {"沣峪村大门村组红草河以东(B3)", "81%", "高"},
+                {"沣峪村石峡沟组原石峡沟村(B6)", "78%", "高"},
+                {"喂子坪村鸡窝子组上鸡窝(B2)", "76%", "高"},
+                {"喂子坪村北石槽组原北石槽村(B10)", "74%", "高"},
+                {"喂子坪村北石槽组南石槽沟西口(B9)", "74%", "高"},
+                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "73%", "高"},
+                {"喂子坪村北石槽组南石槽沟内(B7)", "72%", "高"},
+                {"喂子坪村青岗树组夭佛岩(B4)", "70%", "高"},
+                {"喂子坪村大坪组大坪(B10)", "68%", "中"},
+                {"上王村六组翠微宫园(C2)", "32%", "低"}
+        };
+
+        String MountainTorrentTableName = "山洪灾害预测概率统计表";
+        String[] MountainTorrentHead = {"序号", "位置", "山洪发生概率", "风险等级"};
+        int[] MountainTorrentColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
+        String[][] MountainTorrentData = {
+                {"沣峪村大门村组红草河以东(B3)", "84%", "高"},
+                {"沣峪村石峡沟组原石峡沟村(B6)", "82%", "高"},
+                {"喂子坪村鸡窝子组上鸡窝(B2)", "63%", "中"},
+                {"喂子坪村北石槽组原北石槽村(B10)", "62%", "中"},
+                {"喂子坪村北石槽组南石槽沟西口(B9)", "62%", "中"},
+                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "61%", "中"},
+                {"喂子坪村北石槽组南石槽沟内(B7)", "61%", "中"},
+                {"喂子坪村青岗树组夭佛岩(B4)", "60%", "中"},
+                {"喂子坪村大坪组大坪(B10)", "58%", "中"},
+                {"上王村六组翠微宫园(C2)", "25%", "低"}
+        };
+
+        String UrbanFloodTableName = "城市内涝灾害预测概率统计表";
+        String[] UrbanFloodHead = {"序号", "位置", "城市内涝发生概率", "风险等级"};
+        int[] UrbanFloodColWidths = {2540, 14570, 7210, 3780}; // 序号 位置 概率 等级
+        String[][] UrbanFloodData = {
+                {"长安区靖宁路与西部大道十字", "73%", "高"},
+                {"长安区朱雀市场", "71%", "高"},
+                {"长安区西部大道积水点", "68%", "中"},
+                {"长安区学府大街西段", "66%", "中"},
+                {"雁塔区含光路崇业路", "65%", "中"},
+                {"雁塔区小寨十字", "64%", "中"},
+                {"雁塔区永城路下穿", "64%", "中"},
+                {"雁塔区西影路阳光小区", "59%", "中"},
+                {"雁塔区咸宁东路恒大绿洲", "58%", "中"},
+                {"高新区西三环丈八立交", "22%", "低"}
+        };
+
+        String LifelineProjectTableName = "生命线工程影响统计表";
+        String[] LifelineProjectHead = {"序号", "类型", "位置"};
+        int[] LifelineProjectColWidths = {2540, 7210, 18350}; // 序号 位置 概率 等级
+        String[][] LifelineProjectData = {
+                {"道路", "G210 国道（沣峪村段）"},
+                {"道路", "喂子坪村通村公路"},
+                {"输电线路", "35千伏输电线路（沿红草河沟谷段）"},
+                {"通信设施", "移动通信基站（鸡窝子组）"},
+                {"输水管道", "镇级饮用水主管线（经大门村组）"}
+        };
 
 
         String pictitle = "灾情影响分布图";
@@ -194,9 +191,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 replaceInParagraph(p, map);
             }
 
-            insertProbabilityTableAfterTitle(doc, landslideTableName, landslideHead, landslideData,landslideColWidths);
+            //插入表格
+            insertTableAfterTitle(doc, landslideTableName, landslideHead, landslideData,landslideColWidths);
+            insertTableAfterTitle(doc, MudslideTableName, MudslideHead, MudslideData,MudslideColWidths);
+            insertTableAfterTitle(doc, MountainTorrentTableName, MountainTorrentHead, MountainTorrentData,MountainTorrentColWidths);
+            insertTableAfterTitle(doc, UrbanFloodTableName,  UrbanFloodHead,  UrbanFloodData, UrbanFloodColWidths);
+            insertTableAfterTitle(doc, LifelineProjectTableName,   LifelineProjectHead,   LifelineProjectData,  LifelineProjectColWidths);
             //插入图片
-            insertPic(doc, pictitle, imgUrl);
+            insertPicBeforeTitle(doc, pictitle, imgUrl);
 
             try (OutputStream os = Files.newOutputStream(wordPath)) {
                 doc.write(os);
@@ -205,11 +207,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    /* ===== 3. 保留格式的占位符替换工具 ===== */
-
-    /**
-     * 在段落内替换占位符，**完全保留原格式**
-     */
+    //   在段落内替换占位符
     private void replaceInParagraph(XWPFParagraph para, Map<String, String> map) {
         StringBuilder sb = new StringBuilder();
         for (XWPFRun r : para.getRuns()) {
@@ -239,7 +237,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
     }
 
-    private void insertProbabilityTableAfterTitle(XWPFDocument doc, String title, String[] headers, String[][] data,int[] colWidths) {
+    //插入表格
+    private void insertTableAfterTitle(XWPFDocument doc, String title, String[] headers, String[][] data,int[] colWidths) {
 
         // 1. 找标题段落
         XWPFParagraph anchor = null;
@@ -273,13 +272,23 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         // 5. 表头
         XWPFTableRow header = table.getRow(0);
         for (int i = 0; i < headers.length; i++) {
+            XWPFTableCell cell;
             if (i == 0) {
-                header.getCell(0).setText(headers[0]);
+                cell = header.getCell(0);
             } else {
-                header.addNewTableCell().setText(headers[i]);
+                cell = header.addNewTableCell();
             }
+            // 使用单元格中已有的段落，而不是创建新的段落
+            XWPFParagraph paragraph = cell.getParagraphs().get(0); // 获取第一个段落
+            XWPFRun run = paragraph.createRun();
+            run.setText(headers[i]);
+            run.setBold(true); // 设置文本加粗
+            run.setFontFamily("仿宋_GB2312"); // 设置字体为仿宋_GB2312
+            run.setFontSize(12); // 设置字号为小四（12磅）[^63^]
+            paragraph.setAlignment(ParagraphAlignment.CENTER); // 水平居中
         }
-        setRowCenter(header, colWidths);   // ← 关键：整行一次性搞定
+        setRowCenter(header, colWidths); // 设置表头居中对齐
+
 
         // 6. 数据行（列数 = colWidths.length，不再写死）
         for (int i = 0; i < data.length; i++) {
@@ -287,13 +296,21 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             // 依次写每一列
             for (int c = 0; c < colWidths.length; c++) {
                 String val = (c == 0) ? String.valueOf(i + 1) : data[i][c - 1];
-                row.getCell(c).setText(val);
+                XWPFTableCell cell = row.getCell(c);
+                if (cell.getParagraphs().size() == 0) {
+                    cell.addParagraph(); // 确保单元格有段落
+                }
+                XWPFRun run = cell.getParagraphs().get(0).createRun();
+                run.setText(val);
+                run.setFontFamily("宋体"); // 设置字体为宋体
+                run.setFontSize(11); // 设置字号为11号[^63^]
             }
             // 整行一次性：固定 1.06 cm 行高 + 上下左右居中 + 段前段后 0 磅
             setRowCenter(row, colWidths);
         }
     }
 
+    //插入图片
     private static void setRowCenter(XWPFTableRow row, int[] colWidths) {
         final long ROW_HEIGHT_TWIPS = 600;
 
@@ -332,7 +349,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
     }
 
-    private void insertPic(XWPFDocument doc, String pictitle, String imgUrl) {
+    private void insertPicBeforeTitle(XWPFDocument doc, String pictitle, String imgUrl) {
         Path tempImgPath = Paths.get(imgUrl);
         if (!Files.exists(tempImgPath)) {
             System.err.println("图片不存在：" + imgUrl);
@@ -389,6 +406,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     }
 
 
+    //下载报告
     @Override
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException {
         Path file = Paths.get("D:/report").resolve(fileName).normalize();
