@@ -6,6 +6,10 @@ import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.dto.LatLonDTO;
+import com.ruoyi.system.domain.entity.XianDem;
+
+
 
 import java.util.List;
 
@@ -21,4 +25,11 @@ public interface IModelService extends IService<FactorAnalysis> {
 
 
     public ModelGetDataDTO eqSlideFactorUpdata(List<FactorVO> factorList);
+
+
+    public List<XianDem> getPoliejiao(LatLonDTO latLonDTO);
+
+
+    public List<XianDem> findElevationMinimumPath(Double lon, Double lat);
+
 }

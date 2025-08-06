@@ -8,17 +8,20 @@ import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
+import com.ruoyi.system.domain.entity.XianDem;
 import com.ruoyi.system.domain.vo.FactorAnalysisLevelProbabilityVO;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.mapper.FactorAnalysisMapper;
 import com.ruoyi.system.mapper.FactorValueMapper;
 import com.ruoyi.system.mapper.GeologicalDisasterHideMapper;
+import com.ruoyi.system.mapper.XianDemMapper;
 import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.system.domain.dto.LatLonDTO;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -40,6 +43,9 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Resource
     private IFactorValueService factorValueService;
+
+    @Resource
+    private XianDemMapper xianDemMapper;
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
@@ -370,6 +376,72 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         return modelGetDataDTO;
     }
 
+    // 3x3网格范围的距离（度），约等于45米
+    private static final double GRID_DISTANCE = 0.000405;
+
+    // 最大迭代次数
+    private static final int MAX_ITERATIONS = 30;
+
+    @Override
+    public List<XianDem> getPoliejiao(LatLonDTO latLonDTO){
+
+        List<XianDem> path = findElevationMinimumPath(latLonDTO.getLon(), latLonDTO.getLat());
+        return path;
+    }
+
+    /**
+     * 寻找高程最低点路径
+     */
+    @Override
+    public List<XianDem> findElevationMinimumPath(Double lon, Double lat) {
+        List<XianDem> path = new ArrayList<>();
+
+        // 找到起点所在的网格
+        XianDem currentGrid = xianDemMapper.findGridContainingPoint(lon, lat);
+        if (currentGrid == null) {
+            throw new IllegalArgumentException("经纬度点不在任何网格范围内");
+        }
+
+        int iterations = 0;
+
+        // 迭代寻找最低点
+        while (iterations < MAX_ITERATIONS) {
+            // 添加当前网格到路径
+            path.add(new XianDem(
+                    currentGrid.getCenterLat(),
+                    currentGrid.getCenterLon(),
+                    currentGrid.getElevation()
+            ));
+
+            // 查找3x3范围内高程最低的网格
+            XianDem minElevationGrid = xianDemMapper.findMinElevationGridIn3x3(
+                    currentGrid.getCenterLon(),
+                    currentGrid.getCenterLat(),
+                    GRID_DISTANCE
+            );
+
+            if (minElevationGrid == null) {
+                throw new RuntimeException("无法找到周围网格");
+            }
+
+            // 检查当前网格是否是最低点
+            if (currentGrid.getElevation().equals(minElevationGrid.getElevation())) {
+                break;
+            }
+
+            // 移动到最低点网格
+            currentGrid = minElevationGrid;
+            iterations++;
+        }
+
+        if (iterations >= MAX_ITERATIONS) {
+            throw new RuntimeException("已达到最大迭代次数，可能未找到绝对最低点");
+        }
+
+        return path;
+    }
+
+
     // 暴雨滑坡模型计算概率值
     private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType,double breakDistance,double waterDistance, double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
 //        double INTERCEPT = 1.108;          // 常量
@@ -583,4 +655,6 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
             default: throw new IllegalArgumentException("未知坡型: " + slopeShape);
         }
     }
+
+
 }
