@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("analysis_shelter")
+@TableName("xian_shelter")
 public class EmergencyShelter {
 
     @TableId
@@ -37,8 +37,8 @@ public class EmergencyShelter {
     private String unitHead;
     @TableField("telephone")
     private String telephone;
-    @TableField("longitude")
+    @TableField("lon")
     private Double longitude;
-    @TableField("latitude")
+    @TableField("lat")
     private Double latitude;
 }

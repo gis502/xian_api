@@ -5,8 +5,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.system.mapper.XianEarthquakeListMapper">
     <select id="selectAllEq" resultType="com.ruoyi.system.domain.entity.XianEarthquakeList">
         SELECT
-            eqid,
-            earthquake_name,
+            disaster_id,
+            disaster_name,
             earthquake_full_name,
             position,
             ST_AsText(geom) AS geom,
@@ -30,8 +30,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="getEarthquakeEventById" resultType="com.ruoyi.system.domain.entity.XianEarthquakeList">
         SELECT
-            eqid,
-            earthquake_name,
+            disaster_id,
+            disaster_name,
             earthquake_full_name,
             position,
             ST_AsText(geom) AS geom,
@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             province,
             city
         FROM xian_earthquake_list
-        WHERE eqid = CAST(#{id, jdbcType=VARCHAR} AS INTEGER)
+        WHERE disaster_id = CAST(#{id, jdbcType=VARCHAR} AS INTEGER)
     </select>
 
     <insert id="insertDisaster">
