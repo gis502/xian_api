@@ -27,6 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.xwpf.usermodel.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
+
+import java.util.Map;
+
 /**
  * @author: xiaodemos
  * @date: 2025-07-22 22:04
@@ -192,11 +199,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             }
 
             //插入表格
-            insertTableAfterTitle(doc, landslideTableName, landslideHead, landslideData,landslideColWidths);
-            insertTableAfterTitle(doc, MudslideTableName, MudslideHead, MudslideData,MudslideColWidths);
-            insertTableAfterTitle(doc, MountainTorrentTableName, MountainTorrentHead, MountainTorrentData,MountainTorrentColWidths);
-            insertTableAfterTitle(doc, UrbanFloodTableName,  UrbanFloodHead,  UrbanFloodData, UrbanFloodColWidths);
-            insertTableAfterTitle(doc, LifelineProjectTableName,   LifelineProjectHead,   LifelineProjectData,  LifelineProjectColWidths);
+            insertTableAfterTitle(doc, landslideTableName, landslideHead, landslideData, landslideColWidths);
+            insertTableAfterTitle(doc, MudslideTableName, MudslideHead, MudslideData, MudslideColWidths);
+            insertTableAfterTitle(doc, MountainTorrentTableName, MountainTorrentHead, MountainTorrentData, MountainTorrentColWidths);
+            insertTableAfterTitle(doc, UrbanFloodTableName, UrbanFloodHead, UrbanFloodData, UrbanFloodColWidths);
+            insertTableAfterTitle(doc, LifelineProjectTableName, LifelineProjectHead, LifelineProjectData, LifelineProjectColWidths);
             //插入图片
             insertPicBeforeTitle(doc, pictitle, imgUrl);
 
@@ -207,12 +214,17 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    //   在段落内替换占位符
+    //替换{{}}，保留格式
     private void replaceInParagraph(XWPFParagraph para, Map<String, String> map) {
         StringBuilder sb = new StringBuilder();
+        List<RunStyle> stylesToCopy = new ArrayList<>(); // 保存样式信息
+
+        // 提取段落中的文本和样式信息
         for (XWPFRun r : para.getRuns()) {
             sb.append(r.text());
+            stylesToCopy.add(new RunStyle(r)); // 保存样式信息
         }
+
         String fullText = sb.toString();
 
         // 替换占位符
@@ -221,24 +233,61 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
 
         // 清空原内容
-        for (int i = para.getRuns().size() - 1; i >= 0; i--) {
-            para.removeRun(i);
+        while (para.getRuns().size() > 0) {
+            para.removeRun(0);
         }
 
         // 重新写入整个字符串，保持原样式
         if (!fullText.isEmpty()) {
             XWPFRun newRun = para.createRun();
             newRun.setText(fullText);
+
             // 拷贝原样式（可选）
-            if (para.getRuns().size() > 0) {
-                XWPFRun firstOld = para.createRun(); // 占位
-                newRun.getCTR().setRPr(firstOld.getCTR().getRPr());
+            if (!stylesToCopy.isEmpty()) {
+                RunStyle firstOldStyle = stylesToCopy.get(0);
+
+                // 根据样式信息设置新 run 的样式
+                if (firstOldStyle.isBold != null) newRun.setBold(firstOldStyle.isBold);
+                if (firstOldStyle.fontSize != -1) newRun.setFontSize(firstOldStyle.fontSize);
+                if (firstOldStyle.fontFamily != null) newRun.setFontFamily(firstOldStyle.fontFamily);
+                if (firstOldStyle.color != null) newRun.setColor(firstOldStyle.color);
+            } else {
+                System.out.println("No styles to copy from.");
             }
+        }
+    }
+    class RunStyle {
+        String text;
+        Boolean isBold;
+        Boolean isItalic;
+        Integer fontSize;
+        String fontFamily;
+        String color;
+
+        public RunStyle(XWPFRun run) {
+            this.text = run.text();
+            this.isBold = run.isBold();
+            this.isItalic = run.isItalic();
+            this.fontSize = run.getFontSize();
+            this.fontFamily = run.getFontFamily();
+            this.color = run.getColor();
+        }
+
+        @Override
+        public String toString() {
+            return "RunStyle{" +
+                    "text='" + text + '\'' +
+                    ", isBold=" + isBold +
+                    ", isItalic=" + isItalic +
+                    ", fontSize=" + fontSize +
+                    ", fontFamily='" + fontFamily + '\'' +
+                    ", color='" + color + '\'' +
+                    '}';
         }
     }
 
     //插入表格
-    private void insertTableAfterTitle(XWPFDocument doc, String title, String[] headers, String[][] data,int[] colWidths) {
+    private void insertTableAfterTitle(XWPFDocument doc, String title, String[] headers, String[][] data, int[] colWidths) {
 
         // 1. 找标题段落
         XWPFParagraph anchor = null;
@@ -316,7 +365,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* 1. 行高：直接 addNewTrHeight，不设 w:hRule="exact" Word 不会压缩 */
         CTTrPr trPr = row.getCtRow().addNewTrPr();
-        CTHeight  ht  = trPr.addNewTrHeight();
+        CTHeight ht = trPr.addNewTrHeight();
         ht.setVal(BigInteger.valueOf(ROW_HEIGHT_TWIPS));
 
         /* 2. 每个单元格：垂直 + 水平居中 + 段前段后 0 磅 + 列宽 */
