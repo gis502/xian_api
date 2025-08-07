@@ -33,6 +33,8 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author: xiaodemos
@@ -80,35 +82,35 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         Path wordPath = wordDir.resolve(wordName);
 
         /* 占位符内容 */
-        Map<String, String> map = new HashMap<>();
-        map.put("{{ReportDate}}", "2023年08月11日15时51分");
-        map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
-        map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
-        map.put("{{OverView_mainRainQuXian}}", "长安区");
-        map.put("{{Disaster_MainRainQuXian}}", "长安区");
-        map.put("{{Disaster_LandslideMainCun}}", "喂子坪村");
-        map.put("{{Disaster_LandslideMostHigh}}", "鸡窝子组上鸡窝");
-        map.put("{{Disaster_LandslideMostHighProbability}}", "83%");
-        map.put("{{Disaster_NumOfLandslide}}", "7");
-        map.put("{{Disaster_MudslideMainCun}}", "沣峪村、喂子坪村");
-        map.put("{{Disaster_MudslideMostHigh}}", "大门村组红草河以东");
-        map.put("{{Disaster_MudslideMostHighProbability}}", "81%");
-        map.put("{{Disaster_NumOfMudslide}}", "8");
-        map.put("{{Disaster_MountainTorrentMainCun}}", "沣峪村");
-        map.put("{{Disaster_MountainTorrentMostHigh}}", "大门村组红草河以东");
-        map.put("{{Disaster_MountainTorrentMostHighProbability}}", "83%");
-        map.put("{{Disaster_NumOfMountainTorrente}}", "2");
-        map.put("{{Disaster_UrbanFloodMainCun}}", "长安区、雁塔区");
-        map.put("{{Disaster_UrbanFloodMostHigh}}", "靖宁路与西部大道十字");
-        map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
-        map.put("{{Disaster_NumOfUrbanFlood}}", "2");
-        map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
-        map.put("{{Disaster_AffectedAreaLow}}", "xx");
-        map.put("{{Disaster_AffectedAreaHigh}}", "xx");
-        map.put("{{Disaster_AffectedPeopleLow}}", "xx");
-        map.put("{{Disaster_AffectedPeopleHigh}}", "xx");
-        map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
-        map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
+//        Map<String, String> map = new HashMap<>();
+//        map.put("{{ReportDate}}", "2023年08月11日15时51分");
+//        map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
+//        map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
+//        map.put("{{OverView_mainRainQuXian}}", "长安区");
+//        map.put("{{Disaster_MainRainQuXian}}", "长安区");
+//        map.put("{{Disaster_LandslideMainCun}}", "喂子坪村");
+//        map.put("{{Disaster_LandslideMostHigh}}", "鸡窝子组上鸡窝");
+//        map.put("{{Disaster_LandslideMostHighProbability}}", "83%");
+//        map.put("{{Disaster_NumOfLandslide}}", "7");
+//        map.put("{{Disaster_MudslideMainCun}}", "沣峪村、喂子坪村");
+//        map.put("{{Disaster_MudslideMostHigh}}", "大门村组红草河以东");
+//        map.put("{{Disaster_MudslideMostHighProbability}}", "81%");
+//        map.put("{{Disaster_NumOfMudslide}}", "8");
+//        map.put("{{Disaster_MountainTorrentMainCun}}", "沣峪村");
+//        map.put("{{Disaster_MountainTorrentMostHigh}}", "大门村组红草河以东");
+//        map.put("{{Disaster_MountainTorrentMostHighProbability}}", "83%");
+//        map.put("{{Disaster_NumOfMountainTorrente}}", "2");
+//        map.put("{{Disaster_UrbanFloodMainCun}}", "长安区、雁塔区");
+//        map.put("{{Disaster_UrbanFloodMostHigh}}", "靖宁路与西部大道十字");
+//        map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
+//        map.put("{{Disaster_NumOfUrbanFlood}}", "2");
+//        map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
+//        map.put("{{Disaster_AffectedAreaLow}}", "xx");
+//        map.put("{{Disaster_AffectedAreaHigh}}", "xx");
+//        map.put("{{Disaster_AffectedPeopleLow}}", "xx");
+//        map.put("{{Disaster_AffectedPeopleHigh}}", "xx");
+//        map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
+//        map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
 
 
         //表格内容
@@ -187,7 +189,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 {"输水管道", "镇级饮用水主管线（经大门村组）"}
         };
 
-
+        Map<String, String> replaceMap = writeDescibe(landslideData, MudslideData, MountainTorrentData, UrbanFloodData);
         String pictitle = "灾情影响分布图";
         /* 读模板并替换 */
         try (InputStream template = getClass().getResourceAsStream("/reportTemplate/暴雨应急预评估报告模板.docx");
@@ -195,7 +197,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
             // 逐段替换
             for (XWPFParagraph p : doc.getParagraphs()) {
-                replaceInParagraph(p, map);
+                replaceInParagraph(p, replaceMap);
             }
 
             //插入表格
@@ -214,7 +216,115 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    //替换{{}}，保留格式
+    //描述文段
+    private static Map<String, String> writeDescibe(String[][] landslideData, String[][] MudslideData, String[][] MountainTorrentData, String[][] UrbanFloodData) {
+        Map<String, String> map = new HashMap<>();
+        map.put("{{ReportDate}}", "2023年08月11日15时51分");
+        map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
+        map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
+        map.put("{{OverView_mainRainQuXian}}", "长安区");
+        map.put("{{Disaster_MainRainQuXian}}", "长安区");
+        map.put("{{Disaster_LandslideMainCun}}", "喂子坪村");
+        map.put("{{Disaster_LandslideMostHigh}}", "鸡窝子组上鸡窝");
+        map.put("{{Disaster_LandslideMostHighProbability}}", "83%");
+        map.put("{{Disaster_NumOfLandslide}}", "7");
+        map.put("{{Disaster_MudslideMainCun}}", "沣峪村、喂子坪村");
+        map.put("{{Disaster_MudslideMostHigh}}", "大门村组红草河以东");
+        map.put("{{Disaster_MudslideMostHighProbability}}", "81%");
+        map.put("{{Disaster_NumOfMudslide}}", "8");
+        map.put("{{Disaster_MountainTorrentMainCun}}", "沣峪村");
+        map.put("{{Disaster_MountainTorrentMostHigh}}", "大门村组红草河以东");
+        map.put("{{Disaster_MountainTorrentMostHighProbability}}", "83%");
+        map.put("{{Disaster_NumOfMountainTorrente}}", "2");
+        map.put("{{Disaster_UrbanFloodMainCun}}", "长安区、雁塔区");
+        map.put("{{Disaster_UrbanFloodMostHigh}}", "靖宁路与西部大道十字");
+        map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
+        map.put("{{Disaster_NumOfUrbanFlood}}", "2");
+        map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
+        map.put("{{Disaster_AffectedAreaLow}}", "xx");
+        map.put("{{Disaster_AffectedAreaHigh}}", "xx");
+        map.put("{{Disaster_AffectedPeopleLow}}", "xx");
+        map.put("{{Disaster_AffectedPeopleHigh}}", "xx");
+        map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
+        map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
+
+        Map<String, String> replaceMap = new HashMap<>();
+        replaceMap.put("{{ReportDate}}", "2023年08月11日15时51分");
+
+        String DisasterOverAllOrg = "受持续强降雨影响，根据灾害风险评估模型测算结果，{{Disaster_MainRainQuXian}}多个村（组）地质灾害风险显著上升，需高度警惕滑坡、泥石流等次生灾害发生可能。";
+        String DisasterOverAll = replacePlaceholders(DisasterOverAllOrg, map);
+        replaceMap.put("{{Disaster_OverAll}}", DisasterOverAll);
+
+        String OverViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现50毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
+        String OverView = replacePlaceholders(OverViewOrg, map);
+        replaceMap.put("{{OverView}}", OverView);
+
+
+        String LandslideDescribe = "";
+        if (!containsHighRisk(landslideData)) {
+            LandslideDescribe = "在本次评估中，多个隐患点的滑坡发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的滑坡事件。";
+        } else {
+            String LandslideDescribeOrg = "{{Disaster_LandslideMainCun}}为滑坡高风险区域。{{Disaster_LandslideMostHigh}}滑坡概率达{{Disaster_LandslideMostHighProbability}}，为当前评估区域内滑坡风险最高点。在本轮强降雨影响下，共有{{Disaster_NumOfLandslide}}处滑坡隐患点被评估为高风险，存在失稳可能，需立即加强防范。";
+            LandslideDescribe = replacePlaceholders(LandslideDescribeOrg, map);
+        }
+        replaceMap.put("{{Disaster_LandslideDescribe}}", LandslideDescribe);
+
+
+        String MudslideDescribe = "";
+        if (!containsHighRisk(MudslideData)) {
+            MudslideDescribe = "在本次评估中，多个隐患点的泥石流发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的泥石流事件。";
+        } else {
+            String MudslideDescribeOrg = "泥石流风险主要集中在{{Disaster_MudslideMainCun}}一带。其中{{Disaster_MudslideMostHigh}}点位泥石流发生概率高达{{Disaster_MudslideMostHighProbability}}，为目前模型评估中泥石流风险最高区域。在持续强降雨影响下，共有{{Disaster_NumOfMudslide}}处存在较高的泥石流触发风险。";
+            MudslideDescribe = replacePlaceholders(MudslideDescribeOrg, map);
+        }
+        replaceMap.put("{{Disaster_MudslideDescribe}}", MudslideDescribe);
+
+
+        String MountainTorrentDescribeOrg = "山洪风险主要集中在{{Disaster_MountainTorrentMainCun}}附近区域。其中{{Disaster_MountainTorrentMostHigh}}点位山洪发生概率达{{Disaster_MountainTorrentMostHighProbability}}，为本轮强降雨期间山洪风险最高区域。在持续降雨背景下共有{{Disaster_NumOfMountainTorrente}}处存在山洪骤发风险，需加强预警与应急准备。";
+        String MountainTorrentDescribe = replacePlaceholders(MountainTorrentDescribeOrg, map);
+        replaceMap.put("{{Disaster_MountainTorrentDescribe}}", MountainTorrentDescribe);
+
+        String UrbanFloodDescribeOrg = "城市内涝风险主要集中在{{Disaster_UrbanFloodMainCun}}低洼区域及部分老旧排水片区，其中{{Disaster_UrbanFloodMostHigh}}内涝发生概率为{{Disaster_UrbanFloodMostHighProbability}}，为本轮强降雨期间城市内涝风险最高区域。短时强降雨下共有{{Disaster_NumOfUrbanFlood}}处易出现道路积水和排涝不畅等问题，需提前做好排水疏导和交通应对措施。";
+        String UrbanFloodDescribe = replacePlaceholders(UrbanFloodDescribeOrg, map);
+        replaceMap.put("{{Disaster_UrbanFloodDescribe}}", UrbanFloodDescribe);
+
+        String DisasterAllInAllOrg = "综合研判，{{Disaster_ProtectAreas}}周边等地为本轮强降雨期间次生灾害重点防范区域。建议有关单位强化动态监测和预警信息发布，提前做好人员转移安置及应急物资准备，切实提升应对突发地质灾害的处置能力。";
+        String DisasterAllInAll = replacePlaceholders(DisasterAllInAllOrg, map);
+        replaceMap.put("{{Disaster_AllInAll}}", DisasterAllInAll);
+
+        String DisasterAffectedAreaAndPeopleOrg = "根据滑坡破裂角模型计算结果，结合区域地形坡向与沟谷汇水条件综合分析，当前在持续强降雨影响下，一旦发生次生灾害，初步预测其可能影响范围在{{Disaster_AffectedAreaLow}}至{{Disaster_AffectedAreaHigh}}平方公里之间。经对区域建筑密度与人口分布数据进行叠加分析，预计受影响人口在{{Disaster_AffectedPeopleLow}}至{{Disaster_AffectedPeopleHigh}}人之间，主要集中在地势低洼、沟谷下游及滑坡堆积方向所覆盖区域。";
+        String DisasterAffectedAreaAndPeople = replacePlaceholders(DisasterAffectedAreaAndPeopleOrg, map);
+        replaceMap.put("{{Disaster_AffectedAreaAndPeople}}", DisasterAffectedAreaAndPeople);
+
+        String DisasterLifeLine = "其中，多处道路存在中断风险，沿线输电线路和通信基站可能受损，导致局部供电和通信中断；下游加油站及部分工业厂房等重点危险源或引发燃气泄漏和火灾爆炸等次生灾害。";
+        replaceMap.put("{{Disaster_LifeLine}}", DisasterLifeLine);
+
+        String DisposalEvacuationOrg = "人员疏散方面，建议优先组织{{Disposal_AffectedByFloodAndSlide}}中紧邻河道的民房、农家乐等高风险区域居民转移，此类区域靠近水体，受山洪和泥石流突发影响最为显著。同时，应重点关注{{Disposal_AffectedByUrbanFlood}}城市内涝易发的低洼积水区域，确保上述重点区域人员能够及时、安全撤离，最大限度保障群众生命安全。";
+        String DisposalEvacuation = replacePlaceholders(DisposalEvacuationOrg, map);
+        replaceMap.put("{{Disposal_Evacuation}}", DisposalEvacuation);
+
+        return replaceMap;
+
+    }
+
+    public static boolean containsHighRisk(String[][] Data) {
+        for (String[] data : Data) {
+            // 检查风险等级是否为“高”
+            if ("高".equals(data[2])) {
+                return true; // 存在高风险
+            }
+        }
+        return false; // 不存在高风险
+    }
+
+    public static String replacePlaceholders(String originalText, Map<String, String> placeholders) {
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            originalText = originalText.replace(entry.getKey(), entry.getValue());
+        }
+        return originalText;
+    }
+
+    //文段写入word
     private void replaceInParagraph(XWPFParagraph para, Map<String, String> map) {
         StringBuilder sb = new StringBuilder();
         List<RunStyle> stylesToCopy = new ArrayList<>(); // 保存样式信息
@@ -256,6 +366,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             }
         }
     }
+
     class RunStyle {
         String text;
         Boolean isBold;
