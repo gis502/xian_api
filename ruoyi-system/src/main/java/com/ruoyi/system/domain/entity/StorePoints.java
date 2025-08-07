@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("analysis_store_points")
+@TableName("xian_store_points")
 public class StorePoints {
     @TableId
     private Integer id;
@@ -44,8 +44,8 @@ public class StorePoints {
     private String unitHead;
     @TableField("telephone")
     private String telephone;
-    @TableField("longitude")
+    @TableField("lon")
     private Float longitude;
-    @TableField("latitude")
+    @TableField("lat")
     private Float latitude;
 }
