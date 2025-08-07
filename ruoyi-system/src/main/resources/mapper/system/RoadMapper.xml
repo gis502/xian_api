@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.RoadMapper">
 
     <select id="findIntersectingRoads" resultType="com.ruoyi.system.domain.entity.Road">
-        SELECT *,ST_AsText(geom) AS geomGeom
+        SELECT *,ST_AsText(geom) AS pointGeom
         FROM xian_road
         WHERE ST_Intersects(geom, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(geom, ST_GeomFromText(#{wktPolygon}, 4490))
