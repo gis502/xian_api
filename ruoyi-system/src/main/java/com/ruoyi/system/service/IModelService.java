@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ruoyi.system.domain.dto.EffactAreaDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
@@ -31,5 +32,7 @@ public interface IModelService extends IService<FactorAnalysis> {
 
 
     public List<XianDem> findElevationMinimumPath(Double lon, Double lat);
+
+    public EffactAreaDTO getEffactArea(List<LatLonDTO> latLonDTOList);
 
 }

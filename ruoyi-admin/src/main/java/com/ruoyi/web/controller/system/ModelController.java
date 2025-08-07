@@ -49,4 +49,11 @@ public class ModelController {
         return AjaxResult.success(modelService.getPoliejiao(request));
     }
 
+    @PostMapping("/affectArea")
+    public AjaxResult affectArea(@RequestBody List<LatLonDTO> request)
+    {
+        return AjaxResult.success(modelService.getEffactArea(request));
+
+    }
+
 }

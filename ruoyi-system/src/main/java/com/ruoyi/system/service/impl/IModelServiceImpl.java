@@ -5,16 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
-import com.ruoyi.system.domain.entity.FactorAnalysis;
-import com.ruoyi.system.domain.entity.FactorValue;
-import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
-import com.ruoyi.system.domain.entity.XianDem;
+import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.domain.vo.FactorAnalysisLevelProbabilityVO;
 import com.ruoyi.system.domain.vo.FactorVO;
-import com.ruoyi.system.mapper.FactorAnalysisMapper;
-import com.ruoyi.system.mapper.FactorValueMapper;
-import com.ruoyi.system.mapper.GeologicalDisasterHideMapper;
-import com.ruoyi.system.mapper.XianDemMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.ruoyi.system.domain.dto.LatLonDTO;
+import com.ruoyi.system.domain.dto.EffactAreaDTO;
+
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -46,6 +42,27 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Resource
     private XianDemMapper xianDemMapper;
+
+    @Resource
+    private BridgeMapper bridgeMapper;
+
+    @Resource
+    private ReservoirMapper reservoirMapper;
+
+    @Resource
+    private HighwayMapper highwayMapper;
+
+    @Resource
+    private RoadMapper roadMapper;
+
+    @Resource
+    private WaterPipeMapper waterPipeMapper;
+
+    @Resource
+    private PeopleMapper peopleMapper;
+
+    @Resource
+    private CropsMapper cropsMapper;
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
@@ -441,6 +458,74 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         return path;
     }
 
+    @Override
+    public EffactAreaDTO getEffactArea(List<LatLonDTO> latLonDTOList) {
+        EffactAreaDTO effactAreaDTO = new EffactAreaDTO();
+
+        // 将前端传来的经纬度列表转换为WKT格式的面
+        String wktPolygon = convertLatLonListToWKT(latLonDTOList);
+
+        try {
+            // 查询与面相交或在面内的各类数据
+            List<Bridge> bridges = bridgeMapper.findIntersectingBridges(wktPolygon);
+            List<Reservoir> reservoirs = reservoirMapper.findIntersectingReservoirs(wktPolygon);
+            List<Highway> highways = highwayMapper.findIntersectingHighways(wktPolygon);
+            List<Road> roads = roadMapper.findIntersectingRoads(wktPolygon);
+            List<WaterPipe> waterPipes = waterPipeMapper.findIntersectingWaterPipes(wktPolygon);
+            List<People> people = peopleMapper.findIntersectingPeople(wktPolygon);
+            List<Crops> crops = cropsMapper.findIntersectingCrops(wktPolygon);
+
+            // 设置到DTO中
+            effactAreaDTO.setBridgeList(bridges);
+            effactAreaDTO.setReservoirList(reservoirs);
+            effactAreaDTO.setHighwayList(highways);
+            effactAreaDTO.setRoadList(roads);
+            effactAreaDTO.setWaterPipeList(waterPipes);
+            effactAreaDTO.setPeopleList(people);
+            effactAreaDTO.setCropsList(crops);
+
+            log.info("查询影响区域数据完成，桥梁:{}, 水库:{}, 高速:{}, 道路:{}, 供水管网:{}, 人口:{}, 农作物:{}",
+                    bridges.size(), reservoirs.size(), highways.size(), roads.size(),
+                    waterPipes.size(), people.size(), crops.size());
+
+        } catch (Exception e) {
+            log.error("查询影响区域数据失败", e);
+            throw new RuntimeException("查询影响区域数据失败: " + e.getMessage());
+        }
+
+        return effactAreaDTO;
+    }
+
+    /**
+     * 将经纬度列表转换为WKT格式的面
+     * @param latLonDTOList 经纬度列表
+     * @return WKT格式的面字符串
+     */
+    private String convertLatLonListToWKT(List<LatLonDTO> latLonDTOList) {
+        if (latLonDTOList == null || latLonDTOList.isEmpty()) {
+            throw new IllegalArgumentException("经纬度列表不能为空");
+        }
+
+        StringBuilder wkt = new StringBuilder("POLYGON((");
+
+        for (int i = 0; i < latLonDTOList.size(); i++) {
+            LatLonDTO point = latLonDTOList.get(i);
+            if (i > 0) {
+                wkt.append(", ");
+            }
+            wkt.append(point.getLon()).append(" ").append(point.getLat());
+        }
+
+        // 闭合多边形（第一个点和最后一个点相同）
+        if (!latLonDTOList.get(0).equals(latLonDTOList.get(latLonDTOList.size() - 1))) {
+            LatLonDTO firstPoint = latLonDTOList.get(0);
+            wkt.append(", ").append(firstPoint.getLon()).append(" ").append(firstPoint.getLat());
+        }
+
+        wkt.append("))");
+
+        return wkt.toString();
+    }
 
     // 暴雨滑坡模型计算概率值
     private static double calculateRainLandslideProbability(double elevation, double slope, int soilType, int landUseType,double breakDistance,double waterDistance, double rain, double vegetationCover, double curvature, double sandContent, int slopeShape) {
