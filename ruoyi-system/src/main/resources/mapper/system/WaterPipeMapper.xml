@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.WaterPipeMapper">
 
     <select id="findIntersectingWaterPipes" resultType="com.ruoyi.system.domain.entity.WaterPipe">
-        SELECT *
+        SELECT *,ST_AsText(geom) AS geomGeom
         FROM xian_water_pipe
         WHERE ST_Intersects(geom, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(geom, ST_GeomFromText(#{wktPolygon}, 4490))

@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.CropsMapper">
 
     <select id="findIntersectingCrops" resultType="com.ruoyi.system.domain.entity.Crops">
-        SELECT *
+        SELECT *,ST_AsText(point) AS pointGeom
         FROM xian_crops
         WHERE ST_Intersects(point, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(point, ST_GeomFromText(#{wktPolygon}, 4490))

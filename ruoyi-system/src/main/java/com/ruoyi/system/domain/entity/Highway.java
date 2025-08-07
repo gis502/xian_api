@@ -33,4 +33,7 @@ public class Highway {
     
     @TableField("Shape_Length")
     private String shapeLength; // 形状长度
+
+    private String geomGeom;
+
 }

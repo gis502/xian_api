@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.BridgeMapper">
 
     <select id="findIntersectingBridges" resultType="com.ruoyi.system.domain.entity.Bridge">
-        SELECT *
+        SELECT *,ST_AsText(point) AS pointGeom
         FROM xian_bridge_points
         WHERE ST_Intersects(point, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(point, ST_GeomFromText(#{wktPolygon}, 4490))

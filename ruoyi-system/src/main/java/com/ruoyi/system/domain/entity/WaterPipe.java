@@ -89,4 +89,7 @@ public class WaterPipe {
     
     @TableField("fxpc_datai")
     private String fxpcDatai;
+
+    private String geomGeom;
+
 }

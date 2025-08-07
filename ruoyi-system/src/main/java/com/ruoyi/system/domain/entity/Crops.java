@@ -47,4 +47,6 @@ public class Crops {
     /** 几何信息 (WKT格式) */
     @TableField("point")
     private String point;
+
+    private String pointGeom;
 }

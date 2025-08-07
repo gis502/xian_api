@@ -53,4 +53,7 @@ public class Road {
     
     @TableField("geom")
     private String geom;
+
+    private String geomGeom;
+
 }
