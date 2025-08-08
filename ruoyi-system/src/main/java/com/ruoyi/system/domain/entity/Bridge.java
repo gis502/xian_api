@@ -57,4 +57,7 @@ public class Bridge {
     
     @TableField("point")
     private String point; // 位置（几何类型）
+
+    private String pointGeom;
+
 }

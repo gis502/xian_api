@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.ReservoirMapper">
 
     <select id="findIntersectingReservoirs" resultType="com.ruoyi.system.domain.entity.Reservoir">
-        SELECT *
+        SELECT *,ST_AsText(point) AS pointGeom
         FROM xian_reservoir_list
         WHERE ST_Intersects(point, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(point, ST_GeomFromText(#{wktPolygon}, 4490))

@@ -59,4 +59,7 @@ public class Reservoir {
     
     @TableField("point")
     private String point;
+
+    private String pointGeom;
+
 }
