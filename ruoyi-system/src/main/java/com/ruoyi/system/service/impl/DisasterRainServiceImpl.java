@@ -56,7 +56,9 @@ public class DisasterRainServiceImpl extends ServiceImpl<DisasterRainMapper, Xia
 
         disasterRainMapper.insert(disasterRain);
 
-        log.info("存储暴雨灾害数据成功！");
+        // 获取到rainDisasterId后，可以让其他地方拿到这个Id，进行操作
+        Long rainDisasterId = disasterRain.getDisasterId();
 
+        log.info("存储暴雨灾害数据成功！");
     }
 }

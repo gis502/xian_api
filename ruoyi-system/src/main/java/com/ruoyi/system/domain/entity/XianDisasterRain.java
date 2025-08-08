@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -17,7 +18,8 @@ import java.time.LocalDateTime;
 @Data
 @TableName("xian_disaster_rain")
 public class XianDisasterRain {
-  @TableId
+
+  @TableId(type = IdType.AUTO)
   @TableField("disaster_id")
   private Long disasterId;
   @TableField("disaster_name")
