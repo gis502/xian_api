@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class DisasterRainDTO {
 
+    private Long disasterId;
     private String rainfall;
     private String duration;
     private Long longitude;

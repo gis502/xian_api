@@ -19,13 +19,17 @@ import java.time.LocalDateTime;
 @TableName("xian_disaster_rain")
 public class XianDisasterRain {
 
-  @TableId(type = IdType.AUTO)
   @TableField("disaster_id")
   private Long disasterId;
   @TableField("disaster_name")
   private String disasterName;
   @TableField("occurrence_time")
   private LocalDateTime occurrenceTime;
+  @TableField(value = "geom", typeHandler = GeometryTypeHandler.class)
+  @JsonSerialize(using = GeometrySerializer.class)
+  @JsonDeserialize(using = GeometryDeserializer.class)
+  @JsonInclude(JsonInclude.Include.NON_NULL)  // 仅序列化非空字段
+  private Geometry geom; //经纬度
   @TableField("rainfall")
   private String rainfall;
   @TableField("duration")
@@ -38,11 +42,7 @@ public class XianDisasterRain {
   private LocalDateTime updateTime;
   @TableField("is_deleted")
   private Integer isDeleted;
-  @TableField(value = "geom", typeHandler = GeometryTypeHandler.class)
-  @JsonSerialize(using = GeometrySerializer.class)
-  @JsonDeserialize(using = GeometryDeserializer.class)
-  @JsonInclude(JsonInclude.Include.NON_NULL)  // 仅序列化非空字段
-  private Geometry geom; //经纬度
+
 
 
 }

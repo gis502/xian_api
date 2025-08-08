@@ -33,49 +33,34 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
-
     @Resource
     private FactorAnalysisMapper factorAnalysisMapper;
-
     @Resource
     private FactorValueMapper factorValueMapper;
-
     @Resource
     private IFactorValueService factorValueService;
-
     @Resource
     private XianDemMapper xianDemMapper;
-
     @Resource
     private BridgeMapper bridgeMapper;
-
     @Resource
     private ReservoirMapper reservoirMapper;
-
     @Resource
     private HighwayMapper highwayMapper;
-
     @Resource
     private RoadMapper roadMapper;
-
     @Resource
     private WaterPipeMapper waterPipeMapper;
-
     @Resource
     private PeopleMapper peopleMapper;
-
     @Resource
     private CropsMapper cropsMapper;
-
     @Resource
     private HttpRestClient httpRestClient;
-
     @Resource
     private FactorAnalysisServiceImpl factorAnalysisService;
-
     @Autowired
     private XianDisasterRainMapper disasterRainMapper;
-
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
