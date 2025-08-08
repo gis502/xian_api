@@ -38,16 +38,12 @@ public class EmergencyShelterServiceImpl implements IEmergencyShelterService {
             properties.put("shelterName", emergencyShelter.getName());
             properties.put("position", emergencyShelter.getAddress());
             properties.put("shelterType", emergencyShelter.getType());
-            properties.put("level", emergencyShelter.getLevel());
-            properties.put("shelterVolume", emergencyShelter.getVolume());
-            properties.put("department", emergencyShelter.getDepartment());
-            properties.put("store", emergencyShelter.getStore());
-            properties.put("province", emergencyShelter.getProvince());
-            properties.put("city", emergencyShelter.getCity());
-            properties.put("county", emergencyShelter.getCounty());
-            properties.put("country", emergencyShelter.getCountry());
-            properties.put("unitHead", emergencyShelter.getUnitHead());
-            properties.put("phone", emergencyShelter.getTelephone());
+            properties.put("construction", emergencyShelter.getConstructionCategory());
+            properties.put("coverArea", emergencyShelter.getCoverArea());
+            properties.put("effectiveArea", emergencyShelter.getEffectiveRefugeArea());
+            properties.put("district", emergencyShelter.getDistrict());
+            properties.put("year", emergencyShelter.getYear());
+            properties.put("effectiveNumber", emergencyShelter.getEffectiveNumberOfRefugees());
             properties.put("lon", emergencyShelter.getLongitude());
             properties.put("lat", emergencyShelter.getLatitude());
 

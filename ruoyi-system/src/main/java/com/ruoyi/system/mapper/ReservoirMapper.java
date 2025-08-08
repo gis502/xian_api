@@ -1,0 +1,18 @@
+package com.ruoyi.system.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ruoyi.system.domain.entity.Reservoir;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+
+@Mapper
+public interface ReservoirMapper extends BaseMapper<Reservoir> {
+    
+    /**
+     * 查询与指定面相交或在面内的水库数据
+     * @param wktPolygon WKT格式的面数据
+     * @return 水库列表
+     */
+    List<Reservoir> findIntersectingReservoirs(@Param("wktPolygon") String wktPolygon);
+}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianDemMapper">
+
+    <!-- 查找包含指定经纬度点的网格 -->
+    <select id="findGridContainingPoint" resultType="com.ruoyi.system.domain.entity.XianDem">
+        SELECT
+            gid,
+            id,
+            gridcode,
+            geom,
+            ST_X(ST_Centroid(geom)) as centerLon,
+            ST_Y(ST_Centroid(geom)) as centerLat
+        FROM xian_dem
+        WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4490))
+    </select>
+
+    <!-- 查找3x3范围内高程最低的网格 -->
+    <!-- 查找3x3范围内高程最低的网格（先筛选5公里候选集） -->
+    <select id="findMinElevationGridIn3x3" resultType="com.ruoyi.system.domain.entity.XianDem">
+        -- 直接使用表中已有的center_lon和center_lat字段，避免任何动态计算
+        SELECT
+            gid,
+            id,
+            gridcode,
+            geom,
+            center_lon AS centerLon,
+            center_lat AS centerLat
+        FROM xian_dem
+        WHERE
+          -- 条件1：高程等于3x3范围内的最小值
+            gridcode = (
+                -- 子查询：在3x3范围内找最小高程
+                SELECT MIN(gridcode)
+                FROM xian_dem
+                WHERE
+                  -- 利用表中center_lon和center_lat筛选3x3范围
+                    ST_DWithin(
+                            ST_SetSRID(ST_MakePoint(center_lon, center_lat), 4490),
+                            ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490),
+                            #{distance}
+                    )
+                  -- 先通过经纬度范围快速过滤（进一步缩小计算范围）
+                  AND center_lon BETWEEN (#{centerLon} - #{distance}) AND (#{centerLon} + #{distance})
+                  AND center_lat BETWEEN (#{centerLat} - #{distance}) AND (#{centerLat} + #{distance})
+            )
+          -- 条件2：当前网格在3x3范围内
+          AND ST_DWithin(
+                ST_SetSRID(ST_MakePoint(center_lon, center_lat), 4490),
+                ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490),
+                #{distance}
+              )
+          -- 再次用经纬度范围快速过滤
+          AND center_lon BETWEEN (#{centerLon} - #{distance}) AND (#{centerLon} + #{distance})
+          AND center_lat BETWEEN (#{centerLat} - #{distance}) AND (#{centerLat} + #{distance})
+            LIMIT 1
+    </select>
+
+</mapper>
