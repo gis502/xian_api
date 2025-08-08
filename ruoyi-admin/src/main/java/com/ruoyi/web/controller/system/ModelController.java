@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.domain.dto.DemSlopeDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.service.IModelService;
@@ -54,6 +55,12 @@ public class ModelController {
     {
         return AjaxResult.success(modelService.getEffactArea(request));
 
+    }
+
+    @PostMapping("/getLandslideArea")
+    public AjaxResult getLandslideArea(@RequestBody DemSlopeDTO request)
+    {
+        return AjaxResult.success(modelService.getLandslideArea(request));
     }
 
 }

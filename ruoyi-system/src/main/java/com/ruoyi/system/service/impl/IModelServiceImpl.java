@@ -2,9 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
-import com.ruoyi.system.domain.dto.ModelGetDataDTO;
-import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
+import com.ruoyi.system.domain.dto.*;
 import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.domain.vo.FactorAnalysisLevelProbabilityVO;
 import com.ruoyi.system.domain.vo.FactorVO;
@@ -15,14 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ruoyi.system.domain.dto.LatLonDTO;
-import com.ruoyi.system.domain.dto.EffactAreaDTO;
 
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -741,5 +738,26 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         }
     }
 
-
+    //计算滑坡影响面积
+    @Override
+    public LandslideAreaDto getLandslideArea(DemSlopeDTO DemSlopeDTO){
+        LandslideAreaDto landslideAreaDto = new LandslideAreaDto();
+        double PHI_MIN = 18.0; // 内摩擦角最小值(度)
+        double PHI_MAX = 28.0; // 内摩擦角最大值(度)
+        double WIDTH_MIN_RATIO = 0.5; // 滑坡宽度最小比例
+        double WIDTH_MAX_RATIO = 1.2; // 滑坡宽度最大比例
+        Random random = new Random();
+        double phi = PHI_MIN + (PHI_MAX - PHI_MIN) * random.nextDouble();
+        double widthRatio = WIDTH_MIN_RATIO + (WIDTH_MAX_RATIO - WIDTH_MIN_RATIO) * random.nextDouble();
+        double theta = (DemSlopeDTO.getSlope() + phi) / 2.0;
+        double h = DemSlopeDTO.getDem();
+        //计算过程
+        double thetaRadians = Math.toRadians(theta);
+        double l = h / Math.tan(thetaRadians);
+        double width = l * widthRatio;
+        double ap = l * width;
+        double a = ap / Math.cos(thetaRadians);
+        landslideAreaDto.setLandslideArea(a);
+        return landslideAreaDto;
+    }
 }
