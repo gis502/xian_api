@@ -26,11 +26,17 @@ public class FactorAnalysis {
     @TableField("factor_value")
     private String factorValue;
     @TableField("probability")
-    private Double probability;
-    @TableField("predicted_occur")
-    private Integer predictedOccur;
+    private String probability;
     @TableField("level")
     private String level;
+    @TableField("disasters")
+    private String disasters;
+    @TableField("entity_id")
+    private String entityId;
+    @TableField("disaster_type")
+    private String disasterType;
+    @TableField("predicted_occur")
+    private Integer predictedOccur;
     @TableField("actual_occur")
     private Integer actualOccur;
     @TableField("create_time")

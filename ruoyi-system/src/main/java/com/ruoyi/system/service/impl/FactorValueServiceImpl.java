@@ -1,5 +1,7 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.constant.XianConstants;
+import com.ruoyi.common.exception.base.ParamsException;
 import com.ruoyi.system.domain.dto.BatchHideIdsDTO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,9 +11,12 @@ import com.ruoyi.system.domain.entity.FactorValue;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.mapper.FactorValueMapper;
 import com.ruoyi.system.service.IFactorValueService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -20,6 +25,7 @@ import java.util.*;
  * @description: 因子值实现类
  */
 
+@Slf4j
 @Service
 public class FactorValueServiceImpl implements IFactorValueService {
 
@@ -68,5 +74,24 @@ public class FactorValueServiceImpl implements IFactorValueService {
         return factorValueList;
     }
 
+    // 存储因子值+灾害Id
+    @Async("taskExecutor")
+    @Override
+    public void saveFactorValue(FactorValueDTO factorValueDTO) {
 
+        if (factorValueDTO == null) {
+            throw new ParamsException(XianConstants.PARAMS_EMPTY);
+        }
+        log.info("正在存储因子值...");
+
+        FactorValue factorValue = new FactorValue();
+        BeanUtils.copyProperties(factorValueDTO, factorValue);
+
+        factorValue.setIsDeleted(0);
+        factorValue.setCreateTime(LocalDateTime.now());
+        factorValue.setUpdateTime(LocalDateTime.now());
+
+        factorValueMapper.insert(factorValue);
+        log.info("存储因子值成功！");
+    }
 }
