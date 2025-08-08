@@ -5,6 +5,8 @@ import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.service.IModelService;
 import org.springframework.web.bind.annotation.*;
+import com.ruoyi.system.domain.dto.LatLonDTO;
+
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -39,6 +41,19 @@ public class ModelController {
     public AjaxResult eqSlideFactorUpdata(@RequestBody List<FactorVO> request)
     {
         return AjaxResult.success(modelService.eqSlideFactorUpdata(request));
+    }
+
+    @PostMapping("/getPoliejiao")
+    public AjaxResult getPoliejiao(@RequestBody LatLonDTO request)
+    {
+        return AjaxResult.success(modelService.getPoliejiao(request));
+    }
+
+    @PostMapping("/affectArea")
+    public AjaxResult affectArea(@RequestBody List<LatLonDTO> request)
+    {
+        return AjaxResult.success(modelService.getEffactArea(request));
+
     }
 
 }

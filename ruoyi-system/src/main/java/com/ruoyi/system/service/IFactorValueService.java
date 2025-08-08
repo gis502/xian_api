@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface IFactorValueService  {
+public interface IFactorValueService {
 
 
     // 根据 hideId 查询
