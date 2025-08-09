@@ -25,4 +25,8 @@ public interface IGeologicalDisasterHideService {
 
     public HashMap<String, List> getGeologicalDisasterByFlowList();
 
+    public HashMap<String, List> getGeologicalDisasterByFlashFloodList();
+
+    public HashMap<String, List> getGeologicalDisasterByWaterLogging();
+
 }
