@@ -139,6 +139,7 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         return hideVOlist;
     }
 
+
     // 获取全部滑坡点数据
     @Override
     public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByLandSlideList(){
@@ -173,11 +174,29 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         QueryWrapper wrapper = new QueryWrapper();
         // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
         wrapper.eq("disaster_type","泥石流");
-        // 滑坡数据
+        // 泥石流数据
         List<GeologicalDisasterHide> Flow = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
         // 泥石流数据
         Map<String,List> map = processDisasters(Flow, "泥石流");
 
+        return (HashMap<String, List>) map;
+    }
+
+    @Override
+    public HashMap<String, List> getGeologicalDisasterByFlashFloodList(){
+        // 山洪数据
+        List<GeologicalDisasterHide> Flash = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "山洪"));
+        // 山洪数据
+        Map<String,List> map = processDisasters(Flash, "山洪");
+        return (HashMap<String, List>) map;
+    }
+
+    @Override
+    public HashMap<String, List> getGeologicalDisasterByWaterLogging(){
+        // 山洪数据
+        List<GeologicalDisasterHide> Water = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "内涝"));
+        // 山洪数据
+        Map<String,List> map = processDisasters(Water, "内涝");
         return (HashMap<String, List>) map;
     }
 

@@ -63,4 +63,15 @@ public class GeologicalDisasterHideController {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByFlowList());
     }
 
+    @GetMapping("/getFlashFlood")
+    @ApiOperation("获取全部山洪隐患点")
+    public AjaxResult getGeologicalDisasterAllFlashFloodList(){
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByFlashFloodList());
+    }
+
+    @GetMapping("/getWater")
+    @ApiOperation("获取全部内涝点")
+    public AjaxResult getGeologicalDisasterAllWaterList(){
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByWaterLogging());
+    }
 }
