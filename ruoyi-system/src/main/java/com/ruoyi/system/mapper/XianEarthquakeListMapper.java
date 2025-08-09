@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
+import com.ruoyi.system.domain.vo.EarthquakeVo;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,4 +13,6 @@ public interface XianEarthquakeListMapper extends BaseMapper<XianEarthquakeList>
     List<XianEarthquakeList> selectAllEq();
 
     XianEarthquakeList getEarthquakeEventById(@Param("id") String id);
+
+    boolean insertDisaster(EarthquakeVo earthquake);
 }

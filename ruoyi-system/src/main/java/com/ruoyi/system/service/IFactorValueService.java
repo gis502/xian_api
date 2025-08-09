@@ -25,4 +25,6 @@ public interface IFactorValueService {
     // 获取因子可选列表值
     public Map<String, List<String>> getFactorValueList();
 
+    public void saveFactorValue(FactorValueDTO factorValueDTO);
+
 }

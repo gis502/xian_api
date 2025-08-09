@@ -1,28 +1,31 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
-import com.ruoyi.system.domain.dto.ModelGetDataDTO;
-import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
+import com.ruoyi.common.constant.XianConstants;
+import com.ruoyi.common.exception.base.ParamsException;
+import com.ruoyi.common.utils.http.HttpRestClient;
+import com.ruoyi.system.domain.dto.*;
 import com.ruoyi.system.domain.entity.*;
-import com.ruoyi.system.domain.vo.FactorAnalysisLevelProbabilityVO;
-import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.vo.*;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.IFactorValueService;
 import com.ruoyi.system.service.IModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.ruoyi.system.domain.dto.LatLonDTO;
-import com.ruoyi.system.domain.dto.EffactAreaDTO;
 
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -30,39 +33,34 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
-
     @Resource
     private FactorAnalysisMapper factorAnalysisMapper;
-
     @Resource
     private FactorValueMapper factorValueMapper;
-
     @Resource
     private IFactorValueService factorValueService;
-
     @Resource
     private XianDemMapper xianDemMapper;
-
     @Resource
     private BridgeMapper bridgeMapper;
-
     @Resource
     private ReservoirMapper reservoirMapper;
-
     @Resource
     private HighwayMapper highwayMapper;
-
     @Resource
     private RoadMapper roadMapper;
-
     @Resource
     private WaterPipeMapper waterPipeMapper;
-
     @Resource
     private PeopleMapper peopleMapper;
-
     @Resource
     private CropsMapper cropsMapper;
+    @Resource
+    private HttpRestClient httpRestClient;
+    @Resource
+    private FactorAnalysisServiceImpl factorAnalysisService;
+    @Autowired
+    private XianDisasterRainMapper disasterRainMapper;
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
@@ -677,7 +675,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
             factorAnalysis.setCreateTime(LocalDateTime.now());
             factorAnalysis.setUpdateTime(LocalDateTime.now());
             factorAnalysis.setIsDeleted(0);
-            factorAnalysis.setProbability(factorAnalysisLevelProbability.getProbability());
+            factorAnalysis.setProbability(String.valueOf(factorAnalysisLevelProbability.getProbability()));
             factorAnalysis.setLevel(factorAnalysisLevelProbability.getLevel());
             factorAnalysisLeve.add(factorAnalysis);
         }
@@ -741,5 +739,152 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         }
     }
 
+    //计算滑坡影响面积
+    @Override
+    public LandslideAreaDto getLandslideArea(DemSlopeDTO DemSlopeDTO){
+        LandslideAreaDto landslideAreaDto = new LandslideAreaDto();
+        double PHI_MIN = 18.0; // 内摩擦角最小值(度)
+        double PHI_MAX = 28.0; // 内摩擦角最大值(度)
+        double WIDTH_MIN_RATIO = 0.5; // 滑坡宽度最小比例
+        double WIDTH_MAX_RATIO = 1.2; // 滑坡宽度最大比例
+        Random random = new Random();
+        double phi = PHI_MIN + (PHI_MAX - PHI_MIN) * random.nextDouble();
+        double widthRatio = WIDTH_MIN_RATIO + (WIDTH_MAX_RATIO - WIDTH_MIN_RATIO) * random.nextDouble();
+        double theta = (DemSlopeDTO.getSlope() + phi) / 2.0;
+        double h = DemSlopeDTO.getDem();
+        //计算过程
+        double thetaRadians = Math.toRadians(theta);
+        double l = h / Math.tan(thetaRadians);
+        double width = l * widthRatio;
+        double ap = l * width;
+        double a = ap / Math.cos(thetaRadians);
+        landslideAreaDto.setLandslideArea(a);
+        return landslideAreaDto;
+    }
+
+    // 获取暴雨触发模型计算隐患点的概率
+
+    @Override
+    public List<TriggerVO> rainTrigger(TriggerRequest factors) {
+        // 参数为空
+        if (factors == null) {
+            throw new ParamsException(XianConstants.PARAMS_EMPTY);
+        }
+        log.info("请求贝叶斯模型...");
+        // 处理模型计算参数
+        TriggerRequest requestFactors = processParams(factors);
+        // 指定httpclient返回的格式类型
+        ParameterizedTypeReference<List<TriggerVO>> typeRef = new ParameterizedTypeReference<List<TriggerVO>>() {};
+        // 请求模型 贝叶斯网络模型接口，请求参数，返回结果
+        List<TriggerVO> probabilitiesVOList = httpRestClient.post(XianConstants.BAYES_NET_MODEL_URL, requestFactors, typeRef);
+        // 解析岩土类型
+        probabilitiesVOList = parseModelData(probabilitiesVOList);
+        // 结果为空
+        if (probabilitiesVOList == null) {
+            throw new ParamsException(XianConstants.RESULT_EMPTY);
+        }
+        log.info("请求成功,已经获取数据...");
+        // 存库..
+        List<FactorAnalysis> factorAnalysisList = new ArrayList<>();
+
+        for (TriggerVO res : probabilitiesVOList) {
+            // 创建因子分析对象
+            FactorAnalysis factorAnalysis = new FactorAnalysis();
+
+            factorAnalysis.setEntityId(res.getEntityId());
+            factorAnalysis.setProbability(res.getProbability().toString());
+            factorAnalysis.setLevel(res.getLevel().toString());
+            factorAnalysis.setDisasterType(res.getDisasterType());
+            factorAnalysis.setDisasters(res.getDisaster().toString());
+
+            // 单值变量
+            for (FactorVO factor : res.getFactors()) {
+                factorAnalysis.setAttributeId(factor.getAttributeId());
+                factorAnalysis.setValueId(factor.getValueId());
+                factorAnalysis.setFactorValue(factor.getFactorValue());
+            }
+            factorAnalysis.setCreateTime(LocalDateTime.now());
+            factorAnalysis.setUpdateTime(LocalDateTime.now());
+            factorAnalysis.setIsDeleted(0);
+            // 添加到列表
+            factorAnalysisList.add(factorAnalysis);
+        }
+        // 异步存库
+        saveModelData(factorAnalysisList);
+        return probabilitiesVOList;
+    }
+    // 修改模型参数
+    @Override
+    public String rainFactorUpdate(TriggerUpdate factors) {
+
+        // 空因子参数
+        if (factors == null) {
+            throw new ParamsException(XianConstants.PARAMS_EMPTY);
+        }
+
+        log.info("正在修改模型参数...");
+        httpRestClient.post(XianConstants.BAYES_NET_MODEL_UPDATE_URL, factors, new ParameterizedTypeReference<String>() {});
+        log.info("模型参数已修改...");
+
+        return XianConstants.REQUEST_SUCCESS;
+    }
+    // 异步保存数据
+    @Async("taskExecutor")
+    protected void saveModelData(List<FactorAnalysis> factorAnalysisList) {
+
+        QueryWrapper<XianDisasterRain> wrapper = new QueryWrapper<XianDisasterRain>()
+                .select("disaster_id")
+                .orderByDesc("disaster_id")
+                .last("limit 1");
+
+        // 获取最新的disasterId
+        XianDisasterRain disasterRain = disasterRainMapper.selectOne(wrapper);
+
+        // 每条分析数据都加上 disasterId
+        for (FactorAnalysis factorAnalysis : factorAnalysisList) {
+            factorAnalysis.setRainDisasterId(disasterRain.getDisasterId());
+        }
+
+        log.info("数据正在入库...");
+        // 入库分析表
+        factorAnalysisService.saveBatch(factorAnalysisList);
+        log.info("入库成功...");
+    }
+    // 处理模型请求参数
+    private TriggerRequest processParams(TriggerRequest factors) {
+        // 使用 map 匹配
+        for (TriggerVO datum : factors.getData()) {
+            for (FactorVO factor : datum.getFactors()) {
+                // 对比
+                if (XianConstants.ROCK_TYPE_ALIAS.equals(factor.getAttributeNameAlias())) {
+                    String originalValue = factor.getFactorValue();
+                    // 映射关系
+                    String mappedValue = XianConstants.ROCK_TYPE_MAPPING.get(originalValue);
+                    if (mappedValue != null) {
+                        factor.setFactorValue(mappedValue);
+                    }
+                }
+            }
+        }
+        return factors;
+    }
+    // 解析模型计算数据
+    private List<TriggerVO> parseModelData(List<TriggerVO> triggerVOS) {
+        // 解析
+        for (TriggerVO triggerVO : triggerVOS) {
+            for (FactorVO factor : triggerVO.getFactors()) {
+                // 对比
+                if (XianConstants.ROCK_TYPE_ALIAS.equals(factor.getAttributeNameAlias())) {
+                    String originalValue = factor.getFactorValue();
+                    // 解析映射关系
+                    String mappedValue = XianConstants.ROCK_TYPE_PARSE.get(originalValue);
+                    if (mappedValue != null) {
+                        factor.setFactorValue(mappedValue);
+                    }
+                }
+            }
+        }
+        return triggerVOS;
+    }
 
 }

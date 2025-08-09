@@ -2,8 +2,10 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
+import com.ruoyi.system.domain.vo.EarthquakeVo;
 import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import com.ruoyi.system.service.IXianEarthquakeListService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,4 +22,11 @@ import java.util.Map;
 
 @Service
 public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService {
+    @Autowired
+    private XianEarthquakeListMapper xianEarthquakeListMapper;
+
+    @Override
+    public boolean insertDisaster(EarthquakeVo earthquake) {
+        return xianEarthquakeListMapper.insertDisaster(earthquake);
+    }
 }

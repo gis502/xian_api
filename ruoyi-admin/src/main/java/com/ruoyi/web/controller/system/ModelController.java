@@ -1,9 +1,13 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.domain.dto.DemSlopeDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.vo.TriggerRequest;
+import com.ruoyi.system.domain.vo.TriggerUpdate;
 import com.ruoyi.system.service.IModelService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import com.ruoyi.system.domain.dto.LatLonDTO;
 
@@ -55,5 +59,30 @@ public class ModelController {
         return AjaxResult.success(modelService.getEffactArea(request));
 
     }
+
+    @PostMapping("/getLandslideArea")
+    public AjaxResult getLandslideArea(@RequestBody DemSlopeDTO request)
+    {
+        return AjaxResult.success(modelService.getLandslideArea(request));
+    }
+
+
+    @ApiOperation(value = "暴雨触发接口")
+    @PostMapping("/rain/trigger")
+    public AjaxResult rainTrigger(@RequestBody TriggerRequest request)
+    {
+        return AjaxResult.success(modelService.rainTrigger(request));
+    }
+
+
+    @ApiOperation(value = "模型因子修改接口")
+    @PostMapping("/factor/update")
+    public AjaxResult rainFactorUpdate(@RequestBody TriggerUpdate request)
+    {
+        return AjaxResult.success(modelService.rainFactorUpdate(request));
+    }
+
+
+
 
 }

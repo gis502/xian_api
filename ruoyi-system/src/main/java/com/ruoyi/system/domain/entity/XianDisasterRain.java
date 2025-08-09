@@ -1,20 +1,35 @@
 package com.ruoyi.system.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ruoyi.system.handler.GeometryTypeHandler;
 import lombok.Data;
+import org.locationtech.jts.geom.Geometry;
+import org.n52.jackson.datatype.jts.GeometryDeserializer;
+import org.n52.jackson.datatype.jts.GeometrySerializer;
+
+import java.time.LocalDateTime;
 
 @Data
 @TableName("xian_disaster_rain")
 public class XianDisasterRain {
-  @TableId
+
   @TableField("disaster_id")
-  private long disasterId;
+  private Long disasterId;
   @TableField("disaster_name")
   private String disasterName;
   @TableField("occurrence_time")
-  private java.sql.Timestamp occurrenceTime;
+  private LocalDateTime occurrenceTime;
+  @TableField(value = "geom", typeHandler = GeometryTypeHandler.class)
+  @JsonSerialize(using = GeometrySerializer.class)
+  @JsonDeserialize(using = GeometryDeserializer.class)
+  @JsonInclude(JsonInclude.Include.NON_NULL)  // 仅序列化非空字段
+  private Geometry geom; //经纬度
   @TableField("rainfall")
   private String rainfall;
   @TableField("duration")
@@ -22,13 +37,12 @@ public class XianDisasterRain {
   @TableField("position")
   private String position;
   @TableField("create_time")
-  private java.sql.Timestamp createTime;
+  private LocalDateTime createTime;
   @TableField("update_time")
-  private java.sql.Timestamp updateTime;
+  private LocalDateTime updateTime;
   @TableField("is_deleted")
-  private String isDeleted;
-  @TableField("geom")
-  private String geom;
+  private Integer isDeleted;
+
 
 
 }
