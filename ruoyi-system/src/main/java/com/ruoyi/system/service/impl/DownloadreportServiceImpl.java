@@ -81,106 +81,78 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String wordName = "report_" + System.currentTimeMillis() + ".docx";
         Path wordPath = wordDir.resolve(wordName);
 
-        /* 占位符内容 */
-//        Map<String, String> map = new HashMap<>();
-//        map.put("{{ReportDate}}", "2023年08月11日15时51分");
-//        map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
-//        map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
-//        map.put("{{OverView_mainRainQuXian}}", "长安区");
-//        map.put("{{Disaster_MainRainQuXian}}", "长安区");
-//        map.put("{{Disaster_LandslideMainCun}}", "喂子坪村");
-//        map.put("{{Disaster_LandslideMostHigh}}", "鸡窝子组上鸡窝");
-//        map.put("{{Disaster_LandslideMostHighProbability}}", "83%");
-//        map.put("{{Disaster_NumOfLandslide}}", "7");
-//        map.put("{{Disaster_MudslideMainCun}}", "沣峪村、喂子坪村");
-//        map.put("{{Disaster_MudslideMostHigh}}", "大门村组红草河以东");
-//        map.put("{{Disaster_MudslideMostHighProbability}}", "81%");
-//        map.put("{{Disaster_NumOfMudslide}}", "8");
-//        map.put("{{Disaster_MountainTorrentMainCun}}", "沣峪村");
-//        map.put("{{Disaster_MountainTorrentMostHigh}}", "大门村组红草河以东");
-//        map.put("{{Disaster_MountainTorrentMostHighProbability}}", "83%");
-//        map.put("{{Disaster_NumOfMountainTorrente}}", "2");
-//        map.put("{{Disaster_UrbanFloodMainCun}}", "长安区、雁塔区");
-//        map.put("{{Disaster_UrbanFloodMostHigh}}", "靖宁路与西部大道十字");
-//        map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
-//        map.put("{{Disaster_NumOfUrbanFlood}}", "2");
-//        map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
-//        map.put("{{Disaster_AffectedAreaLow}}", "xx");
-//        map.put("{{Disaster_AffectedAreaHigh}}", "xx");
-//        map.put("{{Disaster_AffectedPeopleLow}}", "xx");
-//        map.put("{{Disaster_AffectedPeopleHigh}}", "xx");
-//        map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
-//        map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
-
-
-        //表格内容
+        // 滑坡
         String landslideTableName = "滑坡灾害预测概率统计表";
-        String[] landslideHead = {"序号", "位置", "滑坡发生概率", "风险等级"};
-        int[] landslideColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
+        String[] landslideHead = {"序号", "区县位置", "详细位置", "滑坡发生概率", "风险等级"};
+        int[] landslideColWidths = {1500, 3000, 8000, 3000, 2000};
         String[][] landslideData = {
-                {"喂子坪村鸡窝子组上鸡窝(B2)", "83%", "高"},
-                {"喂子坪村北石槽组原北石槽村(B10)", "78%", "高"},
-                {"喂子坪村北石槽组南石槽沟西口(B9)", "76%", "高"},
-                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "76%", "高"},
-                {"喂子坪村北石槽组南石槽沟内(B7)", "75%", "高"},
-                {"喂子坪村青岗树组夭佛岩(B4)", "74%", "高"},
-                {"喂子坪村大坪组大坪(B10)", "74%", "高"},
-                {"沣峪村石峡沟组原石峡沟村(B6)", "60%", "中"},
-                {"沣峪村大门村组红草河以东(B3)", "62%", "中"},
-                {"上王村六组翠微宫园(C2)", "22%", "低"}
+                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "83%", "高"},
+                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "78%", "高"},
+                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "76%", "高"},
+                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "76%", "高"},
+                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "75%", "高"},
+                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "74%", "高"},
+                {"长安区", "喂子坪村大坪组大坪(B10)", "74%", "高"},
+                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "60%", "中"},
+                {"长安区", "沣峪村大门村组红草河以东(B3)", "62%", "中"},
+                {"长安区", "上王村六组翠微宫园(C2)", "22%", "低"}
         };
 
+// 泥石流
         String MudslideTableName = "泥石流灾害预测概率统计表";
-        String[] MudslideHead = {"序号", "位置", "泥石流发生概率", "风险等级"};
-        int[] MudslideColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
+        String[] MudslideHead = {"序号", "区县位置", "详细位置", "泥石流发生概率", "风险等级"};
+        int[] MudslideColWidths = {1500, 3000, 8000, 3000, 2000};
         String[][] MudslideData = {
-                {"沣峪村大门村组红草河以东(B3)", "81%", "高"},
-                {"沣峪村石峡沟组原石峡沟村(B6)", "78%", "高"},
-                {"喂子坪村鸡窝子组上鸡窝(B2)", "76%", "高"},
-                {"喂子坪村北石槽组原北石槽村(B10)", "74%", "高"},
-                {"喂子坪村北石槽组南石槽沟西口(B9)", "74%", "高"},
-                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "73%", "高"},
-                {"喂子坪村北石槽组南石槽沟内(B7)", "72%", "高"},
-                {"喂子坪村青岗树组夭佛岩(B4)", "70%", "高"},
-                {"喂子坪村大坪组大坪(B10)", "68%", "中"},
-                {"上王村六组翠微宫园(C2)", "32%", "低"}
+                {"长安区", "沣峪村大门村组红草河以东(B3)", "81%", "高"},
+                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "78%", "高"},
+                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "76%", "高"},
+                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "74%", "高"},
+                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "74%", "高"},
+                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "73%", "高"},
+                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "72%", "高"},
+                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "70%", "高"},
+                {"长安区", "喂子坪村大坪组大坪(B10)", "68%", "中"},
+                {"长安区", "上王村六组翠微宫园(C2)", "32%", "低"}
         };
 
+// 山洪
         String MountainTorrentTableName = "山洪灾害预测概率统计表";
-        String[] MountainTorrentHead = {"序号", "位置", "山洪发生概率", "风险等级"};
-        int[] MountainTorrentColWidths = {2540, 15480, 6300, 3780}; // 序号 位置 概率 等级
+        String[] MountainTorrentHead = {"序号", "区县位置", "详细位置", "山洪发生概率", "风险等级"};
+        int[] MountainTorrentColWidths = {1500, 3000, 8000, 3000, 2000};
         String[][] MountainTorrentData = {
-                {"沣峪村大门村组红草河以东(B3)", "84%", "高"},
-                {"沣峪村石峡沟组原石峡沟村(B6)", "82%", "高"},
-                {"喂子坪村鸡窝子组上鸡窝(B2)", "63%", "中"},
-                {"喂子坪村北石槽组原北石槽村(B10)", "62%", "中"},
-                {"喂子坪村北石槽组南石槽沟西口(B9)", "62%", "中"},
-                {"喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "61%", "中"},
-                {"喂子坪村北石槽组南石槽沟内(B7)", "61%", "中"},
-                {"喂子坪村青岗树组夭佛岩(B4)", "60%", "中"},
-                {"喂子坪村大坪组大坪(B10)", "58%", "中"},
-                {"上王村六组翠微宫园(C2)", "25%", "低"}
+                {"长安区", "沣峪村大门村组红草河以东(B3)", "84%", "高"},
+                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "82%", "高"},
+                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "63%", "中"},
+                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "62%", "中"},
+                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "62%", "中"},
+                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "61%", "中"},
+                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "61%", "中"},
+                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "60%", "中"},
+                {"长安区", "喂子坪村大坪组大坪(B10)", "58%", "中"},
+                {"长安区", "上王村六组翠微宫园(C2)", "25%", "低"}
         };
 
+// 城市内涝
         String UrbanFloodTableName = "城市内涝灾害预测概率统计表";
-        String[] UrbanFloodHead = {"序号", "位置", "城市内涝发生概率", "风险等级"};
-        int[] UrbanFloodColWidths = {2540, 14570, 7210, 3780}; // 序号 位置 概率 等级
+        String[] UrbanFloodHead = {"序号", "区县位置", "详细位置", "城市内涝发生概率", "风险等级"};
+        int[] UrbanFloodColWidths = {1500, 3000, 8000, 3000, 2000};
         String[][] UrbanFloodData = {
-                {"长安区靖宁路与西部大道十字", "73%", "高"},
-                {"长安区朱雀市场", "71%", "高"},
-                {"长安区西部大道积水点", "68%", "中"},
-                {"长安区学府大街西段", "66%", "中"},
-                {"雁塔区含光路崇业路", "65%", "中"},
-                {"雁塔区小寨十字", "64%", "中"},
-                {"雁塔区永城路下穿", "64%", "中"},
-                {"雁塔区西影路阳光小区", "59%", "中"},
-                {"雁塔区咸宁东路恒大绿洲", "58%", "中"},
-                {"高新区西三环丈八立交", "22%", "低"}
+                {"长安区", "靖宁路与西部大道十字", "73%", "高"},
+                {"长安区", "朱雀市场", "71%", "高"},
+                {"长安区", "西部大道积水点", "68%", "中"},
+                {"长安区", "学府大街西段", "66%", "中"},
+                {"雁塔区", "含光路崇业路", "65%", "中"},
+                {"雁塔区", "小寨十字", "64%", "中"},
+                {"雁塔区", "永城路下穿", "64%", "中"},
+                {"雁塔区", "西影路阳光小区", "59%", "中"},
+                {"雁塔区", "咸宁东路恒大绿洲", "58%", "中"},
+                {"高新区", "西三环丈八立交", "22%", "低"}
         };
 
+// 生命线工程
         String LifelineProjectTableName = "生命线工程影响统计表";
-        String[] LifelineProjectHead = {"序号", "类型", "位置"};
-        int[] LifelineProjectColWidths = {2540, 7210, 18350}; // 序号 位置 概率 等级
+        String[] LifelineProjectHead = {"序号", "类型", "名称"};
+        int[] LifelineProjectColWidths = {1500, 3000, 15000};
         String[][] LifelineProjectData = {
                 {"道路", "G210 国道（沣峪村段）"},
                 {"道路", "喂子坪村通村公路"},
@@ -188,6 +160,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 {"通信设施", "移动通信基站（鸡窝子组）"},
                 {"输水管道", "镇级饮用水主管线（经大门村组）"}
         };
+
 
         Map<String, String> replaceMap = writeDescibe(landslideData, MudslideData, MountainTorrentData, UrbanFloodData);
         String pictitle = "灾情影响分布图";
@@ -219,7 +192,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     //描述文段
     private static Map<String, String> writeDescibe(String[][] landslideData, String[][] MudslideData, String[][] MountainTorrentData, String[][] UrbanFloodData) {
         Map<String, String> map = new HashMap<>();
-        map.put("{{ReportDate}}", "2023年08月11日15时51分");
+        map.put("{{ReportDate}}", "08月11日15时51分");
         map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
         map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
         map.put("{{OverView_mainRainQuXian}}", "长安区");
@@ -241,21 +214,21 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
         map.put("{{Disaster_NumOfUrbanFlood}}", "2");
         map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
-        map.put("{{Disaster_AffectedAreaLow}}", "xx");
-        map.put("{{Disaster_AffectedAreaHigh}}", "xx");
-        map.put("{{Disaster_AffectedPeopleLow}}", "xx");
-        map.put("{{Disaster_AffectedPeopleHigh}}", "xx");
+        map.put("{{Disaster_AffectedAreaLow}}", "3");
+        map.put("{{Disaster_AffectedAreaHigh}}", "8");
+        map.put("{{Disaster_AffectedPeopleLow}}", "2000");
+        map.put("{{Disaster_AffectedPeopleHigh}}", "3000");
         map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
         map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
 
         Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("{{ReportDate}}", "2023年08月11日15时51分");
+        replaceMap.put("{{ReportDate}}", "08月11日15时51分");
 
         String DisasterOverAllOrg = "受持续强降雨影响，根据灾害风险评估模型测算结果，{{Disaster_MainRainQuXian}}多个村（组）地质灾害风险显著上升，需高度警惕滑坡、泥石流等次生灾害发生可能。";
         String DisasterOverAll = replacePlaceholders(DisasterOverAllOrg, map);
         replaceMap.put("{{Disaster_OverAll}}", DisasterOverAll);
 
-        String OverViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现50毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
+        String OverViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现100毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
         String OverView = replacePlaceholders(OverViewOrg, map);
         replaceMap.put("{{OverView}}", OverView);
 
