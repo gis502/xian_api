@@ -19,6 +19,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           AND disaster_trigger = #{param2, jdbcType=VARCHAR}
         ORDER BY occurrence_time DESC
     </select>
-
 </mapper>
 

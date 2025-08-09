@@ -1,11 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.enums.DisasterType;
+import com.ruoyi.system.mapper.XianDisasterRainMapper;
+import com.ruoyi.system.mapper.XianFactorAnalysisMapper;
 import com.ruoyi.system.service.DownloadreportService;
+import lombok.Data;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -22,19 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTFonts;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTRPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTStyle;
+import java.util.*;
 
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author: xiaodemos
@@ -44,6 +40,13 @@ import java.util.regex.Pattern;
 
 @Service
 public class DownloadreportServiceImpl implements DownloadreportService {
+    private final XianDisasterRainMapper xianDisasterRainMapper;
+    @Autowired
+    private XianFactorAnalysisMapper xianFactorAnalysisMapper;
+
+    public DownloadreportServiceImpl(XianDisasterRainMapper xianDisasterRainMapper) {
+        this.xianDisasterRainMapper = xianDisasterRainMapper;
+    }
     //保存图片
 
     @Override
@@ -575,4 +578,241 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         Files.copy(file, resp.getOutputStream());
     }
 
+    @Override
+    public Map<String, Object> queryReportInfo(Long disasterId, DisasterType disasterType) {
+        return new ReportInfo().queryReportInfo(disasterId, disasterType);
+    }
+
+    /**
+     * 生成报告信息
+     */
+    class ReportInfo {
+        /**
+         * 获取报告信息
+         *
+         * @param disasterId {Long} - 灾害id
+         * @return
+         */
+        public Map<String, Object> queryReportInfo(Long disasterId, DisasterType disasterType) {
+            Map<String, Object> map = new HashMap<>();
+            map.putAll(queryOverview(disasterId));
+            map.putAll(queryDisasterEstimation(disasterId, disasterType));
+            return map;
+        }
+
+        /**
+         * 获取概况信息
+         *
+         * @param disasterId ｛Long｝ - 灾害id
+         * @return 降雨概况
+         */
+        private Map<String, Object> queryOverview(Long disasterId) {
+            Map<String, Object> map = new HashMap<>();
+
+            List<Map<String, Object>> rainfallOverviews = xianDisasterRainMapper.queryOverview(disasterId);
+
+            // 填充数据
+            map.put("{{ReportDate}}", rainfallOverviews.get(0).get("report_date").toString());
+            map.put("{{OverView_ReportDate}}", rainfallOverviews.get(0).get("over_view_report_date").toString());
+
+            Iterator<Map<String, Object>> rainfallOverviewsIterator = rainfallOverviews.iterator();
+            Map<String, Object> rainfallOverview = null;
+            Set<String> positions = new LinkedHashSet<String>();
+            while (rainfallOverviewsIterator.hasNext()) {
+                rainfallOverview = rainfallOverviewsIterator.next();
+                positions.add(rainfallOverview.get("position").toString());
+
+            }
+            map.put("{{OverView_RainCoveredQuXian}}", positions.stream().collect(Collectors.joining("，")));
+            map.put("{{OverView_mainRainQuXian}}", rainfallOverviews.get(0).get("position").toString());
+            return map;
+        }
+
+        /**
+         * 获取灾情预估
+         *
+         * @param disasterId   - id
+         * @param disasterType - 灾害类型
+         * @return
+         */
+        private Map<String, Object> queryDisasterEstimation(Long disasterId, DisasterType disasterType) {
+            Map<String, Object> map = new HashMap<>();
+
+            // 获取灾情评估基本数据
+            List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(disasterId, disasterType);
+
+            if(disasterEstimation.size() == 0) {
+                return map;
+            }
+
+            // 计数
+            Map<String, Integer> disasterPositionCount = new HashMap<>();
+
+            // 表格数据
+            Map<String, Table> tableInfo = new HashMap<>();
+            tableInfo.put("table", new Table());
+            tableInfo.get("table").getLandslide().setHeader(Arrays.asList("序号", "区县位置", "位置", "滑坡发生概率", "风险等级"));
+            tableInfo.get("table").getLandslide().setData(new ArrayList<>());
+            tableInfo.get("table").getDebrisFlow().setHeader(Arrays.asList("序号", "区县位置", "位置", "泥石流发生概率", "风险等级"));
+            tableInfo.get("table").getDebrisFlow().setData(new ArrayList<>());
+            tableInfo.get("table").getTorrentialFlood().setHeader(Arrays.asList("序号", "区县位置", "位置", "山洪发生概率", "风险等级"));
+            tableInfo.get("table").getTorrentialFlood().setData(new ArrayList<>());
+            tableInfo.get("table").getWaterLogging().setHeader(Arrays.asList("序号", "区县位置", "位置", "内涝发生概率", "风险等级"));
+            tableInfo.get("table").getWaterLogging().setData(new ArrayList<>());
+
+            // 记录高风险地区
+            Set<String> highRiskAreas = new LinkedHashSet<>();
+
+            Iterator<Map<String, Object>> disasterEstimationIterator = disasterEstimation.iterator();
+            Map<String, Object> disasterEstimationMap = null;
+            while (disasterEstimationIterator.hasNext()) {
+                disasterEstimationMap = disasterEstimationIterator.next();
+                String position = disasterEstimationMap.get("position").toString();
+                String disasterTypeName = disasterEstimationMap.get("disaster_type").toString();
+                Double disasterTypeProbability = Double.parseDouble(disasterEstimationMap.get("disaster_probability").toString());
+                String level = disasterEstimationMap.get("level").toString();
+                String city = disasterEstimationMap.get("city").toString();
+                String village = disasterEstimationMap.get("village").toString();
+
+                // 位置计数
+                if (!disasterPositionCount.containsKey(city)) {
+                    disasterPositionCount.put(city, 0);
+                }
+                disasterPositionCount.put(city, disasterPositionCount.get(city) + 1);
+
+                // 用于统计
+                switch (disasterTypeName) {
+                    case "滑坡":
+                        tableInfo.get("table").getLandslide().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
+                        if(tableInfo.get("table").getLandslide().getVillage() == null)
+                            tableInfo.get("table").getLandslide().setVillage(village);
+                        if("高".equals(level)) {
+                            tableInfo.get("table").getLandslide().setHighRiskCount(tableInfo.get("table").getLandslide().getHighRiskCount() + 1);
+                            highRiskAreas.add(city + village);
+                        }
+                        break;
+                    case "泥石流":
+                        tableInfo.get("table").getDebrisFlow().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
+                        if(tableInfo.get("table").getDebrisFlow().getVillage() == null)
+                            tableInfo.get("table").getDebrisFlow().setVillage(village);
+                        if("高".equals(level)) {
+                            tableInfo.get("table").getDebrisFlow().setHighRiskCount(tableInfo.get("table").getDebrisFlow().getHighRiskCount() + 1);
+                            highRiskAreas.add(city + village);
+                        }
+                        break;
+                    case "山洪":
+                        tableInfo.get("table").getTorrentialFlood().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
+                        if(tableInfo.get("table").getTorrentialFlood().getVillage() == null)
+                            tableInfo.get("table").getTorrentialFlood().setVillage(village);
+                        if("高".equals(level)) {
+                            tableInfo.get("table").getTorrentialFlood().setHighRiskCount(tableInfo.get("table").getTorrentialFlood().getHighRiskCount() + 1);
+                            highRiskAreas.add(city + village);
+                        }
+                        break;
+                    case "内涝":
+                        tableInfo.get("table").getWaterLogging().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
+                        if(tableInfo.get("table").getWaterLogging().getVillage() == null)
+                            tableInfo.get("table").getWaterLogging().setVillage(village);
+                        if("高".equals(level)) {
+                            tableInfo.get("table").getWaterLogging().setHighRiskCount(tableInfo.get("table").getWaterLogging().getHighRiskCount() + 1);
+                            highRiskAreas.add(city + village);
+                        }
+                        break;
+                    default:
+                }
+            }
+
+            // 获取地址中最大值以及地址
+            int maxCount = 0;
+            String maxAddress = null;
+
+            // 遍历Map中的所有条目
+            for (Map.Entry<String, Integer> entry : disasterPositionCount.entrySet()) {
+                String address = entry.getKey();
+                int count = entry.getValue();
+
+                // 如果当前条目数量大于已知的最大数量，更新最大值和地址
+                if (count > maxCount) {
+                    maxCount = count;
+                    maxAddress = address;
+                }
+            }
+
+            // 填充到map
+            map.put("{{Disaster_MainRainQuXian}}", maxAddress);
+
+            // 填充滑坡
+            map.put("{{Disaster_LandslideMainCun}}", tableInfo.get("table").getLandslide().getVillage());
+            int len = tableInfo.get("table").getLandslide().getData().size();
+            if(len > 0) {
+                map.put("{{Disaster_LandslideMostHigh}}", tableInfo.get("table").getLandslide().getData().get(0).get(1));
+                map.put("{{Disaster_LandslideMostHighProbability}}", tableInfo.get("table").getLandslide().getData().get(0).get(2));
+            }
+            map.put("{{Disaster_NumOfLandslide}}", tableInfo.get("table").getLandslide().getHighRiskCount());
+
+            // 填充泥石流
+            map.put("{{Disaster_MudslideMainCun}}", tableInfo.get("table").getDebrisFlow().getVillage());
+            len = tableInfo.get("table").getDebrisFlow().getData().size();
+            if(len > 0) {
+                map.put("{{Disaster_MudslideMostHigh}}", tableInfo.get("table").getDebrisFlow().getData().get(0).get(1));
+                map.put("{{Disaster_MudslideMostHighProbability}}", tableInfo.get("table").getDebrisFlow().getData().get(0).get(2));
+            }
+            map.put("{{Disaster_NumOfMudslide}}", tableInfo.get("table").getDebrisFlow().getHighRiskCount());
+
+            // 填充山洪
+            map.put("{{Disaster_MountainTorrentMainCun}}", tableInfo.get("table").getTorrentialFlood().getVillage());
+            len = tableInfo.get("table").getTorrentialFlood().getData().size();
+            if(len > 0) {
+                map.put("{{Disaster_MountainTorrentMostHigh}}", tableInfo.get("table").getTorrentialFlood().getData().get(0).get(1));
+                map.put("{{Disaster_MountainTorrentMostHighProbability}}", tableInfo.get("table").getTorrentialFlood().getData().get(0).get(2));
+            }
+            map.put("{{Disaster_NumOfMountainTorrente}}", tableInfo.get("table").getTorrentialFlood().getHighRiskCount());
+
+            // 内涝
+            map.put("{{Disaster_UrbanFloodMainCun}}", tableInfo.get("table").getWaterLogging().getVillage());
+            len = tableInfo.get("table").getWaterLogging().getData().size();
+            if(len > 0) {
+                map.put("{{Disaster_UrbanFloodMostHigh}}", tableInfo.get("table").getWaterLogging().getData().get(0).get(1));
+                map.put("{{Disaster_UrbanFloodMostHighProbability}}", tableInfo.get("table").getWaterLogging().getData().get(0).get(2));
+            }
+            map.put("{{Disaster_NumOfUrbanFlood}}", tableInfo.get("table").getWaterLogging().getHighRiskCount());
+            map.put("table", tableInfo);
+
+            // 添加高风险区
+            map.put("{{Disaster_ProtectAreas}}", highRiskAreas.stream().collect(Collectors.joining("、")));
+
+            return map;
+        }
+
+
+
+        @Data
+        class Table {
+            @Data
+            class TableStructure {
+                private List<String> header;
+                private List<List<String>> data;
+                private String village;
+                private Integer highRiskCount;
+
+                TableStructure() {
+                    this.header = new ArrayList<>();
+                    this.data = new ArrayList<>();
+                    this.highRiskCount = 0;
+                }
+            }
+
+            private TableStructure landslide;
+            private TableStructure debrisFlow;
+            private TableStructure torrentialFlood;
+            private TableStructure waterLogging;
+
+            Table() {
+                this.landslide = new TableStructure();
+                this.debrisFlow = new TableStructure();
+                this.torrentialFlood = new TableStructure();
+                this.waterLogging = new TableStructure();
+            }
+        }
+    }
 }

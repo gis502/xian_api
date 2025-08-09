@@ -34,5 +34,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE disaster_id = CAST(#{id, jdbcType=VARCHAR} AS INTEGER)
     </select>
 
+    <select id="queryOverview" resultType="map">
+        SELECT
+            TO_CHAR(T1.occurrence_time, 'MM"月"DD"日" HH24"时"MI"分"') AS report_date,
+            TO_CHAR(T1.occurrence_time, 'YYYY"年"MM"月"DD"日" HH24"时"MI"分"') AS over_view_report_date,
+            T2.position
+        FROM
+            xian_disaster_rain T1, xian_rainfall_during_period T2
+        <where>
+            T1.disaster_id = T2.disaster_id
+        </where>
+        ORDER BY T2.rainfall DESC
+    </select>
+
 </mapper>
 
