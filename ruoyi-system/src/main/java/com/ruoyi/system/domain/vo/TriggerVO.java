@@ -18,6 +18,8 @@ public class TriggerVO implements Serializable {
     private String entityId;
     // 当前实体灾害类型
     private String disasterType;
+    private Double lon;
+    private Double lat;
     // 致灾因子
     private List<FactorVO> factors;
     // 风险等级
