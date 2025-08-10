@@ -53,5 +53,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         WHERE disaster_id = CAST(#{id, jdbcType=VARCHAR} AS INTEGER)
     </select>
 
+    <insert id="insertDisaster">
+        INSERT INTO xian_earthquake_list (
+            disaster_name,
+            earthquake_full_name,
+            position,
+            geom,
+            depth,
+            occurrence_time,
+            eq_type,
+            source,
+            eq_addr_code,
+            town_code,
+            is_deleted,
+            magnitude,
+            create_time,
+            update_time,
+            district,
+            province,
+            city
+        ) VALUES (
+            #{name},
+            #{fullName},
+            #{position},
+            ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4326),
+            #{depth, jdbcType=VARCHAR},
+            to_timestamp(#{dateTime}, 'YYYY-MM-DD HH24:MI:SS'),
+            #{type},
+            #{source, jdbcType=VARCHAR},
+            #{countyCode, jdbcType=VARCHAR},
+            #{townshipCode, jdbcType=VARCHAR},
+            0,
+            #{magnitude, jdbcType=VARCHAR},
+            CURRENT_DATE,
+            CURRENT_DATE,
+            #{district, jdbcType=VARCHAR},
+            #{province, jdbcType=VARCHAR},
+            #{city, jdbcType=VARCHAR}
+        )
+    </insert>
 </mapper>
 

@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.system;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
+import com.ruoyi.system.domain.vo.EarthquakeVo;
 import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,4 +30,8 @@ public class XianEarthquakeListController {
         return xianEarthquakeListMapper.getEarthquakeEventById(id);
     }
 
+    @PostMapping("/disaster/add")
+    public AjaxResult disasterAdd(@RequestBody EarthquakeVo earthquake) {
+        return AjaxResult.success(xianEarthquakeListMapper.insertDisaster(earthquake));
+    }
 }

@@ -26,6 +26,14 @@ public class XianConstants {
         put("砂岩", "5");
         put("页岩", "6");
     }};
+    public static final Map<String, String> ROCK_TYPE_PARSE = new HashMap<String, String>() {{
+        put("1", "花岗岩");
+        put("2", "黄土-古土壤");
+        put("3", "黄土-砂岩互层");
+        put("4", "片麻岩");
+        put("5", "砂岩");
+        put("6", "页岩");
+    }};
 
 
     // 触发模型接口
