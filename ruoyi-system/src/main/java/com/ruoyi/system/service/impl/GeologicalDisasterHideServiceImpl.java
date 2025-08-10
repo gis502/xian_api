@@ -215,6 +215,7 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
 
             // 创建属性对象
             Map<String, Object> properties = new HashMap<>();
+            properties.put("id", disaster.getId());
             properties.put("fieldCode", disaster.getFieldCode());
             properties.put("disasterName", disaster.getDisasterName());
             properties.put("longitude", disaster.getLongitude());
