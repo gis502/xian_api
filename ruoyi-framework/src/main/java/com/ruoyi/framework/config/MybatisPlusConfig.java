@@ -31,10 +31,8 @@ public class MybatisPlusConfig
         interceptor.addInnerInterceptor(optimisticLockerInnerInterceptor());
         // 阻断插件
         interceptor.addInnerInterceptor(blockAttackInnerInterceptor());
-
         // 自动填充插件
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
-
 
         return interceptor;
     }

@@ -21,22 +21,18 @@ import java.util.List;
 public class XianDisasterRainController {
 
     @Resource
-    private XianDisasterRainMapper xianDisasterRainMapper;
-
-    @Resource
     private IXianDisasterRainService disasterRainService;
 
-
     @GetMapping("/getAllDisasterRain")
-    public List<XianDisasterRain> selectAllEq() {
-        return xianDisasterRainMapper.selectAllEq();
+    @ApiOperation(value = "获取所有暴雨灾害事件")
+    public AjaxResult selectAllEq() {
+        return AjaxResult.success(disasterRainService.selectAllEq());
     }
 
     @PostMapping("/getDisasterRainById")
-    public XianDisasterRain getDisasterRainById(@RequestParam(value = "id") String id) {
-        System.out.println(id+"getDisasterRainById id");
-        System.out.println(xianDisasterRainMapper.getDisasterRainById(id)+"xianDisasterRainMapper.getDisasterRainById(id)");
-        return xianDisasterRainMapper.getDisasterRainById(id);
+    @ApiOperation(value = "根据Id获取暴雨灾害事件")
+    public AjaxResult getDisasterRainById(@RequestParam(value = "id") Long Id) {
+        return AjaxResult.success(disasterRainService.getDisasterRainById(Id));
     }
 
     @PostMapping("/saver/rain")

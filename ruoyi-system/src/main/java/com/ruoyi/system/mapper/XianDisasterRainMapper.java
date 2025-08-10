@@ -10,8 +10,7 @@ import java.util.Map;
 
 @Mapper
 public interface XianDisasterRainMapper extends BaseMapper<XianDisasterRain> {
-    List<XianDisasterRain> selectAllEq();
-    XianDisasterRain getDisasterRainById(@Param("id") String id);
 
     List<Map<String, Object>> queryOverview(Long disasterId);
+
 }

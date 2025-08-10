@@ -1,8 +1,6 @@
 package com.ruoyi.system.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,10 +24,11 @@ public class XianDisasterRain {
   @TableField("occurrence_time")
   private LocalDateTime occurrenceTime;
   @TableField(value = "geom", typeHandler = GeometryTypeHandler.class)
-  @JsonSerialize(using = GeometrySerializer.class)
-  @JsonDeserialize(using = GeometryDeserializer.class)
-  @JsonInclude(JsonInclude.Include.NON_NULL)  // 仅序列化非空字段
   private Geometry geom; //经纬度
+  @TableField("longitude")
+  private Double longitude;
+  @TableField("latitude")
+  private Double latitude;
   @TableField("rainfall")
   private String rainfall;
   @TableField("duration")
@@ -42,7 +41,5 @@ public class XianDisasterRain {
   private LocalDateTime updateTime;
   @TableField("is_deleted")
   private Integer isDeleted;
-
-
 
 }
