@@ -183,21 +183,98 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     }
 
     @Override
-    public HashMap<String, List> getGeologicalDisasterByFlashFloodList(){
+    public List<HideVO> getGeologicalDisasterByFlashFloodList(){
         // 山洪数据
-        List<GeologicalDisasterHide> Flash = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "山洪"));
-        // 山洪数据
-        Map<String,List> map = processDisasters(Flash, "山洪");
-        return (HashMap<String, List>) map;
+        List<GeologicalDisasterHide> flashDatas = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "山洪"));
+
+        if (flashDatas.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 获取因子值表中所有的 hideId
+        Set<Integer> hideIds = factorValueService.getAllHideId();
+
+        // 筛选出所有存在因子的 hideId
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+        List<Integer> qualifiedIds = new ArrayList<>();
+
+        for (GeologicalDisasterHide disaster : flashDatas) {
+            Integer disasterId = disaster.getId();
+            if (disasterId != null && hideIds.contains(disasterId)) {
+                GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
+                BeanUtils.copyProperties(disaster, hideDTO);
+                hideDTOlist.add(hideDTO);
+                qualifiedIds.add(disasterId);
+            }
+        }
+
+        // 批量查询所有因子值
+        Map<Integer, List<FactorVO>> factorValueMap = new HashMap<>();
+        if (!qualifiedIds.isEmpty()) {
+            // 一次性查询所有ID的因子值
+            List<FactorVO> factorValuesByHideIds = factorValueService.getFactorValuesByHideIds(qualifiedIds);
+            // 按hideId分组
+            for (FactorVO factorVO : factorValuesByHideIds) {
+                factorValueMap.computeIfAbsent(factorVO.getHideId(), k -> new ArrayList<>())
+                        .add(factorVO);
+            }
+        }
+        // 合并数据
+        List<HideVO> hideVOlist = new ArrayList<>(hideDTOlist.size());
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            List<FactorVO> factorVOs = factorValueMap.getOrDefault(hideDTO.getId(), Collections.emptyList());
+            HideVO merged = mergeData(hideDTO, factorVOs, "山洪");
+            hideVOlist.add(merged);
+        }
+
+        return hideVOlist;
     }
 
     @Override
-    public HashMap<String, List> getGeologicalDisasterByWaterLogging(){
-        // 山洪数据
-        List<GeologicalDisasterHide> Water = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "内涝"));
-        // 山洪数据
-        Map<String,List> map = processDisasters(Water, "内涝");
-        return (HashMap<String, List>) map;
+    public List<HideVO> getGeologicalDisasterByWaterLogging(){
+        // 内涝数据
+        List<GeologicalDisasterHide> waterData = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "内涝"));
+        if (waterData.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 获取因子值表中所有的 hideId
+        Set<Integer> hideIds = factorValueService.getAllHideId();
+
+        // 筛选出所有存在因子的 hideId
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+        List<Integer> qualifiedIds = new ArrayList<>();
+
+        for (GeologicalDisasterHide disaster : waterData) {
+            Integer disasterId = disaster.getId();
+            if (disasterId != null && hideIds.contains(disasterId)) {
+                GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
+                BeanUtils.copyProperties(disaster, hideDTO);
+                hideDTOlist.add(hideDTO);
+                qualifiedIds.add(disasterId);
+            }
+        }
+
+        // 批量查询所有因子值
+        Map<Integer, List<FactorVO>> factorValueMap = new HashMap<>();
+        if (!qualifiedIds.isEmpty()) {
+            // 一次性查询所有ID的因子值
+            List<FactorVO> factorValuesByHideIds = factorValueService.getFactorValuesByHideIds(qualifiedIds);
+            // 按hideId分组
+            for (FactorVO factorVO : factorValuesByHideIds) {
+                factorValueMap.computeIfAbsent(factorVO.getHideId(), k -> new ArrayList<>())
+                        .add(factorVO);
+            }
+        }
+        // 合并数据
+        List<HideVO> hideVOlist = new ArrayList<>(hideDTOlist.size());
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            List<FactorVO> factorVOs = factorValueMap.getOrDefault(hideDTO.getId(), Collections.emptyList());
+            HideVO merged = mergeData(hideDTO, factorVOs, "内涝");
+            hideVOlist.add(merged);
+        }
+
+        return hideVOlist;
     }
 
     private Map<String, List> processDisasters(List<GeologicalDisasterHide> disasters, String disasterType) {
