@@ -71,6 +71,8 @@ public class ModelController {
     @PostMapping("/rain/trigger")
     public AjaxResult rainTrigger(@RequestBody TriggerRequest request)
     {
+        System.out.println(request+"request");
+        System.out.println(AjaxResult.success(modelService.rainTrigger(request))+"AjaxResult.success(modelService.rainTrigger(request))");
         return AjaxResult.success(modelService.rainTrigger(request));
     }
 

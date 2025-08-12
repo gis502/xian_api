@@ -77,7 +77,7 @@ spring:
     database: 0
     # 密码
     password: zhangsan
-#    password:
+
     # 连接超时时间
     timeout: 10s
     lettuce:
