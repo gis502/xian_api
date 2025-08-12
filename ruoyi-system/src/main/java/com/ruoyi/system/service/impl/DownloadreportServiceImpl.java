@@ -94,71 +94,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Override
     public R<String> generateRainReport(String imgUrl) throws IOException, InvalidFormatException {
         ReportInfo reportInfo = new ReportInfo();
-//        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
-        Map<String, Object> stringObjectMap = new HashMap<>();
-
-        stringObjectMap.put("{{ReportDate}}", "08月11日 14时00分");
-        stringObjectMap.put("{{Disaster_LandslideMostHigh}}", "蒋村街道王过村（西一村一组）");
-        stringObjectMap.put("{{Disaster_NumOfMountainTorrente}}", 0);
-        stringObjectMap.put("{{Disaster_ProtectAreas}}", "西安市蒋村街道、西安市景区管理局");
-        stringObjectMap.put("{{Disaster_MainRainQuXian}}", "西安市");
-        stringObjectMap.put("{{Disaster_NumOfMudslide}}", 0);
-        stringObjectMap.put("{{Disaster_LandslideMostHighProbability}}", "70.55%");
-        stringObjectMap.put("{{OverView_RainCoveredQuXian}}", "长安区");
-        stringObjectMap.put("{{OverView_ReportDate}}", "2023年08月11日 14时00分");
-        stringObjectMap.put("{{Disaster_MudslideMainCun}}", null);
-        stringObjectMap.put("{{Disaster_NumOfLandslide}}", 3);
-        stringObjectMap.put("{{OverView_mainRainQuXian}}", "长安区");
-        stringObjectMap.put("{{Disaster_LandslideMainCun}}", "蒋村街道");
-        stringObjectMap.put("{{Disaster_UrbanFloodMainCun}}", null);
-        stringObjectMap.put("{{Disaster_NumOfUrbanFlood}}", 0);
-        stringObjectMap.put("{{Disaster_MountainTorrentMainCun}}", null);
-
-// 构造复杂的table数据结构示例（这里示范滑坡的结构）
-        Map<String, Object> tableMap = new HashMap<>();
-
-// landslide表结构
-        Map<String, Object> landslideTable = new HashMap<>();
-        landslideTable.put("header", List.of("序号", "区县位置", "位置", "滑坡发生概率", "风险等级"));
-        landslideTable.put("data", List.of(
-                List.of("西安市", "蒋村街道王过村（西一村一组）", "70.55%", "高"),
-                List.of("西安市", "蒋村街道东寨村青三村一组", "77.24%", "高"),
-                List.of("西安市", "景区管理局郭清村一组", "70.55%", "高")
-        ));
-        landslideTable.put("village", "蒋村街道");
-        landslideTable.put("highRiskCount", 3);
-
-// debrisFlow表（泥石流）
-        Map<String, Object> debrisFlowTable = new HashMap<>();
-        debrisFlowTable.put("header", List.of("序号", "区县位置", "位置", "泥石流发生概率", "风险等级"));
-        debrisFlowTable.put("data", List.of());  // 空列表
-        debrisFlowTable.put("village", null);
-        debrisFlowTable.put("highRiskCount", 0);
-
-// torrentialFlood表（山洪）
-        Map<String, Object> torrentialFloodTable = new HashMap<>();
-        torrentialFloodTable.put("header", List.of("序号", "区县位置", "位置", "山洪发生概率", "风险等级"));
-        torrentialFloodTable.put("data", List.of());
-        torrentialFloodTable.put("village", null);
-        torrentialFloodTable.put("highRiskCount", 0);
-
-// waterLogging表（内涝）
-        Map<String, Object> waterLoggingTable = new HashMap<>();
-        waterLoggingTable.put("header", List.of("序号", "区县位置", "位置", "内涝发生概率", "风险等级"));
-        waterLoggingTable.put("data", List.of());
-        waterLoggingTable.put("village", null);
-        waterLoggingTable.put("highRiskCount", 0);
-
-// 把所有子表放到tableMap
-        tableMap.put("landslide", landslideTable);
-        tableMap.put("debrisFlow", debrisFlowTable);
-        tableMap.put("torrentialFlood", torrentialFloodTable);
-        tableMap.put("waterLogging", waterLoggingTable);
-
-// 放入主map
-        stringObjectMap.put("table", tableMap);
-
-        System.out.println("获取到的真实数据: " + stringObjectMap);
+        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
         System.out.println("原始数据: " + stringObjectMap);
 
 
@@ -169,6 +105,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
         String wordName = "report_" + System.currentTimeMillis() + ".docx";
         Path wordPath = wordDir.resolve(wordName);
+
+        // 构造复杂的table数据结构示例（这里示范滑坡的结构）
+        Map<String, Object> tableMap = new HashMap<>();
+
 
 
         // 从stringObjectMap中获取table（以HashMap形式处理，避免类型转换）
@@ -235,11 +175,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String[] lifelineProjectHead = {"序号", "类型", "名称"};
         int[] lifelineProjectColWidths = {1500, 3000, 15000};
         String[][] lifelineProjectData = {
-                {"1", "道路", "G210 国道（沣峪村段）"},
-                {"2", "道路", "喂子坪村通村公路"},
-                {"3", "输电线路", "35千伏输电线路（沿红草河沟谷段）"},
-                {"4", "通信设施", "移动通信基站（鸡窝子组）"},
-                {"5", "输水管道", "镇级饮用水主管线（经大门村组）"}
+                {"道路", "G210 国道（沣峪村段）"},
+                {"道路", "喂子坪村通村公路"},
+                {"输电线路", "35千伏输电线路（沿红草河沟谷段）"},
+                {"通信设施", "移动通信基站（鸡窝子组）"},
+                {"输水管道", "镇级饮用水主管线（经大门村组）"}
         };
 
 
@@ -335,10 +275,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         map.put("{{Disaster_ProtectAreas}}", getStringValue(dataMap, "{{Disaster_ProtectAreas}}", "未知区域"));
 
         // 补充其他必要的默认值
-        map.put("{{Disaster_AffectedAreaLow}}", "3");
-        map.put("{{Disaster_AffectedAreaHigh}}", "8");
-        map.put("{{Disaster_AffectedPeopleLow}}", "2000");
-        map.put("{{Disaster_AffectedPeopleHigh}}", "3000");
+        map.put("{{Disaster_AffectedAreaLow}}", getStringValue(dataMap, "{{Disaster_AffectedAreaLow}}", "未知"));
+        map.put("{{Disaster_AffectedAreaHigh}}", getStringValue(dataMap, "{{Disaster_AffectedAreaHigh}}", "未知"));
+        map.put("{{Disaster_AffectedPeopleLow}}", getStringValue(dataMap, "{{Disaster_AffectedPeopleLow}}", "0"));
+        map.put("{{Disaster_AffectedPeopleHigh}}", getStringValue(dataMap, "{{Disaster_AffectedPeopleHigh}}", "0"));
         map.put("{{Disposal_AffectedByFloodAndSlide}}", map.get("{{Disaster_LandslideMainCun}}"));
         map.put("{{Disposal_AffectedByUrbanFlood}}", map.get("{{Disaster_UrbanFloodMainCun}}"));
 
