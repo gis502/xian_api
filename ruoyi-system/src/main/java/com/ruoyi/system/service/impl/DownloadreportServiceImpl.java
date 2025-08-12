@@ -102,7 +102,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
         System.out.println("原始数据: " + stringObjectMap);
 
-
         // 生成 Word 路径
         Path wordDir = Paths.get("D:/report");
         if (!Files.exists(wordDir)) {
@@ -111,55 +110,69 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String wordName = "report_" + System.currentTimeMillis() + ".docx";
         Path wordPath = wordDir.resolve(wordName);
 
-        // 构造复杂的table数据结构示例（这里示范滑坡的结构）
-        Map<String, Object> tableMap = new HashMap<>();
+        // 在方法开头（解析数据前）声明并初始化所有灾害数据变量
+        String[][] landslideData = new String[0][0];       // 滑坡数据
+        String[][] mudslideData = new String[0][0];        // 泥石流数据
+        String[][] mountainTorrentData = new String[0][0]; // 山洪数据
+        String[][] urbanFloodData = new String[0][0];      // 城市内涝数据
 
 
 
-        // 从stringObjectMap中获取table（以HashMap形式处理，避免类型转换）
-        Object tableObj = stringObjectMap.get("table");
-        if (tableObj instanceof Map) {
-            tableMap = (Map<String, Object>) tableObj; // 确认是Map类型后转换
+        // 从stringObjectMap中获取外层table（对应Table类实例）
+        Object outerTableObj = stringObjectMap.get("table");
+        if (outerTableObj instanceof Map) {
+            Map<String, Object> outerTableMap = (Map<String, Object>) outerTableObj;
+            // 获取真正的Table对象（innerTableObj）
+            Object innerTableObj = outerTableMap.get("table");
+
+            // 关键：判断innerTableObj是否为Table类实例
+            if (innerTableObj instanceof DownloadreportServiceImpl.ReportInfo.Table) {
+                DownloadreportServiceImpl.ReportInfo.Table table = (DownloadreportServiceImpl.ReportInfo.Table) innerTableObj;
+
+                // 解析滑坡数据（通过Table类的getLandslide()方法）
+                DownloadreportServiceImpl.ReportInfo.Table.TableStructure landslideStructure = table.getLandslide();
+                if (landslideStructure != null) {
+                    landslideData = convertTableStructureTo2DArray(landslideStructure);
+                    System.out.println("滑坡数据转换后: " + Arrays.deepToString(landslideData));
+                } else {
+                    System.out.println("landslideStructure为空");
+                }
+
+                // 解析泥石流数据（通过getDebrisFlow()方法）
+                DownloadreportServiceImpl.ReportInfo.Table.TableStructure debrisFlowStructure = table.getDebrisFlow();
+                if (debrisFlowStructure != null) {
+                    mudslideData = convertTableStructureTo2DArray(debrisFlowStructure);
+                    System.out.println("泥石流数据转换后: " + Arrays.deepToString(mudslideData));
+                } else {
+                    System.out.println("debrisFlowStructure为空");
+                }
+
+                // 解析山洪数据（通过getTorrentialFlood()方法）
+                DownloadreportServiceImpl.ReportInfo.Table.TableStructure torrentStructure = table.getTorrentialFlood();
+                if (torrentStructure != null) {
+                    mountainTorrentData = convertTableStructureTo2DArray(torrentStructure);
+                    System.out.println("山洪数据转换后: " + Arrays.deepToString(mountainTorrentData));
+                } else {
+                    System.out.println("torrentStructure为空");
+                }
+
+                // 解析内涝数据（通过getWaterLogging()方法）
+                DownloadreportServiceImpl.ReportInfo.Table.TableStructure floodStructure = table.getWaterLogging();
+                if (floodStructure != null) {
+                    urbanFloodData = convertTableStructureTo2DArray(floodStructure);
+                    System.out.println("城市内涝数据转换后: " + Arrays.deepToString(urbanFloodData));
+                } else {
+                    System.out.println("floodStructure为空");
+                }
+
+            } else {
+                System.out.println("innerTableObj不是Table类型，实际类型：" + innerTableObj.getClass());
+            }
+        } else {
+            System.out.println("outerTableObj不是Map类型，实际类型：" + (outerTableObj != null ? outerTableObj.getClass() : "null"));
         }
 
-        // 定义各灾害数据的二维数组（默认空数组）
-        String[][] landslideData = new String[0][0];
-        String[][] mudslideData = new String[0][0];
-        String[][] mountainTorrentData = new String[0][0];
-        String[][] urbanFloodData = new String[0][0];
-
-        // 1. 解析滑坡数据（tableMap中的"landslide"字段）
-        Object landslideObj = tableMap.get("landslide");
-        if (landslideObj instanceof Map) {
-            Map<String, Object> landslideMap = (Map<String, Object>) landslideObj;
-            landslideData = convertMapDataTo2DArray(landslideMap);
-        }
-
-        // 2. 解析泥石流数据（tableMap中的"debrisFlow"字段）
-        Object mudslideObj = tableMap.get("debrisFlow");
-        if (mudslideObj instanceof Map) {
-            Map<String, Object> mudslideMap = (Map<String, Object>) mudslideObj;
-            mudslideData = convertMapDataTo2DArray(mudslideMap);
-        }
-
-        // 3. 解析山洪数据（tableMap中的"torrentialFlood"字段）
-        Object mountainTorrentObj = tableMap.get("torrentialFlood");
-        if (mountainTorrentObj instanceof Map) {
-            Map<String, Object> mountainTorrentMap = (Map<String, Object>) mountainTorrentObj;
-            mountainTorrentData = convertMapDataTo2DArray(mountainTorrentMap);
-        }
-
-        // 4. 解析城市内涝数据（tableMap中的"waterLogging"字段）
-        Object urbanFloodObj = tableMap.get("waterLogging");
-        if (urbanFloodObj instanceof Map) {
-            Map<String, Object> urbanFloodMap = (Map<String, Object>) urbanFloodObj;
-            urbanFloodData = convertMapDataTo2DArray(urbanFloodMap);
-        }
-
-        System.out.println("滑坡数据转换后: " + Arrays.deepToString(landslideData));
-
-
-        // 表格配置（保持不变）
+        // 表头与列宽配置
         String landslideTableName = "滑坡灾害预测概率统计表";
         String[] landslideHead = {"序号", "区县位置", "详细位置", "滑坡发生概率", "风险等级"};
         int[] landslideColWidths = {1500, 3000, 8000, 3000, 2000};
@@ -187,7 +200,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 {"输水管道", "镇级饮用水主管线（经大门村组）"}
         };
 
-
         Map<String, String> replaceMap = writeDescibe(landslideData, mudslideData, mountainTorrentData, urbanFloodData, stringObjectMap);
         String pictitle = "灾情影响分布图";
 
@@ -200,7 +212,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 replaceInParagraph(p, replaceMap);
             }
 
-            // 插入表格
+            // 插入表格，空数据也会生成表头
             insertTableAfterTitle(doc, landslideTableName, landslideHead, landslideData, landslideColWidths);
             insertTableAfterTitle(doc, mudslideTableName, mudslideHead, mudslideData, mudslideColWidths);
             insertTableAfterTitle(doc, mountainTorrentTableName, mountainTorrentHead, mountainTorrentData, mountainTorrentColWidths);
@@ -217,41 +229,52 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    // 转换方法：从Map中解析data数据并转换为二维数组
-    private String[][] convertMapDataTo2DArray(Map<String, Object> disasterMap) {
-        // 从灾害Map中获取data字段（你的数据中是List<List<String>>格式）
-        Object dataObj = disasterMap.get("data");
-        if (!(dataObj instanceof List)) {
-            return new String[0][0]; // 非List类型直接返回空数组
-        }
-
-        List<?> rawDataList = (List<?>) dataObj;
-        if (rawDataList.isEmpty()) {
+    /**
+     * 将TableStructure的Map（包含header和data）转换为二维字符串数组
+     * @param dataMap 包含"header"和"data"键的Map（对应landslide/debrisFlow等字段）
+     * @return 转换后的二维数组（每行对应一条数据）
+     */
+    /**
+     * 将TableStructure对象转换为二维字符串数组
+     * @param structure TableStructure实例（包含data字段）
+     * @return 转换后的二维数组
+     */
+    private String[][] convertTableStructureTo2DArray(DownloadreportServiceImpl.ReportInfo.Table.TableStructure structure) {
+        // 从TableStructure中获取data（注意：data的类型可能是List<Object[]>或List<List<Object>>）
+        List<?> dataList = structure.getData();
+        if (dataList == null || dataList.isEmpty()) {
+            System.out.println("TableStructure数据为空");
             return new String[0][0];
         }
 
-        // 转换为目标二维数组（5列：序号、区县位置、详细位置、概率、风险等级）
-        String[][] result = new String[rawDataList.size()][5];
-        for (int i = 0; i < rawDataList.size(); i++) {
-            Object rowObj = rawDataList.get(i);
-            if (!(rowObj instanceof List)) {
-                continue; // 跳过非List类型的行
+        // 转换dataList为String[][]
+        String[][] result = new String[dataList.size()][];
+        for (int i = 0; i < dataList.size(); i++) {
+            Object rowObj = dataList.get(i); // 每行数据（可能是Object[]或List<Object>）
+            List<Object> rowData;
+
+            // 处理行数据的两种可能类型
+            if (rowObj instanceof Object[]) {
+                rowData = Arrays.asList((Object[]) rowObj); // 数组转List
+            } else if (rowObj instanceof List<?>) {
+                rowData = new ArrayList<>((List<?>) rowObj); // List强转
+            } else {
+                // 异常数据处理
+                rowData = new ArrayList<>();
+                rowData.add(rowObj);
             }
 
-            List<?> rowList = (List<?>) rowObj;
-            // 填充序号（第0列）
-            result[i][0] = String.valueOf(i + 1);
-            // 填充区县位置（第1列，对应rowList的第0个元素）
-            result[i][1] = rowList.size() > 0 ? rowList.get(0).toString() : "";
-            // 填充详细位置（第2列，对应rowList的第1个元素）
-            result[i][2] = rowList.size() > 1 ? rowList.get(1).toString() : "";
-            // 填充概率（第3列，对应rowList的第2个元素）
-            result[i][3] = rowList.size() > 2 ? rowList.get(2).toString() : "";
-            // 填充风险等级（第4列，对应rowList的第3个元素）
-            result[i][4] = rowList.size() > 3 ? rowList.get(3).toString() : "";
+            // 转换为String数组（去除风险等级的括号）
+            String[] rowArr = new String[rowData.size()];
+            for (int j = 0; j < rowData.size(); j++) {
+                Object value = rowData.get(j);
+                rowArr[j] = (value != null) ? value.toString().replaceAll("[\\[\\]]", "").trim() : "";
+            }
+            result[i] = rowArr;
         }
         return result;
     }
+
 
 
     // 描述文段（保持不变，已适配带双大括号的键名）
@@ -267,19 +290,23 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         map.put("{{OverView_RainCoveredQuXian}}", getStringValue(dataMap, "{{OverView_RainCoveredQuXian}}", "未知区域"));
         map.put("{{OverView_mainRainQuXian}}", getStringValue(dataMap, "{{OverView_mainRainQuXian}}", "未知区域"));
         map.put("{{Disaster_MainRainQuXian}}", getStringValue(dataMap, "{{Disaster_MainRainQuXian}}", "未知区域"));
+        //滑坡相关
         map.put("{{Disaster_LandslideMainCun}}", getStringValue(dataMap, "{{Disaster_LandslideMainCun}}", "未知村庄"));
         map.put("{{Disaster_LandslideMostHigh}}", getStringValue(dataMap, "{{Disaster_LandslideMostHigh}}", "未知地点"));
         map.put("{{Disaster_LandslideMostHighProbability}}", getStringValue(dataMap, "{{Disaster_LandslideMostHighProbability}}", "未知"));
         map.put("{{Disaster_NumOfLandslide}}", getStringValue(dataMap, "{{Disaster_NumOfLandslide}}", "0"));
+        //泥石流相关
         map.put("{{Disaster_MudslideMainCun}}", getStringValue(dataMap, "{{Disaster_MudslideMainCun}}", "无数据"));
         map.put("{{Disaster_NumOfMudslide}}", getStringValue(dataMap, "{{Disaster_NumOfMudslide}}", "0"));
+        //山洪相关
         map.put("{{Disaster_MountainTorrentMainCun}}", getStringValue(dataMap, "{{Disaster_MountainTorrentMainCun}}", "无数据"));
         map.put("{{Disaster_NumOfMountainTorrente}}", getStringValue(dataMap, "{{Disaster_NumOfMountainTorrente}}", "0"));
+        //城市内涝
         map.put("{{Disaster_UrbanFloodMainCun}}", getStringValue(dataMap, "{{Disaster_UrbanFloodMainCun}}", "无数据"));
         map.put("{{Disaster_NumOfUrbanFlood}}", getStringValue(dataMap, "{{Disaster_NumOfUrbanFlood}}", "0"));
         map.put("{{Disaster_ProtectAreas}}", getStringValue(dataMap, "{{Disaster_ProtectAreas}}", "未知区域"));
 
-        // 补充其他必要的默认值
+        // 影响范围与人口
         map.put("{{Disaster_AffectedAreaLow}}", getStringValue(dataMap, "{{Disaster_AffectedAreaLow}}", "未知"));
         map.put("{{Disaster_AffectedAreaHigh}}", getStringValue(dataMap, "{{Disaster_AffectedAreaHigh}}", "未知"));
         map.put("{{Disaster_AffectedPeopleLow}}", getStringValue(dataMap, "{{Disaster_AffectedPeopleLow}}", "0"));
@@ -297,6 +324,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String overViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现100毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
         String overView = replacePlaceholders(overViewOrg, map);
         replaceMap.put("{{OverView}}", overView);
+        System.out.println("替换后的数据landslideData: " + Arrays.deepToString(landslideData));
+
 
         String landslideDescribe = "";
         if (!containsHighRisk(landslideData)) {
@@ -308,7 +337,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         replaceMap.put("{{Disaster_LandslideDescribe}}", landslideDescribe);
 
         String mudslideDescribe = "";
-        if (mudslideData.length == 0 || !containsHighRisk(mudslideData)) {
+        if (!containsHighRisk(mudslideData)) {
             mudslideDescribe = "在本次评估中，未发现高风险的泥石流隐患点。";
         } else {
             String mudslideDescribeOrg = "泥石流风险主要集中在{{Disaster_MudslideMainCun}}一带。共有{{Disaster_NumOfMudslide}}处存在较高的泥石流触发风险。";
@@ -317,7 +346,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         replaceMap.put("{{Disaster_MudslideDescribe}}", mudslideDescribe);
 
         String mountainTorrentDescribe = "";
-        if (mountainTorrentData.length == 0 || !containsHighRisk(mountainTorrentData)) {
+        if (!containsHighRisk(mountainTorrentData)) {
             mountainTorrentDescribe = "在本次评估中，未发现高风险的山洪隐患点。";
         } else {
             String mountainTorrentDescribeOrg = "山洪风险主要集中在{{Disaster_MountainTorrentMainCun}}附近区域。在持续降雨背景下共有{{Disaster_NumOfMountainTorrente}}处存在山洪骤发风险，需加强预警与应急准备。";
@@ -326,7 +355,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         replaceMap.put("{{Disaster_MountainTorrentDescribe}}", mountainTorrentDescribe);
 
         String urbanFloodDescribe = "";
-        if (urbanFloodData.length == 0 || !containsHighRisk(urbanFloodData)) {
+        if (!containsHighRisk(urbanFloodData)) {
             urbanFloodDescribe = "在本次评估中，未发现高风险的城市内涝隐患点。";
         } else {
             String urbanFloodDescribeOrg = "城市内涝风险主要集中在{{Disaster_UrbanFloodMainCun}}低洼区域及部分老旧排水片区。短时强降雨下共有{{Disaster_NumOfUrbanFlood}}处易出现道路积水和排涝不畅等问题，需提前做好排水疏导和交通应对措施。";
@@ -363,18 +392,21 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     }
 
 
-    // 风险等级判断（保持不变）
-    public static boolean containsHighRisk(String[][] data) {
-        if (data == null || data.length == 0) {
-            return false;
-        }
-        for (String[] row : data) {
-            if (row.length > 4 && "高".equals(row[4])) {
-                return true;
-            }
-        }
+// 修正风险等级判断（风险等级明确在第3列，索引为3）
+public static boolean containsHighRisk(String[][] data) {
+    if (data == null || data.length == 0) {
         return false;
     }
+    // 遍历每行数据，检查第3列（索引3）是否为"高"
+    for (String[] row : data) {
+        // 确保行数据至少有4列（避免数组越界），且第3列trim后为"高"
+        if (row.length >= 4 && "高".equals(row[3].trim())) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 
     // 占位符替换（保持不变）
@@ -628,103 +660,102 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
     }
 
-    public List<XianDem> calPeople(){
-        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(1L, DisasterType.RAINSTORM);
-
-        List<Map<String, Integer>> peopleList = new ArrayList<>();
-
-        LatLonDTO latLonDTO1 = new LatLonDTO();
-        latLonDTO1.setLat(34.02667);
-        latLonDTO1.setLon(108.04083);
-
-        List<XianDem> xianDems1 = modelService.getPoliejiao(latLonDTO1);
-        List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
-        for(Map<String, Object> map : queryDisasterEstimation){
-
-            LatLonDTO latLonDTO = new LatLonDTO();
-            latLonDTO.setLat((Double) map.get("lat"));
-            latLonDTO.setLon((Double) map.get("lon"));
-            List<XianDem> xianDems = modelService.getPoliejiao(latLonDTO);
-
-            // 遍历XianDem列表中的每个对象
-            for (XianDem xianDem : xianDems) {
-                // 获取中心点经纬度
-                Double centerLon = xianDem.getCenterLon();
-                Double centerLat = xianDem.getCenterLat();
-
-                // 创建存储受影响基础设施的列表
-//                List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
-
-                // 30米圆形范围查询
-                double radiusMeters = 30.0;
-
-                try {
-                    // 查询危险源
-                    List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-//                    for (GeologicalDisasterHide disaster : disasters) {
+//    public List<XianDem> calPeople(){
+//        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(1L, DisasterType.RAINSTORM);
+//
+//        List<Map<String, Integer>> peopleList = new ArrayList<>();
+//
+//        LatLonDTO latLonDTO1 = new LatLonDTO();
+//        latLonDTO1.setLat(34.02667);
+//        latLonDTO1.setLon(108.04083);
+//
+//        List<XianDem> xianDems1 = modelService.getPoliejiao(latLonDTO1);
+//        List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
+//        for(Map<String, Object> map : queryDisasterEstimation){
+//
+//            LatLonDTO latLonDTO = new LatLonDTO();
+//            latLonDTO.setLat((Double) map.get("lat"));
+//            latLonDTO.setLon((Double) map.get("lon"));
+//            List<XianDem> xianDems = modelService.getPoliejiao(latLonDTO);
+//
+//            // 遍历XianDem列表中的每个对象
+//            for (XianDem xianDem : xianDems) {
+//                // 获取中心点经纬度
+//                Double centerLon = xianDem.getCenterLon();
+//                Double centerLat = xianDem.getCenterLat();
+//
+//                // 创建存储受影响基础设施的列表
+////                List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
+//
+//                // 30米圆形范围查询
+//                double radiusMeters = 30.0;
+//
+//                try {
+//                    // 查询危险源
+//                    List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+////                    for (GeologicalDisasterHide disaster : disasters) {
+////                        Map<String, String> item = new HashMap<>();
+////                        item.put("type", "危险源");
+////                        item.put("name", disaster.getDisasterName() != null ? disaster.getDisasterName() : "未知危险源");
+////                        item.put("subType", disaster.getDisasterType() != null ? disaster.getDisasterType() : "未知类型");
+////                        affectedInfrastructure.add(item);
+////                    }
+//
+//                    // 查询公路
+//                    List<Road> roads = roadMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                    for (Road road : roads) {
 //                        Map<String, String> item = new HashMap<>();
-//                        item.put("type", "危险源");
-//                        item.put("name", disaster.getDisasterName() != null ? disaster.getDisasterName() : "未知危险源");
-//                        item.put("subType", disaster.getDisasterType() != null ? disaster.getDisasterType() : "未知类型");
+//                        item.put("type", "公路");
+//                        item.put("name", road.getRoadName() != null ? road.getRoadName() : "未知公路");
 //                        affectedInfrastructure.add(item);
 //                    }
-
-                    // 查询公路
-                    List<Road> roads = roadMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-                    for (Road road : roads) {
-                        Map<String, String> item = new HashMap<>();
-                        item.put("type", "公路");
-                        item.put("name", road.getRoadName() != null ? road.getRoadName() : "未知公路");
-                        affectedInfrastructure.add(item);
-                    }
-
-                    // 查询水库
-                    List<Reservoir> reservoirs = reservoirMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-                    for (Reservoir reservoir : reservoirs) {
-                        Map<String, String> item = new HashMap<>();
-                        item.put("type", "水库");
-                        item.put("name", reservoir.getName() != null ? reservoir.getName() : "未知水库");
-                        affectedInfrastructure.add(item);
-                    }
-
-                    // 查询高速公路
-                    List<Highway> highways = highwayMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-                    for (Highway highway : highways) {
-                        Map<String, String> item = new HashMap<>();
-                        item.put("type", "高速公路");
-                        item.put("name", highway.getName() != null ? highway.getName() : "未知高速公路");
-                        affectedInfrastructure.add(item);
-                    }
-
-                    // 查询桥梁
-                    List<Bridge> bridges = bridgeMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-                    for (Bridge bridge : bridges) {
-                        Map<String, String> item = new HashMap<>();
-                        item.put("type", "桥梁");
-                        item.put("name", bridge.getBridgeName() != null ? bridge.getBridgeName() : "未知桥梁");
-                        affectedInfrastructure.add(item);
-                    }
-
-                    // 将受影响的基础设施信息存储到xianDem对象中（如果XianDem类有相应字段）
-                    // 或者可以打印输出查看结果
-                    if (!affectedInfrastructure.isEmpty()) {
-                        System.out.println("网格中心点 (" + centerLon + ", " + centerLat + ") 30米范围内受影响的基础设施:");
-                        for (Map<String, String> infrastructure : affectedInfrastructure) {
-                            System.out.println("- 类型: " + infrastructure.get("type") +
-                                             ", 名称: " + infrastructure.get("name") +
-                                             ", 子类型: " + infrastructure.get("subType"));
-                        }
-                    }
-
-                } catch (Exception e) {
-                    System.err.println("查询网格 (" + centerLon + ", " + centerLat + ") 周边基础设施时发生错误: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return affectedInfrastructure;
-    }
+//
+//                    // 查询水库
+//                    List<Reservoir> reservoirs = reservoirMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                    for (Reservoir reservoir : reservoirs) {
+//                        Map<String, String> item = new HashMap<>();
+//                        item.put("type", "水库");
+//                        item.put("name", reservoir.getName() != null ? reservoir.getName() : "未知水库");
+//                        affectedInfrastructure.add(item);
+//                    }
+//
+//                    // 查询高速公路
+//                    List<Highway> highways = highwayMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                    for (Highway highway : highways) {
+//                        Map<String, String> item = new HashMap<>();
+//                        item.put("type", "高速公路");
+//                        item.put("name", highway.getName() != null ? highway.getName() : "未知高速公路");
+//                        affectedInfrastructure.add(item);
+//                    }
+//
+//                    // 查询桥梁
+//                    List<Bridge> bridges = bridgeMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                    for (Bridge bridge : bridges) {
+//                        Map<String, String> item = new HashMap<>();
+//                        item.put("type", "桥梁");
+//                        item.put("name", bridge.getBridgeName() != null ? bridge.getBridgeName() : "未知桥梁");
+//                        affectedInfrastructure.add(item);
+//                    }
+//
+//                    // 将受影响的基础设施信息存储到xianDem对象中（如果XianDem类有相应字段）
+//                    // 或者可以打印输出查看结果
+//                    if (!affectedInfrastructure.isEmpty()) {
+//                        System.out.println("网格中心点 (" + centerLon + ", " + centerLat + ") 30米范围内受影响的基础设施:");
+//                        for (Map<String, String> infrastructure : affectedInfrastructure) {
+//                            System.out.println("- 类型: " + infrastructure.get("type") +
+//                                             ", 名称: " + infrastructure.get("name") +
+//                                             ", 子类型: " + infrastructure.get("subType"));
+//                        }
+//                    }
+//
+//                } catch (Exception e) {
+//                    System.err.println("查询网格 (" + centerLon + ", " + centerLat + ") 周边基础设施时发生错误: " + e.getMessage());
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        return affectedInfrastructure;
+//    }
 
 
     //下载报告
