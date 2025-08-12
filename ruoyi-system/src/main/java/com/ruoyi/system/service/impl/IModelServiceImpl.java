@@ -423,6 +423,9 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         while (iterations < MAX_ITERATIONS) {
             // 添加当前网格到路径
             path.add(new XianDem(
+//                    currentGrid.getGid(),
+//                    currentGrid.getId(),
+                    currentGrid.getGeomP(),
                     currentGrid.getCenterLat(),
                     currentGrid.getCenterLon(),
                     currentGrid.getElevation()

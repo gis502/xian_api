@@ -9,5 +9,13 @@
         WHERE ST_Intersects(point, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(point, ST_GeomFromText(#{wktPolygon}, 4490))
     </select>
+    
+    <select id="findPeopleByPoint" resultType="com.ruoyi.system.domain.entity.People">
+        SELECT *,
+        ST_AsText(point) AS pointGeom
+        FROM xian_people
+        WHERE ST_Contains(point, ST_GeomFromText('POINT(' || #{lon} || ' ' || #{lat} || ')', 4490))
+        LIMIT 1
+    </select>
 
 </mapper>

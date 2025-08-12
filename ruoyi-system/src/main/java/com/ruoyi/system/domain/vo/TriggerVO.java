@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.vo;
 
+import com.ruoyi.system.domain.dto.GeologicalDisasterHideDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -28,5 +29,7 @@ public class TriggerVO implements Serializable {
     private List<String> probability;
     // 灾害类型
     private List<String> disaster;
+    // 隐患点基本信息
+    private GeologicalDisasterHideDTO geologicalDisasterHideDTO;
 
 }
