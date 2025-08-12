@@ -22,19 +22,24 @@ public class XianDem {
     private String geom; // 存储WKT格式的几何信息，或使用空间类型
 
     // 非数据库字段，用于存储计算出的中心点坐标
-    @TableField(exist = false)
+    @TableField("center_lon")
     private Double centerLon;
 
-    @TableField(exist = false)
+    @TableField("center_lat")
     private Double centerLat;
+
+     private String geomP;
 
     // 获取高程值（转为整数）
     public Integer getElevation() {
         return gridcode != null ? gridcode.intValue() : null;
     }
-    
+
     // 添加构造函数
-    public XianDem(Double centerLat, Double centerLon, Integer elevation) {
+    public XianDem(String geomP, Double centerLat, Double centerLon, Integer elevation) {
+//        this.id = id;
+//        this.gid = gid;
+        this.geomP = geomP;
         this.centerLat = centerLat;
         this.centerLon = centerLon;
         this.gridcode = elevation != null ? elevation.doubleValue() : null;
