@@ -2,9 +2,8 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.DisasterType;
-import com.ruoyi.system.mapper.XianDisasterRainMapper;
-import com.ruoyi.system.mapper.XianFactorAnalysisMapper;
-import com.ruoyi.system.domain.entity.XianDem;
+import com.ruoyi.system.domain.entity.*;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.DownloadreportService;
 import lombok.Data;
 import org.apache.poi.util.Units;
@@ -37,11 +36,6 @@ import java.util.regex.Pattern;
 import com.ruoyi.system.domain.dto.LatLonDTO;
 import com.ruoyi.system.service.IModelService;
 import javax.annotation.Resource;
-import com.ruoyi.system.mapper.PeopleMapper;
-import com.ruoyi.system.domain.entity.People;
-
-
-
 
 
 /**
@@ -59,8 +53,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     @Resource
     private PeopleMapper peopleMapper;
-    
+
     private final XianDisasterRainMapper xianDisasterRainMapper;
+
+    @Resource
+    private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
+    @Resource
+    private RoadMapper roadMapper;
+    @Resource
+    private ReservoirMapper reservoirMapper;
+    @Resource
+    private HighwayMapper highwayMapper;
+    @Resource
+    private BridgeMapper bridgeMapper;
     @Autowired
     private XianFactorAnalysisMapper xianFactorAnalysisMapper;
 
@@ -589,55 +594,100 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
     }
 
-    public List<XianDem> calPeople(){
-        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(1L, DisasterType.RAINSTORM);
-
-        List<Map<String, Integer>> peopleList = new ArrayList<>();
+    public List<Map<String, String>> calPeople(){
+        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(169010L, DisasterType.RAINSTORM);
 
         LatLonDTO latLonDTO1 = new LatLonDTO();
         latLonDTO1.setLat(34.02667);
         latLonDTO1.setLon(108.04083);
 
         List<XianDem> xianDems1 = modelService.getPoliejiao(latLonDTO1);
-
+        List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
         for(Map<String, Object> map : queryDisasterEstimation){
-            // 累积计算人口总和
-            int totalPeople = 0;
+
             LatLonDTO latLonDTO = new LatLonDTO();
             latLonDTO.setLat((Double) map.get("lat"));
             latLonDTO.setLon((Double) map.get("lon"));
             List<XianDem> xianDems = modelService.getPoliejiao(latLonDTO);
-
 
             // 遍历XianDem列表中的每个对象
             for (XianDem xianDem : xianDems) {
                 // 获取中心点经纬度
                 Double centerLon = xianDem.getCenterLon();
                 Double centerLat = xianDem.getCenterLat();
-                
-                // 根据经纬度查询对应区域的人口数据
-                if (centerLon != null && centerLat != null) {
-                    People people = peopleMapper.findPeopleByPoint(centerLon, centerLat);
-                    if (people != null && people.getPeopleNum() != null) {
-                        totalPeople += people.getPeopleNum();
+
+                // 创建存储受影响基础设施的列表
+//                List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
+
+                // 30米圆形范围查询
+                double radiusMeters = 30.0;
+
+                try {
+                    // 查询危险源
+                    List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                    for (GeologicalDisasterHide disaster : disasters) {
+//                        Map<String, String> item = new HashMap<>();
+//                        item.put("type", "危险源");
+//                        item.put("name", disaster.getDisasterName() != null ? disaster.getDisasterName() : "未知危险源");
+//                        item.put("subType", disaster.getDisasterType() != null ? disaster.getDisasterType() : "未知类型");
+//                        affectedInfrastructure.add(item);
+//                    }
+
+                    // 查询公路
+                    List<Road> roads = roadMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+                    for (Road road : roads) {
+                        Map<String, String> item = new HashMap<>();
+                        item.put("type", "公路");
+                        item.put("name", road.getRoadName() != null ? road.getRoadName() : "未知公路");
+                        affectedInfrastructure.add(item);
                     }
+
+                    // 查询水库
+                    List<Reservoir> reservoirs = reservoirMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+                    for (Reservoir reservoir : reservoirs) {
+                        Map<String, String> item = new HashMap<>();
+                        item.put("type", "水库");
+                        item.put("name", reservoir.getName() != null ? reservoir.getName() : "未知水库");
+                        affectedInfrastructure.add(item);
+                    }
+
+                    // 查询高速公路
+                    List<Highway> highways = highwayMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+                    for (Highway highway : highways) {
+                        Map<String, String> item = new HashMap<>();
+                        item.put("type", "高速公路");
+                        item.put("name", highway.getName() != null ? highway.getName() : "未知高速公路");
+                        affectedInfrastructure.add(item);
+                    }
+
+                    // 查询桥梁
+                    List<Bridge> bridges = bridgeMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+                    for (Bridge bridge : bridges) {
+                        Map<String, String> item = new HashMap<>();
+                        item.put("type", "桥梁");
+                        item.put("name", bridge.getBridgeName() != null ? bridge.getBridgeName() : "未知桥梁");
+                        affectedInfrastructure.add(item);
+                    }
+
+                    // 将受影响的基础设施信息存储到xianDem对象中（如果XianDem类有相应字段）
+                    // 或者可以打印输出查看结果
+                    if (!affectedInfrastructure.isEmpty()) {
+                        System.out.println("网格中心点 (" + centerLon + ", " + centerLat + ") 30米范围内受影响的基础设施:");
+                        for (Map<String, String> infrastructure : affectedInfrastructure) {
+                            System.out.println("- 类型: " + infrastructure.get("type") +
+                                             ", 名称: " + infrastructure.get("name") +
+                                             ", 子类型: " + infrastructure.get("subType"));
+                        }
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("查询网格 (" + centerLon + ", " + centerLat + ") 周边基础设施时发生错误: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
-            Map<String, Integer> peopleMap = new HashMap<>();
-            peopleMap.put(map.get("position").toString(), totalPeople);
-            peopleList.add(peopleMap);
-
-            // 可以将总人口数存储到某个地方或返回
-            System.out.println("影响范围内的人口: " + totalPeople);
         }
 
-        Integer total = 0;
-        for(Map<String, Integer> map : peopleList){
-            total += map.get(map.keySet().iterator().next());
-        }
-        System.out.println("影响范围内的人口: " + total);
-        
-        return xianDems1;
+        return affectedInfrastructure;
     }
 
 
@@ -859,7 +909,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
             return map;
         }
-           
+
         /**
          * 获取影响人口
          *
@@ -887,7 +937,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                     // 获取中心点经纬度
                     Double centerLon = xianDem.getCenterLon();
                     Double centerLat = xianDem.getCenterLat();
-                    
+
                     // 根据经纬度查询对应区域的人口数据
                     if (centerLon != null && centerLat != null) {
                         People people = peopleMapper.findPeopleByPoint(centerLon, centerLat);
@@ -908,19 +958,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             for(Map<String, Integer> map : peopleList){
                 total += map.get(map.keySet().iterator().next());
             }
-            
+
             // 根据total值大小动态生成范围
             int[] range = generateRange(total);
             int lowValue = range[0];
             int highValue = range[1];
-            
+
             System.out.println("影响范围内的人口: " + total + ", 范围: " + lowValue + " - " + highValue);
             Map<String, String> peopleMap = new HashMap<>();
             peopleMap.put("{{Disaster_AffectedPeopleLow}}", String.valueOf(lowValue));
             peopleMap.put("{{Disaster_AffectedPeopleHigh}}", String.valueOf(highValue));
             return peopleMap;
         }
-        
+
         /**
          * 根据total值动态生成范围
          * @param total 总人口数
@@ -930,11 +980,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             if (total == 0) {
                 return new int[]{0, 0};
             }
-            
+
             // 确定total的位数和主要数位
             int digits = String.valueOf(total).length();
             int variance;
-            
+
             if (digits >= 4) {
                 // 千位及以上，在百位上加减300
                 variance = 300;
@@ -948,10 +998,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 // 个位数，加减5
                 variance = 5;
             }
-            
+
             int lowValue = Math.max(0, total - variance); // 确保不小于0
             int highValue = total + variance;
-            
+
             return new int[]{lowValue, highValue};
         }
 
@@ -990,19 +1040,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 total += map.get(map.keySet().iterator().next());
             }
             System.out.println("影响范围内的面积: " + total);
-            
+
             // 根据total值大小动态生成范围
             int[] range = generateAreaRange(total);
             int lowValue = range[0];
             int highValue = range[1];
-            
+
             System.out.println("影响范围内的面积: " + total + ", 范围: " + lowValue + " - " + highValue);
             Map<String, String> areaMap = new HashMap<>();
             areaMap.put("{{Disaster_AffectedAreaLow}}", String.valueOf(lowValue/1000));
             areaMap.put("{{Disaster_AffectedAreaHigh}}", String.valueOf(highValue/1000));
             return areaMap;
         }
-        
+
         /**
          * 根据total值动态生成范围
          * @param total 总面积
@@ -1012,7 +1062,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             if (total == 0) {
                 return new int[]{0, 0};
             }
-            
+
             // 确定total的位数和主要数位
             int digits = String.valueOf(total).length();
             int variance;
@@ -1033,14 +1083,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 // 个位数，加减5
                 variance = 5;
             }
-            
+
             int lowValue = Math.max(0, total - variance); // 确保不小于0
             int highValue = total + variance;
-            
+
             return new int[]{lowValue, highValue};
         }
 
-        
+
         @Data
         class Table {
             @Data

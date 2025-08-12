@@ -10,8 +10,7 @@
             gridcode,
             geom,
             ST_X(ST_Centroid(geom)) as centerLon,
-            ST_Y(ST_Centroid(geom)) as centerLat,
-            ST_AsText(geom) as geomP
+            ST_Y(ST_Centroid(geom)) as centerLat
         FROM xian_dem
         WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4490))
     </select>

@@ -20,5 +20,5 @@ public interface DownloadreportService {
 
     Map<String, Object> queryReportInfo(Long disasterId, DisasterType disasterType);
 
-    public List<XianDem> calPeople();
+    public List<Map<String, String>> calPeople();
 }
