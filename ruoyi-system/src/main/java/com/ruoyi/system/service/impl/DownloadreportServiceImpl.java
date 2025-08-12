@@ -660,102 +660,103 @@ public static boolean containsHighRisk(String[][] data) {
         }
     }
 
-//    public List<XianDem> calPeople(){
-//        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(1L, DisasterType.RAINSTORM);
-//
-//        List<Map<String, Integer>> peopleList = new ArrayList<>();
-//
-//        LatLonDTO latLonDTO1 = new LatLonDTO();
-//        latLonDTO1.setLat(34.02667);
-//        latLonDTO1.setLon(108.04083);
-//
-//        List<XianDem> xianDems1 = modelService.getPoliejiao(latLonDTO1);
-//        List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
-//        for(Map<String, Object> map : queryDisasterEstimation){
-//
-//            LatLonDTO latLonDTO = new LatLonDTO();
-//            latLonDTO.setLat((Double) map.get("lat"));
-//            latLonDTO.setLon((Double) map.get("lon"));
-//            List<XianDem> xianDems = modelService.getPoliejiao(latLonDTO);
-//
-//            // 遍历XianDem列表中的每个对象
-//            for (XianDem xianDem : xianDems) {
-//                // 获取中心点经纬度
-//                Double centerLon = xianDem.getCenterLon();
-//                Double centerLat = xianDem.getCenterLat();
-//
-//                // 创建存储受影响基础设施的列表
-////                List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
-//
-//                // 30米圆形范围查询
-//                double radiusMeters = 30.0;
-//
-//                try {
-//                    // 查询危险源
-//                    List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-////                    for (GeologicalDisasterHide disaster : disasters) {
-////                        Map<String, String> item = new HashMap<>();
-////                        item.put("type", "危险源");
-////                        item.put("name", disaster.getDisasterName() != null ? disaster.getDisasterName() : "未知危险源");
-////                        item.put("subType", disaster.getDisasterType() != null ? disaster.getDisasterType() : "未知类型");
-////                        affectedInfrastructure.add(item);
-////                    }
-//
-//                    // 查询公路
-//                    List<Road> roads = roadMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-//                    for (Road road : roads) {
-//                        Map<String, String> item = new HashMap<>();
-//                        item.put("type", "公路");
-//                        item.put("name", road.getRoadName() != null ? road.getRoadName() : "未知公路");
-//                        affectedInfrastructure.add(item);
-//                    }
-//
-//                    // 查询水库
-//                    List<Reservoir> reservoirs = reservoirMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-//                    for (Reservoir reservoir : reservoirs) {
-//                        Map<String, String> item = new HashMap<>();
-//                        item.put("type", "水库");
-//                        item.put("name", reservoir.getName() != null ? reservoir.getName() : "未知水库");
-//                        affectedInfrastructure.add(item);
-//                    }
-//
-//                    // 查询高速公路
-//                    List<Highway> highways = highwayMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-//                    for (Highway highway : highways) {
-//                        Map<String, String> item = new HashMap<>();
-//                        item.put("type", "高速公路");
-//                        item.put("name", highway.getName() != null ? highway.getName() : "未知高速公路");
-//                        affectedInfrastructure.add(item);
-//                    }
-//
-//                    // 查询桥梁
-//                    List<Bridge> bridges = bridgeMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
-//                    for (Bridge bridge : bridges) {
-//                        Map<String, String> item = new HashMap<>();
-//                        item.put("type", "桥梁");
-//                        item.put("name", bridge.getBridgeName() != null ? bridge.getBridgeName() : "未知桥梁");
-//                        affectedInfrastructure.add(item);
-//                    }
-//
-//                    // 将受影响的基础设施信息存储到xianDem对象中（如果XianDem类有相应字段）
-//                    // 或者可以打印输出查看结果
-//                    if (!affectedInfrastructure.isEmpty()) {
-//                        System.out.println("网格中心点 (" + centerLon + ", " + centerLat + ") 30米范围内受影响的基础设施:");
-//                        for (Map<String, String> infrastructure : affectedInfrastructure) {
-//                            System.out.println("- 类型: " + infrastructure.get("type") +
-//                                             ", 名称: " + infrastructure.get("name") +
-//                                             ", 子类型: " + infrastructure.get("subType"));
-//                        }
-//                    }
-//
-//                } catch (Exception e) {
-//                    System.err.println("查询网格 (" + centerLon + ", " + centerLat + ") 周边基础设施时发生错误: " + e.getMessage());
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//        return affectedInfrastructure;
-//    }
+    public List<Map<String, Object>> calPeople(){
+        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(169010L, DisasterType.RAINSTORM);
+
+        // LatLonDTO latLonDTO1 = new LatLonDTO();
+        // latLonDTO1.setLat(34.02667);
+        // latLonDTO1.setLon(108.04083);
+        // List<XianDem> xianDems1 = modelService.getPoliejiao(latLonDTO1);
+
+        // List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
+        for(Map<String, Object> map : queryDisasterEstimation){
+
+            LatLonDTO latLonDTO = new LatLonDTO();
+            latLonDTO.setLat((Double) map.get("lat"));
+            latLonDTO.setLon((Double) map.get("lon"));
+            List<XianDem> xianDems = modelService.getPoliejiao(latLonDTO);
+
+            // 遍历XianDem列表中的每个对象
+            for (XianDem xianDem : xianDems) {
+                // 获取中心点经纬度
+                Double centerLon = xianDem.getCenterLon();
+                Double centerLat = xianDem.getCenterLat();
+
+
+                // 创建存储受影响基础设施的列表
+//                List<Map<String, String>> affectedInfrastructure = new ArrayList<>();
+
+                // 30米圆形范围查询
+                double radiusMeters = 30.0;
+                // return queryDisasterEstimation;
+
+//                 try {
+//                     // 查询危险源
+//                     // List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+// //                    for (GeologicalDisasterHide disaster : disasters) {
+// //                        Map<String, String> item = new HashMap<>();
+// //                        item.put("type", "危险源");
+// //                        item.put("name", disaster.getDisasterName() != null ? disaster.getDisasterName() : "未知危险源");
+// //                        item.put("subType", disaster.getDisasterType() != null ? disaster.getDisasterType() : "未知类型");
+// //                        affectedInfrastructure.add(item);
+// //                    }
+
+//                     // 查询公路
+//                     List<Road> roads = roadMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                     for (Road road : roads) {
+//                         Map<String, String> item = new HashMap<>();
+//                         item.put("type", "公路");
+//                         item.put("name", road.getRoadName() != null ? road.getRoadName() : "未知公路");
+//                         affectedInfrastructure.add(item);
+//                     }
+
+//                     // 查询水库
+//                     List<Reservoir> reservoirs = reservoirMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                     for (Reservoir reservoir : reservoirs) {
+//                         Map<String, String> item = new HashMap<>();
+//                         item.put("type", "水库");
+//                         item.put("name", reservoir.getName() != null ? reservoir.getName() : "未知水库");
+//                         affectedInfrastructure.add(item);
+//                     }
+
+//                     // 查询高速公路
+//                     List<Highway> highways = highwayMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                     for (Highway highway : highways) {
+//                         Map<String, String> item = new HashMap<>();
+//                         item.put("type", "高速公路");
+//                         item.put("name", highway.getName() != null ? highway.getName() : "未知高速公路");
+//                         affectedInfrastructure.add(item);
+//                     }
+
+//                     // 查询桥梁
+//                     List<Bridge> bridges = bridgeMapper.findWithinCircle(centerLon, centerLat, radiusMeters);
+//                     for (Bridge bridge : bridges) {
+//                         Map<String, String> item = new HashMap<>();
+//                         item.put("type", "桥梁");
+//                         item.put("name", bridge.getBridgeName() != null ? bridge.getBridgeName() : "未知桥梁");
+//                         affectedInfrastructure.add(item);
+//                     }
+
+//                     // 将受影响的基础设施信息存储到xianDem对象中（如果XianDem类有相应字段）
+//                     // 或者可以打印输出查看结果
+//                     if (!affectedInfrastructure.isEmpty()) {
+//                         System.out.println("网格中心点 (" + centerLon + ", " + centerLat + ") 30米范围内受影响的基础设施:");
+//                         for (Map<String, String> infrastructure : affectedInfrastructure) {
+//                             System.out.println("- 类型: " + infrastructure.get("type") +
+//                                              ", 名称: " + infrastructure.get("name") +
+//                                              ", 子类型: " + infrastructure.get("subType"));
+//                         }
+//                     }
+
+//                 } catch (Exception e) {
+//                     System.err.println("查询网格 (" + centerLon + ", " + centerLat + ") 周边基础设施时发生错误: " + e.getMessage());
+//                     e.printStackTrace();
+//                 }
+            }
+        }
+
+        return queryDisasterEstimation;
+    }
 
 
     //下载报告
@@ -990,6 +991,9 @@ public static boolean containsHighRisk(String[][] data) {
             List<Map<String, Integer>> peopleList = new ArrayList<>();
 
             for(Map<String, Object> map : queryDisasterEstimation){
+                if(map.get("level") !="[高]"){
+                    continue;
+                }
                 // 累积计算人口总和
                 int totalPeople = 0;
 
@@ -1085,6 +1089,9 @@ public static boolean containsHighRisk(String[][] data) {
             List<Map<String, Integer>> peopleList = new ArrayList<>();
 
             for(Map<String, Object> map : queryDisasterEstimation){
+                if(map.get("level") !="[高]"){
+                    continue;
+                }
                 // 累积计算面积总和
                 int totalArea = 0;
                 LatLonDTO latLonDTO = new LatLonDTO();
