@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.GeologicalDisasterHideMapper">
+
+    <select id="findWithinCircle" resultType="com.ruoyi.system.domain.entity.GeologicalDisasterHide">
+        SELECT id, field_code, disaster_name, disaster_type, lon, lat, position, scale_grade, risk_grade
+        FROM xian_disaster_hide
+        WHERE ST_DWithin(
+            ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4490), 4490),
+            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 4490),
+            #{radiusMeters}
+        )
+    </select>
+
+</mapper>
