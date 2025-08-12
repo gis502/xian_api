@@ -73,100 +73,159 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     @Override
     public R<String> generateRainReport(String imgUrl) throws IOException, InvalidFormatException {
+        ReportInfo reportInfo = new ReportInfo();
+//        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
+        Map<String, Object> stringObjectMap = new HashMap<>();
+
+        stringObjectMap.put("{{ReportDate}}", "08月11日 14时00分");
+        stringObjectMap.put("{{Disaster_LandslideMostHigh}}", "蒋村街道王过村（西一村一组）");
+        stringObjectMap.put("{{Disaster_NumOfMountainTorrente}}", 0);
+        stringObjectMap.put("{{Disaster_ProtectAreas}}", "西安市蒋村街道、西安市景区管理局");
+        stringObjectMap.put("{{Disaster_MainRainQuXian}}", "西安市");
+        stringObjectMap.put("{{Disaster_NumOfMudslide}}", 0);
+        stringObjectMap.put("{{Disaster_LandslideMostHighProbability}}", "70.55%");
+        stringObjectMap.put("{{OverView_RainCoveredQuXian}}", "长安区");
+        stringObjectMap.put("{{OverView_ReportDate}}", "2023年08月11日 14时00分");
+        stringObjectMap.put("{{Disaster_MudslideMainCun}}", null);
+        stringObjectMap.put("{{Disaster_NumOfLandslide}}", 3);
+        stringObjectMap.put("{{OverView_mainRainQuXian}}", "长安区");
+        stringObjectMap.put("{{Disaster_LandslideMainCun}}", "蒋村街道");
+        stringObjectMap.put("{{Disaster_UrbanFloodMainCun}}", null);
+        stringObjectMap.put("{{Disaster_NumOfUrbanFlood}}", 0);
+        stringObjectMap.put("{{Disaster_MountainTorrentMainCun}}", null);
+
+// 构造复杂的table数据结构示例（这里示范滑坡的结构）
+        Map<String, Object> tableMap = new HashMap<>();
+
+// landslide表结构
+        Map<String, Object> landslideTable = new HashMap<>();
+        landslideTable.put("header", List.of("序号", "区县位置", "位置", "滑坡发生概率", "风险等级"));
+        landslideTable.put("data", List.of(
+                List.of("西安市", "蒋村街道王过村（西一村一组）", "70.55%", "高"),
+                List.of("西安市", "蒋村街道东寨村青三村一组", "77.24%", "高"),
+                List.of("西安市", "景区管理局郭清村一组", "70.55%", "高")
+        ));
+        landslideTable.put("village", "蒋村街道");
+        landslideTable.put("highRiskCount", 3);
+
+// debrisFlow表（泥石流）
+        Map<String, Object> debrisFlowTable = new HashMap<>();
+        debrisFlowTable.put("header", List.of("序号", "区县位置", "位置", "泥石流发生概率", "风险等级"));
+        debrisFlowTable.put("data", List.of());  // 空列表
+        debrisFlowTable.put("village", null);
+        debrisFlowTable.put("highRiskCount", 0);
+
+// torrentialFlood表（山洪）
+        Map<String, Object> torrentialFloodTable = new HashMap<>();
+        torrentialFloodTable.put("header", List.of("序号", "区县位置", "位置", "山洪发生概率", "风险等级"));
+        torrentialFloodTable.put("data", List.of());
+        torrentialFloodTable.put("village", null);
+        torrentialFloodTable.put("highRiskCount", 0);
+
+// waterLogging表（内涝）
+        Map<String, Object> waterLoggingTable = new HashMap<>();
+        waterLoggingTable.put("header", List.of("序号", "区县位置", "位置", "内涝发生概率", "风险等级"));
+        waterLoggingTable.put("data", List.of());
+        waterLoggingTable.put("village", null);
+        waterLoggingTable.put("highRiskCount", 0);
+
+// 把所有子表放到tableMap
+        tableMap.put("landslide", landslideTable);
+        tableMap.put("debrisFlow", debrisFlowTable);
+        tableMap.put("torrentialFlood", torrentialFloodTable);
+        tableMap.put("waterLogging", waterLoggingTable);
+
+// 放入主map
+        stringObjectMap.put("table", tableMap);
+
+        System.out.println("获取到的真实数据: " + stringObjectMap);
+        System.out.println("原始数据: " + stringObjectMap);
 
 
-        // 生成 Word
+        // 生成 Word 路径
         Path wordDir = Paths.get("D:/report");
         if (!Files.exists(wordDir)) {
             Files.createDirectories(wordDir);
         }
-
         String wordName = "report_" + System.currentTimeMillis() + ".docx";
         Path wordPath = wordDir.resolve(wordName);
 
-        // 滑坡
+
+        // 从stringObjectMap中获取table（以HashMap形式处理，避免类型转换）
+        Object tableObj = stringObjectMap.get("table");
+        if (tableObj instanceof Map) {
+            tableMap = (Map<String, Object>) tableObj; // 确认是Map类型后转换
+        }
+
+        // 定义各灾害数据的二维数组（默认空数组）
+        String[][] landslideData = new String[0][0];
+        String[][] mudslideData = new String[0][0];
+        String[][] mountainTorrentData = new String[0][0];
+        String[][] urbanFloodData = new String[0][0];
+
+        // 1. 解析滑坡数据（tableMap中的"landslide"字段）
+        Object landslideObj = tableMap.get("landslide");
+        if (landslideObj instanceof Map) {
+            Map<String, Object> landslideMap = (Map<String, Object>) landslideObj;
+            landslideData = convertMapDataTo2DArray(landslideMap);
+        }
+
+        // 2. 解析泥石流数据（tableMap中的"debrisFlow"字段）
+        Object mudslideObj = tableMap.get("debrisFlow");
+        if (mudslideObj instanceof Map) {
+            Map<String, Object> mudslideMap = (Map<String, Object>) mudslideObj;
+            mudslideData = convertMapDataTo2DArray(mudslideMap);
+        }
+
+        // 3. 解析山洪数据（tableMap中的"torrentialFlood"字段）
+        Object mountainTorrentObj = tableMap.get("torrentialFlood");
+        if (mountainTorrentObj instanceof Map) {
+            Map<String, Object> mountainTorrentMap = (Map<String, Object>) mountainTorrentObj;
+            mountainTorrentData = convertMapDataTo2DArray(mountainTorrentMap);
+        }
+
+        // 4. 解析城市内涝数据（tableMap中的"waterLogging"字段）
+        Object urbanFloodObj = tableMap.get("waterLogging");
+        if (urbanFloodObj instanceof Map) {
+            Map<String, Object> urbanFloodMap = (Map<String, Object>) urbanFloodObj;
+            urbanFloodData = convertMapDataTo2DArray(urbanFloodMap);
+        }
+
+        System.out.println("滑坡数据转换后: " + Arrays.deepToString(landslideData));
+
+
+        // 表格配置（保持不变）
         String landslideTableName = "滑坡灾害预测概率统计表";
         String[] landslideHead = {"序号", "区县位置", "详细位置", "滑坡发生概率", "风险等级"};
         int[] landslideColWidths = {1500, 3000, 8000, 3000, 2000};
-        String[][] landslideData = {
-                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "83%", "高"},
-                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "78%", "高"},
-                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "76%", "高"},
-                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "76%", "高"},
-                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "75%", "高"},
-                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "74%", "高"},
-                {"长安区", "喂子坪村大坪组大坪(B10)", "74%", "高"},
-                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "60%", "中"},
-                {"长安区", "沣峪村大门村组红草河以东(B3)", "62%", "中"},
-                {"长安区", "上王村六组翠微宫园(C2)", "22%", "低"}
-        };
 
-// 泥石流
-        String MudslideTableName = "泥石流灾害预测概率统计表";
-        String[] MudslideHead = {"序号", "区县位置", "详细位置", "泥石流发生概率", "风险等级"};
-        int[] MudslideColWidths = {1500, 3000, 8000, 3000, 2000};
-        String[][] MudslideData = {
-                {"长安区", "沣峪村大门村组红草河以东(B3)", "81%", "高"},
-                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "78%", "高"},
-                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "76%", "高"},
-                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "74%", "高"},
-                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "74%", "高"},
-                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "73%", "高"},
-                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "72%", "高"},
-                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "70%", "高"},
-                {"长安区", "喂子坪村大坪组大坪(B10)", "68%", "中"},
-                {"长安区", "上王村六组翠微宫园(C2)", "32%", "低"}
-        };
+        String mudslideTableName = "泥石流灾害预测概率统计表";
+        String[] mudslideHead = {"序号", "区县位置", "详细位置", "泥石流发生概率", "风险等级"};
+        int[] mudslideColWidths = {1500, 3000, 8000, 3000, 2000};
 
-// 山洪
-        String MountainTorrentTableName = "山洪灾害预测概率统计表";
-        String[] MountainTorrentHead = {"序号", "区县位置", "详细位置", "山洪发生概率", "风险等级"};
-        int[] MountainTorrentColWidths = {1500, 3000, 8000, 3000, 2000};
-        String[][] MountainTorrentData = {
-                {"长安区", "沣峪村大门村组红草河以东(B3)", "84%", "高"},
-                {"长安区", "沣峪村石峡沟组原石峡沟村(B6)", "82%", "高"},
-                {"长安区", "喂子坪村鸡窝子组上鸡窝(B2)", "63%", "中"},
-                {"长安区", "喂子坪村北石槽组原北石槽村(B10)", "62%", "中"},
-                {"长安区", "喂子坪村北石槽组南石槽沟西口(B9)", "62%", "中"},
-                {"长安区", "喂子坪村鸡窝子组龙窝子-凤凰咀(B3)", "61%", "中"},
-                {"长安区", "喂子坪村北石槽组南石槽沟内(B7)", "61%", "中"},
-                {"长安区", "喂子坪村青岗树组夭佛岩(B4)", "60%", "中"},
-                {"长安区", "喂子坪村大坪组大坪(B10)", "58%", "中"},
-                {"长安区", "上王村六组翠微宫园(C2)", "25%", "低"}
-        };
+        String mountainTorrentTableName = "山洪灾害预测概率统计表";
+        String[] mountainTorrentHead = {"序号", "区县位置", "详细位置", "山洪发生概率", "风险等级"};
+        int[] mountainTorrentColWidths = {1500, 3000, 8000, 3000, 2000};
 
-// 城市内涝
-        String UrbanFloodTableName = "城市内涝灾害预测概率统计表";
-        String[] UrbanFloodHead = {"序号", "区县位置", "详细位置", "城市内涝发生概率", "风险等级"};
-        int[] UrbanFloodColWidths = {1500, 3000, 8000, 3000, 2000};
-        String[][] UrbanFloodData = {
-                {"长安区", "靖宁路与西部大道十字", "73%", "高"},
-                {"长安区", "朱雀市场", "71%", "高"},
-                {"长安区", "西部大道积水点", "68%", "中"},
-                {"长安区", "学府大街西段", "66%", "中"},
-                {"雁塔区", "含光路崇业路", "65%", "中"},
-                {"雁塔区", "小寨十字", "64%", "中"},
-                {"雁塔区", "永城路下穿", "64%", "中"},
-                {"雁塔区", "西影路阳光小区", "59%", "中"},
-                {"雁塔区", "咸宁东路恒大绿洲", "58%", "中"},
-                {"高新区", "西三环丈八立交", "22%", "低"}
-        };
+        String urbanFloodTableName = "城市内涝灾害预测概率统计表";
+        String[] urbanFloodHead = {"序号", "区县位置", "详细位置", "城市内涝发生概率", "风险等级"};
+        int[] urbanFloodColWidths = {1500, 3000, 8000, 3000, 2000};
 
-// 生命线工程
-        String LifelineProjectTableName = "生命线工程影响统计表";
-        String[] LifelineProjectHead = {"序号", "类型", "名称"};
-        int[] LifelineProjectColWidths = {1500, 3000, 15000};
-        String[][] LifelineProjectData = {
-                {"道路", "G210 国道（沣峪村段）"},
-                {"道路", "喂子坪村通村公路"},
-                {"输电线路", "35千伏输电线路（沿红草河沟谷段）"},
-                {"通信设施", "移动通信基站（鸡窝子组）"},
-                {"输水管道", "镇级饮用水主管线（经大门村组）"}
+        String lifelineProjectTableName = "生命线工程影响统计表";
+        String[] lifelineProjectHead = {"序号", "类型", "名称"};
+        int[] lifelineProjectColWidths = {1500, 3000, 15000};
+        String[][] lifelineProjectData = {
+                {"1", "道路", "G210 国道（沣峪村段）"},
+                {"2", "道路", "喂子坪村通村公路"},
+                {"3", "输电线路", "35千伏输电线路（沿红草河沟谷段）"},
+                {"4", "通信设施", "移动通信基站（鸡窝子组）"},
+                {"5", "输水管道", "镇级饮用水主管线（经大门村组）"}
         };
 
 
-        Map<String, String> replaceMap = writeDescibe(landslideData, MudslideData, MountainTorrentData, UrbanFloodData);
+        Map<String, String> replaceMap = writeDescibe(landslideData, mudslideData, mountainTorrentData, urbanFloodData, stringObjectMap);
         String pictitle = "灾情影响分布图";
+
         /* 读模板并替换 */
         try (InputStream template = getClass().getResourceAsStream("/reportTemplate/暴雨应急预评估报告模板.docx");
              XWPFDocument doc = new XWPFDocument(template)) {
@@ -176,13 +235,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 replaceInParagraph(p, replaceMap);
             }
 
-            //插入表格
+            // 插入表格
             insertTableAfterTitle(doc, landslideTableName, landslideHead, landslideData, landslideColWidths);
-            insertTableAfterTitle(doc, MudslideTableName, MudslideHead, MudslideData, MudslideColWidths);
-            insertTableAfterTitle(doc, MountainTorrentTableName, MountainTorrentHead, MountainTorrentData, MountainTorrentColWidths);
-            insertTableAfterTitle(doc, UrbanFloodTableName, UrbanFloodHead, UrbanFloodData, UrbanFloodColWidths);
-            insertTableAfterTitle(doc, LifelineProjectTableName, LifelineProjectHead, LifelineProjectData, LifelineProjectColWidths);
-            //插入图片
+            insertTableAfterTitle(doc, mudslideTableName, mudslideHead, mudslideData, mudslideColWidths);
+            insertTableAfterTitle(doc, mountainTorrentTableName, mountainTorrentHead, mountainTorrentData, mountainTorrentColWidths);
+            insertTableAfterTitle(doc, urbanFloodTableName, urbanFloodHead, urbanFloodData, urbanFloodColWidths);
+            insertTableAfterTitle(doc, lifelineProjectTableName, lifelineProjectHead, lifelineProjectData, lifelineProjectColWidths);
+
+            // 插入图片
             insertPicBeforeTitle(doc, pictitle, imgUrl);
 
             try (OutputStream os = Files.newOutputStream(wordPath)) {
@@ -192,113 +252,175 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    //描述文段
-    private static Map<String, String> writeDescibe(String[][] landslideData, String[][] MudslideData, String[][] MountainTorrentData, String[][] UrbanFloodData) {
+    // 转换方法：从Map中解析data数据并转换为二维数组
+    private String[][] convertMapDataTo2DArray(Map<String, Object> disasterMap) {
+        // 从灾害Map中获取data字段（你的数据中是List<List<String>>格式）
+        Object dataObj = disasterMap.get("data");
+        if (!(dataObj instanceof List)) {
+            return new String[0][0]; // 非List类型直接返回空数组
+        }
+
+        List<?> rawDataList = (List<?>) dataObj;
+        if (rawDataList.isEmpty()) {
+            return new String[0][0];
+        }
+
+        // 转换为目标二维数组（5列：序号、区县位置、详细位置、概率、风险等级）
+        String[][] result = new String[rawDataList.size()][5];
+        for (int i = 0; i < rawDataList.size(); i++) {
+            Object rowObj = rawDataList.get(i);
+            if (!(rowObj instanceof List)) {
+                continue; // 跳过非List类型的行
+            }
+
+            List<?> rowList = (List<?>) rowObj;
+            // 填充序号（第0列）
+            result[i][0] = String.valueOf(i + 1);
+            // 填充区县位置（第1列，对应rowList的第0个元素）
+            result[i][1] = rowList.size() > 0 ? rowList.get(0).toString() : "";
+            // 填充详细位置（第2列，对应rowList的第1个元素）
+            result[i][2] = rowList.size() > 1 ? rowList.get(1).toString() : "";
+            // 填充概率（第3列，对应rowList的第2个元素）
+            result[i][3] = rowList.size() > 2 ? rowList.get(2).toString() : "";
+            // 填充风险等级（第4列，对应rowList的第3个元素）
+            result[i][4] = rowList.size() > 3 ? rowList.get(3).toString() : "";
+        }
+        return result;
+    }
+
+
+    // 描述文段（保持不变，已适配带双大括号的键名）
+    private static Map<String, String> writeDescibe(String[][] landslideData, String[][] mudslideData,
+                                                    String[][] mountainTorrentData, String[][] urbanFloodData,
+                                                    Map<String, Object> dataMap) {
         Map<String, String> map = new HashMap<>();
-        map.put("{{ReportDate}}", "08月11日15时51分");
-        map.put("{{OverView_ReportDate}}", "2023年8月11日15时51分");
-        map.put("{{OverView_RainCoveredQuXian}}", "长安区、临潼区、蓝田县");
-        map.put("{{OverView_mainRainQuXian}}", "长安区");
-        map.put("{{Disaster_MainRainQuXian}}", "长安区");
-        map.put("{{Disaster_LandslideMainCun}}", "喂子坪村");
-        map.put("{{Disaster_LandslideMostHigh}}", "鸡窝子组上鸡窝");
-        map.put("{{Disaster_LandslideMostHighProbability}}", "83%");
-        map.put("{{Disaster_NumOfLandslide}}", "7");
-        map.put("{{Disaster_MudslideMainCun}}", "沣峪村、喂子坪村");
-        map.put("{{Disaster_MudslideMostHigh}}", "大门村组红草河以东");
-        map.put("{{Disaster_MudslideMostHighProbability}}", "81%");
-        map.put("{{Disaster_NumOfMudslide}}", "8");
-        map.put("{{Disaster_MountainTorrentMainCun}}", "沣峪村");
-        map.put("{{Disaster_MountainTorrentMostHigh}}", "大门村组红草河以东");
-        map.put("{{Disaster_MountainTorrentMostHighProbability}}", "83%");
-        map.put("{{Disaster_NumOfMountainTorrente}}", "2");
-        map.put("{{Disaster_UrbanFloodMainCun}}", "长安区、雁塔区");
-        map.put("{{Disaster_UrbanFloodMostHigh}}", "靖宁路与西部大道十字");
-        map.put("{{Disaster_UrbanFloodMostHighProbability}}", "73%");
-        map.put("{{Disaster_NumOfUrbanFlood}}", "2");
-        map.put("{{Disaster_ProtectAreas}}", "长安区喂子坪村、沣峪村，以及靖宁路与西部大道十字交汇区域、朱雀市场");
+        System.out.println("获取到的真实数据: " + dataMap);
+
+        // 从dataMap中获取数据（键名带双大括号，与数据匹配）
+        map.put("{{ReportDate}}", getStringValue(dataMap, "{{ReportDate}}", "未知时间"));
+        map.put("{{OverView_ReportDate}}", getStringValue(dataMap, "{{OverView_ReportDate}}", "未知日期"));
+        map.put("{{OverView_RainCoveredQuXian}}", getStringValue(dataMap, "{{OverView_RainCoveredQuXian}}", "未知区域"));
+        map.put("{{OverView_mainRainQuXian}}", getStringValue(dataMap, "{{OverView_mainRainQuXian}}", "未知区域"));
+        map.put("{{Disaster_MainRainQuXian}}", getStringValue(dataMap, "{{Disaster_MainRainQuXian}}", "未知区域"));
+        map.put("{{Disaster_LandslideMainCun}}", getStringValue(dataMap, "{{Disaster_LandslideMainCun}}", "未知村庄"));
+        map.put("{{Disaster_LandslideMostHigh}}", getStringValue(dataMap, "{{Disaster_LandslideMostHigh}}", "未知地点"));
+        map.put("{{Disaster_LandslideMostHighProbability}}", getStringValue(dataMap, "{{Disaster_LandslideMostHighProbability}}", "未知"));
+        map.put("{{Disaster_NumOfLandslide}}", getStringValue(dataMap, "{{Disaster_NumOfLandslide}}", "0"));
+        map.put("{{Disaster_MudslideMainCun}}", getStringValue(dataMap, "{{Disaster_MudslideMainCun}}", "无数据"));
+        map.put("{{Disaster_NumOfMudslide}}", getStringValue(dataMap, "{{Disaster_NumOfMudslide}}", "0"));
+        map.put("{{Disaster_MountainTorrentMainCun}}", getStringValue(dataMap, "{{Disaster_MountainTorrentMainCun}}", "无数据"));
+        map.put("{{Disaster_NumOfMountainTorrente}}", getStringValue(dataMap, "{{Disaster_NumOfMountainTorrente}}", "0"));
+        map.put("{{Disaster_UrbanFloodMainCun}}", getStringValue(dataMap, "{{Disaster_UrbanFloodMainCun}}", "无数据"));
+        map.put("{{Disaster_NumOfUrbanFlood}}", getStringValue(dataMap, "{{Disaster_NumOfUrbanFlood}}", "0"));
+        map.put("{{Disaster_ProtectAreas}}", getStringValue(dataMap, "{{Disaster_ProtectAreas}}", "未知区域"));
+
+        // 补充其他必要的默认值
         map.put("{{Disaster_AffectedAreaLow}}", "3");
         map.put("{{Disaster_AffectedAreaHigh}}", "8");
         map.put("{{Disaster_AffectedPeopleLow}}", "2000");
         map.put("{{Disaster_AffectedPeopleHigh}}", "3000");
-        map.put("{{Disposal_AffectedByFloodAndSlide}}", "喂子坪村、沣峪村");
-        map.put("{{Disposal_AffectedByUrbanFlood}}", "长安区靖宁路与西部大道十字交汇区域、朱雀市场等");
+        map.put("{{Disposal_AffectedByFloodAndSlide}}", map.get("{{Disaster_LandslideMainCun}}"));
+        map.put("{{Disposal_AffectedByUrbanFlood}}", map.get("{{Disaster_UrbanFloodMainCun}}"));
 
         Map<String, String> replaceMap = new HashMap<>();
-        replaceMap.put("{{ReportDate}}", "08月11日15时51分");
+        replaceMap.put("{{ReportDate}}", map.get("{{ReportDate}}"));
 
-        String DisasterOverAllOrg = "受持续强降雨影响，根据灾害风险评估模型测算结果，{{Disaster_MainRainQuXian}}多个村（组）地质灾害风险显著上升，需高度警惕滑坡、泥石流等次生灾害发生可能。";
-        String DisasterOverAll = replacePlaceholders(DisasterOverAllOrg, map);
-        replaceMap.put("{{Disaster_OverAll}}", DisasterOverAll);
+        String disasterOverAllOrg = "受持续强降雨影响，根据灾害风险评估模型测算结果，{{Disaster_MainRainQuXian}}多个村（组）地质灾害风险显著上升，需高度警惕滑坡、泥石流等次生灾害发生可能。";
+        String disasterOverAll = replacePlaceholders(disasterOverAllOrg, map);
+        replaceMap.put("{{Disaster_OverAll}}", disasterOverAll);
 
-        String OverViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现100毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
-        String OverView = replacePlaceholders(OverViewOrg, map);
-        replaceMap.put("{{OverView}}", OverView);
+        String overViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现100毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
+        String overView = replacePlaceholders(overViewOrg, map);
+        replaceMap.put("{{OverView}}", overView);
 
-
-        String LandslideDescribe = "";
+        String landslideDescribe = "";
         if (!containsHighRisk(landslideData)) {
-            LandslideDescribe = "在本次评估中，多个隐患点的滑坡发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的滑坡事件。";
+            landslideDescribe = "在本次评估中，多个隐患点的滑坡发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的滑坡事件。";
         } else {
-            String LandslideDescribeOrg = "{{Disaster_LandslideMainCun}}为滑坡高风险区域。{{Disaster_LandslideMostHigh}}滑坡概率达{{Disaster_LandslideMostHighProbability}}，为当前评估区域内滑坡风险最高点。在本轮强降雨影响下，共有{{Disaster_NumOfLandslide}}处滑坡隐患点被评估为高风险，存在失稳可能，需立即加强防范。";
-            LandslideDescribe = replacePlaceholders(LandslideDescribeOrg, map);
+            String landslideDescribeOrg = "{{Disaster_LandslideMainCun}}为滑坡高风险区域。{{Disaster_LandslideMostHigh}}滑坡概率达{{Disaster_LandslideMostHighProbability}}，为当前评估区域内滑坡风险最高点。在本轮强降雨影响下，共有{{Disaster_NumOfLandslide}}处滑坡隐患点被评估为高风险，存在失稳可能，需立即加强防范。";
+            landslideDescribe = replacePlaceholders(landslideDescribeOrg, map);
         }
-        replaceMap.put("{{Disaster_LandslideDescribe}}", LandslideDescribe);
+        replaceMap.put("{{Disaster_LandslideDescribe}}", landslideDescribe);
 
-
-        String MudslideDescribe = "";
-        if (!containsHighRisk(MudslideData)) {
-            MudslideDescribe = "在本次评估中，多个隐患点的泥石流发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的泥石流事件。";
+        String mudslideDescribe = "";
+        if (mudslideData.length == 0 || !containsHighRisk(mudslideData)) {
+            mudslideDescribe = "在本次评估中，未发现高风险的泥石流隐患点。";
         } else {
-            String MudslideDescribeOrg = "泥石流风险主要集中在{{Disaster_MudslideMainCun}}一带。其中{{Disaster_MudslideMostHigh}}点位泥石流发生概率高达{{Disaster_MudslideMostHighProbability}}，为目前模型评估中泥石流风险最高区域。在持续强降雨影响下，共有{{Disaster_NumOfMudslide}}处存在较高的泥石流触发风险。";
-            MudslideDescribe = replacePlaceholders(MudslideDescribeOrg, map);
+            String mudslideDescribeOrg = "泥石流风险主要集中在{{Disaster_MudslideMainCun}}一带。共有{{Disaster_NumOfMudslide}}处存在较高的泥石流触发风险。";
+            mudslideDescribe = replacePlaceholders(mudslideDescribeOrg, map);
         }
-        replaceMap.put("{{Disaster_MudslideDescribe}}", MudslideDescribe);
+        replaceMap.put("{{Disaster_MudslideDescribe}}", mudslideDescribe);
 
+        String mountainTorrentDescribe = "";
+        if (mountainTorrentData.length == 0 || !containsHighRisk(mountainTorrentData)) {
+            mountainTorrentDescribe = "在本次评估中，未发现高风险的山洪隐患点。";
+        } else {
+            String mountainTorrentDescribeOrg = "山洪风险主要集中在{{Disaster_MountainTorrentMainCun}}附近区域。在持续降雨背景下共有{{Disaster_NumOfMountainTorrente}}处存在山洪骤发风险，需加强预警与应急准备。";
+            mountainTorrentDescribe = replacePlaceholders(mountainTorrentDescribeOrg, map);
+        }
+        replaceMap.put("{{Disaster_MountainTorrentDescribe}}", mountainTorrentDescribe);
 
-        String MountainTorrentDescribeOrg = "山洪风险主要集中在{{Disaster_MountainTorrentMainCun}}附近区域。其中{{Disaster_MountainTorrentMostHigh}}点位山洪发生概率达{{Disaster_MountainTorrentMostHighProbability}}，为本轮强降雨期间山洪风险最高区域。在持续降雨背景下共有{{Disaster_NumOfMountainTorrente}}处存在山洪骤发风险，需加强预警与应急准备。";
-        String MountainTorrentDescribe = replacePlaceholders(MountainTorrentDescribeOrg, map);
-        replaceMap.put("{{Disaster_MountainTorrentDescribe}}", MountainTorrentDescribe);
+        String urbanFloodDescribe = "";
+        if (urbanFloodData.length == 0 || !containsHighRisk(urbanFloodData)) {
+            urbanFloodDescribe = "在本次评估中，未发现高风险的城市内涝隐患点。";
+        } else {
+            String urbanFloodDescribeOrg = "城市内涝风险主要集中在{{Disaster_UrbanFloodMainCun}}低洼区域及部分老旧排水片区。短时强降雨下共有{{Disaster_NumOfUrbanFlood}}处易出现道路积水和排涝不畅等问题，需提前做好排水疏导和交通应对措施。";
+            urbanFloodDescribe = replacePlaceholders(urbanFloodDescribeOrg, map);
+        }
+        replaceMap.put("{{Disaster_UrbanFloodDescribe}}", urbanFloodDescribe);
 
-        String UrbanFloodDescribeOrg = "城市内涝风险主要集中在{{Disaster_UrbanFloodMainCun}}低洼区域及部分老旧排水片区，其中{{Disaster_UrbanFloodMostHigh}}内涝发生概率为{{Disaster_UrbanFloodMostHighProbability}}，为本轮强降雨期间城市内涝风险最高区域。短时强降雨下共有{{Disaster_NumOfUrbanFlood}}处易出现道路积水和排涝不畅等问题，需提前做好排水疏导和交通应对措施。";
-        String UrbanFloodDescribe = replacePlaceholders(UrbanFloodDescribeOrg, map);
-        replaceMap.put("{{Disaster_UrbanFloodDescribe}}", UrbanFloodDescribe);
+        String disasterAllInAllOrg = "综合研判，{{Disaster_ProtectAreas}}周边等地为本轮强降雨期间次生灾害重点防范区域。建议有关单位强化动态监测和预警信息发布，提前做好人员转移安置及应急物资准备，切实提升应对突发地质灾害的处置能力。";
+        String disasterAllInAll = replacePlaceholders(disasterAllInAllOrg, map);
+        replaceMap.put("{{Disaster_AllInAll}}", disasterAllInAll);
 
-        String DisasterAllInAllOrg = "综合研判，{{Disaster_ProtectAreas}}周边等地为本轮强降雨期间次生灾害重点防范区域。建议有关单位强化动态监测和预警信息发布，提前做好人员转移安置及应急物资准备，切实提升应对突发地质灾害的处置能力。";
-        String DisasterAllInAll = replacePlaceholders(DisasterAllInAllOrg, map);
-        replaceMap.put("{{Disaster_AllInAll}}", DisasterAllInAll);
+        String disasterAffectedAreaAndPeopleOrg = "根据滑坡破裂角模型计算结果，结合区域地形坡向与沟谷汇水条件综合分析，当前在持续强降雨影响下，一旦发生次生灾害，初步预测其可能影响范围在{{Disaster_AffectedAreaLow}}至{{Disaster_AffectedAreaHigh}}平方公里之间。经对区域建筑密度与人口分布数据进行叠加分析，预计受影响人口在{{Disaster_AffectedPeopleLow}}至{{Disaster_AffectedPeopleHigh}}人之间，主要集中在地势低洼、沟谷下游及滑坡堆积方向所覆盖区域。";
+        String disasterAffectedAreaAndPeople = replacePlaceholders(disasterAffectedAreaAndPeopleOrg, map);
+        replaceMap.put("{{Disaster_AffectedAreaAndPeople}}", disasterAffectedAreaAndPeople);
 
-        String DisasterAffectedAreaAndPeopleOrg = "根据滑坡破裂角模型计算结果，结合区域地形坡向与沟谷汇水条件综合分析，当前在持续强降雨影响下，一旦发生次生灾害，初步预测其可能影响范围在{{Disaster_AffectedAreaLow}}至{{Disaster_AffectedAreaHigh}}平方公里之间。经对区域建筑密度与人口分布数据进行叠加分析，预计受影响人口在{{Disaster_AffectedPeopleLow}}至{{Disaster_AffectedPeopleHigh}}人之间，主要集中在地势低洼、沟谷下游及滑坡堆积方向所覆盖区域。";
-        String DisasterAffectedAreaAndPeople = replacePlaceholders(DisasterAffectedAreaAndPeopleOrg, map);
-        replaceMap.put("{{Disaster_AffectedAreaAndPeople}}", DisasterAffectedAreaAndPeople);
+        String disasterLifeLine = "其中，多处道路存在中断风险，沿线输电线路和通信基站可能受损，导致局部供电和通信中断；下游加油站及部分工业厂房等重点危险源或引发燃气泄漏和火灾爆炸等次生灾害。";
+        replaceMap.put("{{Disaster_LifeLine}}", disasterLifeLine);
 
-        String DisasterLifeLine = "其中，多处道路存在中断风险，沿线输电线路和通信基站可能受损，导致局部供电和通信中断；下游加油站及部分工业厂房等重点危险源或引发燃气泄漏和火灾爆炸等次生灾害。";
-        replaceMap.put("{{Disaster_LifeLine}}", DisasterLifeLine);
-
-        String DisposalEvacuationOrg = "人员疏散方面，建议优先组织{{Disposal_AffectedByFloodAndSlide}}中紧邻河道的民房、农家乐等高风险区域居民转移，此类区域靠近水体，受山洪和泥石流突发影响最为显著。同时，应重点关注{{Disposal_AffectedByUrbanFlood}}城市内涝易发的低洼积水区域，确保上述重点区域人员能够及时、安全撤离，最大限度保障群众生命安全。";
-        String DisposalEvacuation = replacePlaceholders(DisposalEvacuationOrg, map);
-        replaceMap.put("{{Disposal_Evacuation}}", DisposalEvacuation);
+        String disposalEvacuationOrg = "人员疏散方面，建议优先组织{{Disposal_AffectedByFloodAndSlide}}中紧邻河道的民房、农家乐等高风险区域居民转移，此类区域靠近水体，受山洪和泥石流突发影响最为显著。同时，应重点关注{{Disposal_AffectedByUrbanFlood}}城市内涝易发的低洼积水区域，确保上述重点区域人员能够及时、安全撤离，最大限度保障群众生命安全。";
+        String disposalEvacuation = replacePlaceholders(disposalEvacuationOrg, map);
+        replaceMap.put("{{Disposal_Evacuation}}", disposalEvacuation);
 
         return replaceMap;
-
     }
 
-    public static boolean containsHighRisk(String[][] Data) {
-        for (String[] data : Data) {
-            // 检查风险等级是否为“高”
-            if ("高".equals(data[2])) {
-                return true; // 存在高风险
+
+    // 工具方法：从map中获取字符串值，提供默认值
+    private static String getStringValue(Map<String, Object> map, String key, String defaultValue) {
+        Object value = map.get(key);
+        if (value == null || "null".equals(value) || value.toString().trim().isEmpty()) {
+            return defaultValue;
+        }
+        return value.toString();
+    }
+
+
+    // 风险等级判断（保持不变）
+    public static boolean containsHighRisk(String[][] data) {
+        if (data == null || data.length == 0) {
+            return false;
+        }
+        for (String[] row : data) {
+            if (row.length > 4 && "高".equals(row[4])) {
+                return true;
             }
         }
-        return false; // 不存在高风险
+        return false;
     }
 
+
+    // 占位符替换（保持不变）
     public static String replacePlaceholders(String originalText, Map<String, String> placeholders) {
+        String result = originalText;
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            originalText = originalText.replace(entry.getKey(), entry.getValue());
+            result = result.replace(entry.getKey(), entry.getValue() == null ? "" : entry.getValue());
         }
-        return originalText;
+        return result;
     }
+
 
     //文段写入word
     private void replaceInParagraph(XWPFParagraph para, Map<String, String> map) {

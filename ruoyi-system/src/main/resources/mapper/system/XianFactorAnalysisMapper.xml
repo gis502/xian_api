@@ -9,7 +9,7 @@
         dh.disaster_type,
         dh.longitude,
         dh.latitude,
-        ROUND(CAST(fa.probability AS NUMERIC) * 100, 2)AS disaster_probability,
+        ROUND(CAST(fa.probability AS NUMERIC) * 100, 2) AS disaster_probability,
         fa.level,
         dh.city,
         dh.village
@@ -28,11 +28,13 @@
         xian_disaster_hide dh_sub ON fv.hide_id = dh_sub.id
         WHERE 1=1
         <choose>
+            <!-- 修正：将fa.rain_disaster_id改为fv.rain_disaster_id -->
             <when test="disasterType.name() == 'RAINSTORM'">
-                AND fa.rain_disaster_id = #{disasterId}
+                AND fv.rain_disaster_id = #{disasterId}
             </when>
+            <!-- 修正：将fa.eq_disaster_id改为fv.eq_disaster_id -->
             <when test="disasterType.name() == 'EARTHQUAKE'">
-                AND fa.eq_disaster_id = #{disasterId}
+                AND fv.eq_disaster_id = #{disasterId}
             </when>
         </choose>
         ORDER BY
