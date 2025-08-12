@@ -878,7 +878,7 @@ public static boolean containsHighRisk(String[][] data) {
                         tableInfo.get("table").getLandslide().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
                         if(tableInfo.get("table").getLandslide().getVillage() == null)
                             tableInfo.get("table").getLandslide().setVillage(village);
-                        if("高".equals(level)) {
+                        if("[高]".equals(level)) {
                             tableInfo.get("table").getLandslide().setHighRiskCount(tableInfo.get("table").getLandslide().getHighRiskCount() + 1);
                             highRiskAreas.add(city + village);
                         }
@@ -887,7 +887,7 @@ public static boolean containsHighRisk(String[][] data) {
                         tableInfo.get("table").getDebrisFlow().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
                         if(tableInfo.get("table").getDebrisFlow().getVillage() == null)
                             tableInfo.get("table").getDebrisFlow().setVillage(village);
-                        if("高".equals(level)) {
+                        if("[高]".equals(level)) {
                             tableInfo.get("table").getDebrisFlow().setHighRiskCount(tableInfo.get("table").getDebrisFlow().getHighRiskCount() + 1);
                             highRiskAreas.add(city + village);
                         }
@@ -896,7 +896,7 @@ public static boolean containsHighRisk(String[][] data) {
                         tableInfo.get("table").getTorrentialFlood().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
                         if(tableInfo.get("table").getTorrentialFlood().getVillage() == null)
                             tableInfo.get("table").getTorrentialFlood().setVillage(village);
-                        if("高".equals(level)) {
+                        if("[高]".equals(level)) {
                             tableInfo.get("table").getTorrentialFlood().setHighRiskCount(tableInfo.get("table").getTorrentialFlood().getHighRiskCount() + 1);
                             highRiskAreas.add(city + village);
                         }
@@ -905,7 +905,7 @@ public static boolean containsHighRisk(String[][] data) {
                         tableInfo.get("table").getWaterLogging().getData().add(Arrays.asList(city, position, disasterTypeProbability + "%", level));
                         if(tableInfo.get("table").getWaterLogging().getVillage() == null)
                             tableInfo.get("table").getWaterLogging().setVillage(village);
-                        if("高".equals(level)) {
+                        if("[高]".equals(level)) {
                             tableInfo.get("table").getWaterLogging().setHighRiskCount(tableInfo.get("table").getWaterLogging().getHighRiskCount() + 1);
                             highRiskAreas.add(city + village);
                         }
