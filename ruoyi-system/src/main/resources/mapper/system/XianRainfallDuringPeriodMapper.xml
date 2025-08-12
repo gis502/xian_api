@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianRainfallDuringPeriodMapper">
+    <select id="getRainPeriodInfoByDisasterId" resultType="com.ruoyi.system.domain.entity.XianRainfallDuringPeriod">
+      select * from xian_rainfall_during_period
+      WHERE disaster_id = CAST(#{Id, jdbcType=VARCHAR} AS BIGINT)
+    </select>
+
+</mapper>
+
