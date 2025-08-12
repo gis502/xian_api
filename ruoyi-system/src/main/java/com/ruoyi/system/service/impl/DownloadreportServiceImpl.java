@@ -173,20 +173,20 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         // 表头与列宽配置
         String landslideTableName = "滑坡灾害预测概率统计表";
-        String[] landslideHead = {"序号", "区县位置", "详细位置", "滑坡发生概率", "风险等级"};
-        int[] landslideColWidths = {1500, 3000, 8000, 3000, 2000};
+        String[] landslideHead = {"序号", "区县位置", "详细位置", "风险等级"};
+        int[] landslideColWidths = {1500, 3000, 8000, 3000};
 
         String mudslideTableName = "泥石流灾害预测概率统计表";
-        String[] mudslideHead = {"序号", "区县位置", "详细位置", "泥石流发生概率", "风险等级"};
-        int[] mudslideColWidths = {1500, 3000, 8000, 3000, 2000};
+        String[] mudslideHead = {"序号", "区县位置", "详细位置", "风险等级"};
+        int[] mudslideColWidths = {1500, 3000, 8000, 3000};
 
         String mountainTorrentTableName = "山洪灾害预测概率统计表";
-        String[] mountainTorrentHead = {"序号", "区县位置", "详细位置", "山洪发生概率", "风险等级"};
-        int[] mountainTorrentColWidths = {1500, 3000, 8000, 3000, 2000};
+        String[] mountainTorrentHead = {"序号", "区县位置", "详细位置", "风险等级"};
+        int[] mountainTorrentColWidths = {1500, 3000, 8000, 3000};
 
         String urbanFloodTableName = "城市内涝灾害预测概率统计表";
-        String[] urbanFloodHead = {"序号", "区县位置", "详细位置", "城市内涝发生概率", "风险等级"};
-        int[] urbanFloodColWidths = {1500, 3000, 8000, 3000, 2000};
+        String[] urbanFloodHead = {"序号", "区县位置", "详细位置","风险等级"};
+        int[] urbanFloodColWidths = {1500, 3000, 8000, 3000};
 
         String lifelineProjectTableName = "生命线工程影响统计表";
         String[] lifelineProjectHead = {"序号", "类型", "名称"};
@@ -238,41 +238,90 @@ public class DownloadreportServiceImpl implements DownloadreportService {
      * @param structure TableStructure实例（包含data字段）
      * @return 转换后的二维数组
      */
+//    private String[][] convertTableStructureTo2DArray(DownloadreportServiceImpl.ReportInfo.Table.TableStructure structure) {
+//        // 从TableStructure中获取data（注意：data的类型可能是List<Object[]>或List<List<Object>>）
+//        List<?> dataList = structure.getData();
+//        if (dataList == null || dataList.isEmpty()) {
+//            System.out.println("TableStructure数据为空");
+//            return new String[0][0];
+//        }
+//
+//        // 转换dataList为String[][]
+//        String[][] result = new String[dataList.size()][];
+//        for (int i = 0; i < dataList.size(); i++) {
+//            Object rowObj = dataList.get(i); // 每行数据（可能是Object[]或List<Object>）
+//            List<Object> rowData;
+//
+//            // 处理行数据的两种可能类型
+//            if (rowObj instanceof Object[]) {
+//                rowData = Arrays.asList((Object[]) rowObj); // 数组转List
+//            } else if (rowObj instanceof List<?>) {
+//                rowData = new ArrayList<>((List<?>) rowObj); // List强转
+//            } else {
+//                // 异常数据处理
+//                rowData = new ArrayList<>();
+//                rowData.add(rowObj);
+//            }
+//
+//            // 转换为String数组（去除风险等级的括号）
+//            String[] rowArr = new String[rowData.size()];
+//            for (int j = 0; j < rowData.size(); j++) {
+//                Object value = rowData.get(j);
+//                rowArr[j] = (value != null) ? value.toString().replaceAll("[\\[\\]]", "").trim() : "";
+//            }
+//            result[i] = rowArr;
+//        }
+//        return result;
+//    }
+    /**
+     * 将TableStructure对象转换为二维字符串数组（不含概率数据）
+     * @param structure TableStructure实例（包含data字段）
+     * @return 转换后的二维数组（移除概率列）
+     */
     private String[][] convertTableStructureTo2DArray(DownloadreportServiceImpl.ReportInfo.Table.TableStructure structure) {
-        // 从TableStructure中获取data（注意：data的类型可能是List<Object[]>或List<List<Object>>）
         List<?> dataList = structure.getData();
         if (dataList == null || dataList.isEmpty()) {
             System.out.println("TableStructure数据为空");
             return new String[0][0];
         }
 
-        // 转换dataList为String[][]
         String[][] result = new String[dataList.size()][];
         for (int i = 0; i < dataList.size(); i++) {
-            Object rowObj = dataList.get(i); // 每行数据（可能是Object[]或List<Object>）
+            Object rowObj = dataList.get(i);
             List<Object> rowData;
 
             // 处理行数据的两种可能类型
             if (rowObj instanceof Object[]) {
-                rowData = Arrays.asList((Object[]) rowObj); // 数组转List
+                rowData = Arrays.asList((Object[]) rowObj);
             } else if (rowObj instanceof List<?>) {
-                rowData = new ArrayList<>((List<?>) rowObj); // List强转
+                rowData = new ArrayList<>((List<?>) rowObj);
             } else {
-                // 异常数据处理
                 rowData = new ArrayList<>();
                 rowData.add(rowObj);
             }
 
-            // 转换为String数组（去除风险等级的括号）
-            String[] rowArr = new String[rowData.size()];
-            for (int j = 0; j < rowData.size(); j++) {
-                Object value = rowData.get(j);
-                rowArr[j] = (value != null) ? value.toString().replaceAll("[\\[\\]]", "").trim() : "";
+            // 构建新行（移除概率列，保留：区县位置、详细位置、风险等级）
+            List<String> newRow = new ArrayList<>();
+            // 添加区县位置（第0列）
+            if (rowData.size() > 0) {
+                newRow.add(rowData.get(0) != null ? rowData.get(0).toString().trim() : "");
             }
-            result[i] = rowArr;
+            // 添加详细位置（第1列）
+            if (rowData.size() > 1) {
+                newRow.add(rowData.get(1) != null ? rowData.get(1).toString().trim() : "");
+            }
+            // 添加风险等级（第3列，移除概率列[索引2]）
+            if (rowData.size() > 3) {
+                String risk = rowData.get(3).toString().replaceAll("[\\[\\]]", "").trim();
+                newRow.add(risk);
+            }
+
+            // 转换为数组
+            result[i] = newRow.toArray(new String[0]);
         }
         return result;
     }
+
 
 
 
@@ -328,7 +377,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         String landslideDescribe = "";
         if (!containsHighRisk(landslideData)) {
-            landslideDescribe = "在本次评估中，多个隐患点的滑坡发生概率处于低风险。但仍需采取适当的预防措施，以应对可能的滑坡事件。";
+            landslideDescribe = "在本次评估中，多个隐患点的滑坡发生概率处于中、低风险。但仍需采取适当的预防措施，以应对可能的滑坡事件。";
         } else {
             String landslideDescribeOrg = "{{Disaster_LandslideMainCun}}为滑坡高风险区域。{{Disaster_LandslideMostHigh}}滑坡概率达{{Disaster_LandslideMostHighProbability}}，为当前评估区域内滑坡风险最高点。在本轮强降雨影响下，共有{{Disaster_NumOfLandslide}}处滑坡隐患点被评估为高风险，存在失稳可能，需立即加强防范。";
             landslideDescribe = replacePlaceholders(landslideDescribeOrg, map);
@@ -393,18 +442,24 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
 // 修正风险等级判断（风险等级明确在第3列，索引为3）
 public static boolean containsHighRisk(String[][] data) {
+    // 防御性检查：数据为空或无行时直接返回false
     if (data == null || data.length == 0) {
         return false;
     }
-    // 遍历每行数据，检查第3列（索引3）是否为"高"
+
+    // 遍历每行数据，检查风险等级
     for (String[] row : data) {
-        // 确保行数据至少有4列（避免数组越界），且第3列trim后为"高"
-        if (row.length >= 4 && "高".equals(row[3].trim())) {
+        // 1. 确保行数据至少有3列（避免数组越界）
+        // 2. 检查第2列（风险等级）是否为"高"（去除前后空格，避免格式问题）
+        if (row != null && row.length >= 3 && "高".equals(row[2].trim())) {
             return true;
         }
     }
+
+    // 所有行都不满足高风险条件
     return false;
 }
+
 
 
 
@@ -544,24 +599,37 @@ public static boolean containsHighRisk(String[][] data) {
         setRowCenter(header, colWidths); // 设置表头居中对齐
 
 
-        // 6. 数据行（列数 = colWidths.length，不再写死）
+        // 6. 数据行（修复越界问题）
         for (int i = 0; i < data.length; i++) {
             XWPFTableRow row = table.createRow();
-            // 依次写每一列
+            // 依次写每一列（c从0到colWidths.length-1）
             for (int c = 0; c < colWidths.length; c++) {
-                String val = (c == 0) ? String.valueOf(i + 1) : data[i][c - 1];
+                String val;
+                if (c == 0) {
+                    // 第0列是序号
+                    val = String.valueOf(i + 1);
+                } else {
+                    // 其他列对应数据（c-1为数据索引）
+                    int dataIndex = c - 1;
+                    // 关键：检查数据索引是否有效，无效则赋空值
+                    if (data[i] != null && dataIndex < data[i].length) {
+                        val = data[i][dataIndex];
+                    } else {
+                        val = ""; // 索引无效时赋空，避免越界
+                    }
+                }
                 XWPFTableCell cell = row.getCell(c);
                 if (cell.getParagraphs().size() == 0) {
-                    cell.addParagraph(); // 确保单元格有段落
+                    cell.addParagraph();
                 }
                 XWPFRun run = cell.getParagraphs().get(0).createRun();
                 run.setText(val);
-                run.setFontFamily("宋体"); // 设置字体为宋体
-                run.setFontSize(11); // 设置字号为11号[^63^]
+                run.setFontFamily("宋体");
+                run.setFontSize(11);
             }
-            // 整行一次性：固定 1.06 cm 行高 + 上下左右居中 + 段前段后 0 磅
             setRowCenter(row, colWidths);
         }
+
     }
 
     //插入图片
