@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.XianDisasterRainMapper">
+
+    <!--    <select id="queryOverview" resultType="map">-->
+    <!--        SELECT-->
+    <!--            TO_CHAR(T1.occurrence_time, 'MM"月"DD"日" HH24"时"MI"分"') AS report_date,-->
+    <!--            TO_CHAR(T1.occurrence_time, 'YYYY"年"MM"月"DD"日" HH24"时"MI"分"') AS over_view_report_date,-->
+    <!--            T2.position-->
+    <!--        FROM-->
+    <!--            xian_disaster_rain T1, xian_rainfall_during_period T2-->
+    <!--        <where>-->
+    <!--            T1.disaster_id = T2.disaster_id-->
+    <!--        </where>-->
+    <!--        ORDER BY T2.rainfall DESC-->
+    <!--    </select>-->
 
     <select id="queryOverview" resultType="map">
         SELECT
-            TO_CHAR(T1.occurrence_time, 'MM"月"DD"日" HH24"时"MI"分"') AS report_date,
-            TO_CHAR(T1.occurrence_time, 'YYYY"年"MM"月"DD"日" HH24"时"MI"分"') AS over_view_report_date,
-            T2.position
+        TO_CHAR(T1.occurrence_time, 'MM"月"DD"日" HH24"时"MI"分"') AS report_date,
+        TO_CHAR(T1.occurrence_time, 'YYYY"年"MM"月"DD"日" HH24"时"MI"分"') AS over_view_report_date,
+        T2.position
         FROM
-            xian_disaster_rain T1, xian_rainfall_during_period T2
+        xian_disaster_rain T1, xian_rainfall_during_period T2
         <where>
+            T1.disaster_id = (
+            SELECT disaster_id FROM xian_disaster_rain
+            ORDER BY disaster_id DESC LIMIT 1
+            ) AND
             T1.disaster_id = T2.disaster_id
         </where>
         ORDER BY T2.rainfall DESC
     </select>
 
 </mapper>
-

@@ -8,13 +8,13 @@
         WHERE ST_Intersects(point, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(point, ST_GeomFromText(#{wktPolygon}, 4490))
     </select>
-    
+
     <select id="findWithinCircle" resultType="com.ruoyi.system.domain.entity.Bridge">
         SELECT *, ST_AsText(point) AS pointGeom
         FROM xian_bridge_points
         WHERE ST_DWithin(
-            ST_Transform(point, 3857),
-            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 3857),
+            ST_Transform(point, 4490),
+            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 4490),
             #{radiusMeters}
         )
     </select>

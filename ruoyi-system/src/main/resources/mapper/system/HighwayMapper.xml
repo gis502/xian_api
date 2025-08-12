@@ -8,13 +8,13 @@
         WHERE ST_Intersects(geom, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(geom, ST_GeomFromText(#{wktPolygon}, 4490))
     </select>
-    
+
     <select id="findWithinCircle" resultType="com.ruoyi.system.domain.entity.Highway">
-        SELECT *, ST_AsText(ST_Intersection(geom, ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 3857), #{radiusMeters}))) AS pointGeom
+        SELECT *, ST_AsText(ST_Intersection(geom, ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 4490), #{radiusMeters}))) AS pointGeom
         FROM xian_highway
         WHERE ST_DWithin(
-            ST_Transform(geom, 3857),
-            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 3857),
+            ST_Transform(geom, 4490),
+            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 4490),
             #{radiusMeters}
         )
     </select>

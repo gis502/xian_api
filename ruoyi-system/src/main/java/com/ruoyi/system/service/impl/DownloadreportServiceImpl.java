@@ -98,6 +98,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     @Override
     public R<String> generateRainReport(String imgUrl) throws IOException, InvalidFormatException {
+
         ReportInfo reportInfo = new ReportInfo();
         Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
         System.out.println("原始数据: " + stringObjectMap);
@@ -115,8 +116,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String[][] mudslideData = new String[0][0];        // 泥石流数据
         String[][] mountainTorrentData = new String[0][0]; // 山洪数据
         String[][] urbanFloodData = new String[0][0];      // 城市内涝数据
-
-
 
         // 从stringObjectMap中获取外层table（对应Table类实例）
         Object outerTableObj = stringObjectMap.get("table");
