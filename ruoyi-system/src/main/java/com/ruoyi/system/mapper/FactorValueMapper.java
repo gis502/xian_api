@@ -39,9 +39,9 @@ public interface FactorValueMapper extends BaseMapper<FactorValue> {
     // 批量查询因子值
     public List<FactorVO> getFactorValuesByHideIds(@Param("hideIds") List<Integer> hideIds);
 
-    @Select("select b.factor_value from xian_factor_attribute as a\n" +
+    @Select("select TRIM(factor_value) as \"factor_value\" from xian_factor_attribute as a\n" +
             "left join xian_factor_value as b on a.attribute_id = b.attribute_id\n" +
-            "where a.attribute_name = '岩土类型' group by factor_value;")
+            "where a.attribute_name = '岩土类型' group by TRIM(factor_value);")
     // 岩土类别
     public List<String> getRockType();
     @Select("select b.factor_value from xian_factor_attribute as a\n" +

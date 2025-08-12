@@ -1,9 +1,11 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.domain.dto.EqDTO;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
 import com.ruoyi.system.mapper.XianEarthquakeListMapper;
+import com.ruoyi.system.service.IXianEarthquakeListService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,19 +21,19 @@ import java.util.List;
 public class XianEarthquakeListController {
 
     @Resource
-    private XianEarthquakeListMapper xianEarthquakeListMapper;
+    private IXianEarthquakeListService eqListService;
 
     @GetMapping("/getAllEarthquakeList")
-    public List<XianEarthquakeList> selectAllEq() {
-        return xianEarthquakeListMapper.selectAllEq();
+    public AjaxResult selectAllEq() {
+        return AjaxResult.success(eqListService.selectAllEq()) ;
     }
     @PostMapping("/getEarthquakeEventById")
-    public XianEarthquakeList getEarthquakeEventById(@RequestParam(value = "id") String id) {
-        return xianEarthquakeListMapper.getEarthquakeEventById(id);
+    public AjaxResult getEarthquakeEventById(@RequestParam(value = "id") Long Id) {
+        return AjaxResult.success(eqListService.getEarthquakeEventById(Id));
     }
 
     @PostMapping("/disaster/add")
     public AjaxResult disasterAdd(@RequestBody EarthquakeVo earthquake) {
-        return AjaxResult.success(xianEarthquakeListMapper.insertDisaster(earthquake));
+        return AjaxResult.success(eqListService.insertDisaster(earthquake));
     }
 }
