@@ -15,7 +15,6 @@
         WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4490))
     </select>
 
-    <!-- 查找3x3范围内高程最低的网格 -->
     <!-- 查找3x3范围内高程最低的网格（先筛选5公里候选集） -->
     <select id="findMinElevationGridIn3x3" resultType="com.ruoyi.system.domain.entity.XianDem">
         -- 直接使用表中已有的center_lon和center_lat字段，避免任何动态计算
@@ -56,4 +55,112 @@
             LIMIT 1
     </select>
 
+<!--    <select id="" resultType="com.ruoyi.system.domain.entity.XianDem">-->
+<!--        &#45;&#45; 计算每个积水点周围5x5网格（含范围中心点及中心点与最低点的高程差）-->
+<!--        WITH water_center_grid AS (-->
+<!--            &#45;&#45; 第一步：找到每个积水点及3公里内的中心网格-->
+<!--            SELECT-->
+<!--                wp.id AS water_point_id,-->
+<!--                wp.county,-->
+<!--                wp.street,-->
+<!--                wp.name,-->
+<!--                wp.location,-->
+<!--                wp.geom AS water_point_geom,-->
+<!--                dem.gid AS center_grid_gid,-->
+<!--                dem.gridcode AS center_elevation,  &#45;&#45; 中心点高程-->
+<!--                dem.geom AS center_grid_geom,-->
+<!--                dem.center_lon AS center_lon,-->
+<!--                dem.center_lat AS center_lat-->
+<!--            FROM-->
+<!--                xian_water_accumulation_point wp-->
+<!--                    JOIN-->
+<!--                xian_dem dem-->
+<!--                ON ST_Contains(dem.geom, wp.geom)-->
+<!--                    AND ST_DWithin(-->
+<!--                           ST_SetSRID(ST_MakePoint(dem.center_lon, dem.center_lat), 4490),-->
+<!--                           ST_SetSRID(ST_MakePoint(ST_X(wp.geom), ST_Y(wp.geom)), 4490),-->
+<!--                           0.027  &#45;&#45; 3公里范围-->
+<!--                        )-->
+<!--        ),-->
+<!--             filtered_5x5_grids AS (-->
+<!--                 &#45;&#45; 第二步：筛选5x5网格-->
+<!--                 SELECT-->
+<!--                     wcg.*,-->
+<!--                     g.gid AS grid_gid,-->
+<!--                     g.gridcode AS grid_elevation,-->
+<!--                     g.geom AS grid_geom,-->
+<!--                     g.center_lon AS grid_center_lon,-->
+<!--                     g.center_lat AS grid_center_lat-->
+<!--                 FROM-->
+<!--                     water_center_grid wcg-->
+<!--                         JOIN-->
+<!--                     xian_dem g-->
+<!--                     ON ST_DWithin(-->
+<!--                                ST_SetSRID(ST_MakePoint(wcg.center_lon, wcg.center_lat), 4490),-->
+<!--                                ST_SetSRID(ST_MakePoint(g.center_lon, g.center_lat), 4490),-->
+<!--                                0.000808   &#45;&#45;0.000808  &#45;&#45; 5x5网格距离0.000404-->
+<!--                        )-->
+<!--                         AND g.center_lon BETWEEN (wcg.center_lon - 0.000808) AND (wcg.center_lon + 0.000808)-->
+<!--                         AND g.center_lat BETWEEN (wcg.center_lat - 0.000808) AND (wcg.center_lat + 0.000808)-->
+<!--             ),-->
+<!--             range_stats AS (-->
+<!--                 &#45;&#45; 计算5x5范围的聚合统计（仅保留最低点高程）-->
+<!--                 SELECT-->
+<!--                     water_point_id,-->
+<!--                     &#45;&#45; 5x5范围中心点（平均经纬度）-->
+<!--                     AVG(grid_center_lon) AS range_center_lon,-->
+<!--                     AVG(grid_center_lat) AS range_center_lat,-->
+<!--                     &#45;&#45; 仅保留最低点高程-->
+<!--                     MIN(grid_elevation) AS min_elevation-->
+<!--                 FROM filtered_5x5_grids-->
+<!--                 GROUP BY water_point_id-->
+<!--             )-->
+<!--&#45;&#45; 最终查询：关联所有数据并输出结果-->
+<!--        SELECT-->
+<!--            f.water_point_id,-->
+<!--            f.county,-->
+<!--            f.street,-->
+<!--            f.name,-->
+<!--            f.location,-->
+<!--            f.center_grid_gid,-->
+<!--            f.center_elevation,  &#45;&#45; 中心点高程-->
+<!--            f.grid_gid,-->
+<!--            f.grid_elevation,-->
+<!--            f.grid_geom,-->
+<!--            &#45;&#45; 网格间实际距离（米）-->
+<!--            ST_Distance(-->
+<!--                    ST_Transform(ST_SetSRID(ST_MakePoint(f.center_lon, f.center_lat), 4490), 32649),-->
+<!--                    ST_Transform(ST_SetSRID(ST_MakePoint(f.grid_center_lon, f.grid_center_lat), 4490), 32649)-->
+<!--            ) AS distance_meters,-->
+<!--            &#45;&#45; 5x5范围中心点（带坐标系）-->
+<!--            ST_SetSRID(ST_MakePoint(r.range_center_lon, r.range_center_lat), 4490) AS range_center_geom,-->
+<!--            &#45;&#45; 新增：中心点与最低点的高程差（中心点高程 - 最低点高程）-->
+<!--            (f.center_elevation - r.min_elevation) AS center_min_elevation_diff-->
+<!--        FROM-->
+<!--            filtered_5x5_grids f-->
+<!--                JOIN range_stats r-->
+<!--                     ON f.water_point_id = r.water_point_id-->
+<!--        GROUP BY-->
+<!--            f.water_point_id,-->
+<!--            f.county,-->
+<!--            f.street,-->
+<!--            f.name,-->
+<!--            f.location,-->
+<!--            f.center_grid_gid,-->
+<!--            f.center_elevation,-->
+<!--            f.grid_gid,-->
+<!--            f.grid_elevation,-->
+<!--            f.grid_geom,-->
+<!--            f.center_lon,-->
+<!--            f.center_lat,-->
+<!--            f.grid_center_lon,-->
+<!--            f.grid_center_lat,-->
+<!--            r.range_center_lon,-->
+<!--            r.range_center_lat,-->
+<!--            r.min_elevation-->
+<!--        ORDER BY-->
+<!--            center_min_elevation_diff DESC,  &#45;&#45; 优先按高程差降序-->
+<!--            f.water_point_id,-->
+<!--            distance_meters;-->
+<!--    </select>-->
 </mapper>

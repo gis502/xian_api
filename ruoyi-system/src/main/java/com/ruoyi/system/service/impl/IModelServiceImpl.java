@@ -423,6 +423,9 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         while (iterations < MAX_ITERATIONS) {
             // 添加当前网格到路径
             path.add(new XianDem(
+//                    currentGrid.getGid(),
+//                    currentGrid.getId(),
+                    // currentGrid.getGeomP(),
                     currentGrid.getCenterLat(),
                     currentGrid.getCenterLon(),
                     currentGrid.getElevation()
@@ -450,7 +453,8 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         }
 
         if (iterations >= MAX_ITERATIONS) {
-            throw new RuntimeException("已达到最大迭代次数，可能未找到绝对最低点");
+            return path;
+//            throw new RuntimeException("已达到最大迭代次数，可能未找到绝对最低点");
         }
 
         return path;

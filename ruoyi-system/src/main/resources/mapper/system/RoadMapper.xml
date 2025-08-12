@@ -3,10 +3,20 @@
 <mapper namespace="com.ruoyi.system.mapper.RoadMapper">
 
     <select id="findIntersectingRoads" resultType="com.ruoyi.system.domain.entity.Road">
-        SELECT *,ST_AsText(geom) AS pointGeom
+        SELECT *,ST_AsText(ST_Intersection(geom, ST_GeomFromText(#{wktPolygon}, 4490))) AS pointGeom
         FROM xian_road
         WHERE ST_Intersects(geom, ST_GeomFromText(#{wktPolygon}, 4490))
            OR ST_Within(geom, ST_GeomFromText(#{wktPolygon}, 4490))
+    </select>
+    
+    <select id="findWithinCircle" resultType="com.ruoyi.system.domain.entity.Road">
+        SELECT *, ST_AsText(ST_Intersection(geom, ST_Buffer(ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 3857), #{radiusMeters}))) AS pointGeom
+        FROM xian_road
+        WHERE ST_DWithin(
+            ST_Transform(geom, 3857),
+            ST_Transform(ST_SetSRID(ST_MakePoint(#{centerLon}, #{centerLat}), 4490), 3857),
+            #{radiusMeters}
+        )
     </select>
 
 </mapper>
