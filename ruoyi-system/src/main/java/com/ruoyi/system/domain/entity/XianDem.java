@@ -36,10 +36,10 @@ public class XianDem {
     }
 
     // 添加构造函数
-    public XianDem(String geomP, Double centerLat, Double centerLon, Integer elevation) {
+    public XianDem(Double centerLat, Double centerLon, Integer elevation) {
 //        this.id = id;
 //        this.gid = gid;
-        this.geomP = geomP;
+        // this.geomP = geomP;
         this.centerLat = centerLat;
         this.centerLon = centerLon;
         this.gridcode = elevation != null ? elevation.doubleValue() : null;
