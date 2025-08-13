@@ -99,8 +99,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Override
     public R<String> generateRainReport(String imgUrl) throws IOException, InvalidFormatException {
 
+        //查询灾害表最新的ID
+        Long latestRainDisasterId = xianDisasterRainMapper.getLatestRainDisasterId();
+
         ReportInfo reportInfo = new ReportInfo();
-        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(1L, DisasterType.RAINSTORM);
+        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(latestRainDisasterId, DisasterType.RAINSTORM);
         System.out.println("原始数据: " + stringObjectMap);
 
         // 生成 Word 路径
@@ -335,6 +338,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         // 从dataMap中获取数据（键名带双大括号，与数据匹配）
         map.put("{{ReportDate}}", getStringValue(dataMap, "{{ReportDate}}", "未知时间"));
         map.put("{{OverView_ReportDate}}", getStringValue(dataMap, "{{OverView_ReportDate}}", "未知日期"));
+        //降雨量
+        map.put("{{RainFall}}", getStringValue(dataMap, "{{RainFall}}", "未知"));
         map.put("{{OverView_RainCoveredQuXian}}", getStringValue(dataMap, "{{OverView_RainCoveredQuXian}}", "未知区域"));
         map.put("{{OverView_mainRainQuXian}}", getStringValue(dataMap, "{{OverView_mainRainQuXian}}", "未知区域"));
         map.put("{{Disaster_MainRainQuXian}}", getStringValue(dataMap, "{{Disaster_MainRainQuXian}}", "未知区域"));
@@ -369,7 +374,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String disasterOverAll = replacePlaceholders(disasterOverAllOrg, map);
         replaceMap.put("{{Disaster_OverAll}}", disasterOverAll);
 
-        String overViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已出现100毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
+        String overViewOrg = "{{OverView_ReportDate}}，西安市部分区域（包括{{OverView_RainCoveredQuXian}}）已达到{{RainFall}}毫米以上降水。根据最新气象监测数据，暴雨主要集中在{{OverView_mainRainQuXian}}一带，区域内山体含水饱和风险增加，具备诱发滑坡、泥石流、山洪和城市内涝等次生灾害的典型触发条件。";
         String overView = replacePlaceholders(overViewOrg, map);
         replaceMap.put("{{OverView}}", overView);
         System.out.println("替换后的数据landslideData: " + Arrays.deepToString(landslideData));
@@ -885,6 +890,7 @@ public static boolean containsHighRisk(String[][] data) {
             }
             map.put("{{OverView_RainCoveredQuXian}}", positions.stream().collect(Collectors.joining("，")));
             map.put("{{OverView_mainRainQuXian}}", rainfallOverviews.get(0).get("position").toString());
+            map.put("{{RainFall}}", rainfallOverviews.get(0).get("rainfall").toString().replace("mm", ""));
             return map;
         }
 
