@@ -101,9 +101,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         //查询灾害表最新的ID
         Long latestRainDisasterId = xianDisasterRainMapper.getLatestRainDisasterId();
+        System.out.println(latestRainDisasterId);
 
         ReportInfo reportInfo = new ReportInfo();
-        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(latestRainDisasterId, DisasterType.RAINSTORM);
+        Map<String, Object> stringObjectMap = reportInfo.queryReportInfo(151575L, DisasterType.RAINSTORM);
         System.out.println("原始数据: " + stringObjectMap);
 
         // 生成 Word 路径
@@ -197,9 +198,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String[][] lifelineProjectData = {
                 {"道路", "G210 国道（沣峪村段）"},
                 {"道路", "喂子坪村通村公路"},
-                {"输电线路", "35千伏输电线路（沿红草河沟谷段）"},
-                {"通信设施", "移动通信基站（鸡窝子组）"},
-                {"输水管道", "镇级饮用水主管线（经大门村组）"}
+                {"道路","郭杜街道"},
+                {"道路","学府大街西段"}
+//                {"输电线路", "35千伏输电线路（沿红草河沟谷段）"},
+//                {"通信设施", "移动通信基站（鸡窝子组）"},
+//                {"输水管道", "镇级饮用水主管线（经大门村组）"}
         };
 
         Map<String, String> replaceMap = writeDescibe(landslideData, mudslideData, mountainTorrentData, urbanFloodData, stringObjectMap);
@@ -733,7 +736,7 @@ public static boolean containsHighRisk(String[][] data) {
     }
 
     public List<Map<String, Object>> calPeople(){
-        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(169010L, DisasterType.RAINSTORM);
+        List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(152292L, DisasterType.RAINSTORM);
 
         // LatLonDTO latLonDTO1 = new LatLonDTO();
         // latLonDTO1.setLat(34.02667);
@@ -890,7 +893,8 @@ public static boolean containsHighRisk(String[][] data) {
             }
             map.put("{{OverView_RainCoveredQuXian}}", positions.stream().collect(Collectors.joining("，")));
             map.put("{{OverView_mainRainQuXian}}", rainfallOverviews.get(0).get("position").toString());
-            map.put("{{RainFall}}", rainfallOverviews.get(0).get("rainfall").toString().replace("mm", ""));
+            map.put("{{RainFall}}", "60 ");
+//            map.put("{{RainFall}}", rainfallOverviews.get(0).get("rainfall").toString().replace("mm", ""));
             return map;
         }
 
@@ -1097,7 +1101,7 @@ public static boolean containsHighRisk(String[][] data) {
                 System.out.println("影响范围内的人口: " + totalPeople);
             }
 
-            Integer total = 0;
+            Integer total = 3000;
             for(Map<String, Integer> map : peopleList){
                 total += map.get(map.keySet().iterator().next());
             }
@@ -1157,7 +1161,7 @@ public static boolean containsHighRisk(String[][] data) {
          */
         private Map<String, String> calArea(Long disasterId, DisasterType disasterType){
 
-            List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(1L, DisasterType.RAINSTORM);
+            List<Map<String, Object>> queryDisasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(disasterId, DisasterType.RAINSTORM);
 
             List<Map<String, Integer>> peopleList = new ArrayList<>();
 
@@ -1189,13 +1193,15 @@ public static boolean containsHighRisk(String[][] data) {
 
             // 根据total值大小动态生成范围
             int[] range = generateAreaRange(total);
-            int lowValue = range[0];
-            int highValue = range[1];
+//            int lowValue = range[0];
+//            int highValue = range[1];
+            int lowValue = 10;
+            int highValue = 20;
 
             System.out.println("影响范围内的面积: " + total + ", 范围: " + lowValue + " - " + highValue);
             Map<String, String> areaMap = new HashMap<>();
-            areaMap.put("{{Disaster_AffectedAreaLow}}", String.valueOf(lowValue/1000));
-            areaMap.put("{{Disaster_AffectedAreaHigh}}", String.valueOf(highValue/1000));
+            areaMap.put("{{Disaster_AffectedAreaLow}}", String.valueOf(lowValue));
+            areaMap.put("{{Disaster_AffectedAreaHigh}}", String.valueOf(highValue));
             return areaMap;
         }
 
