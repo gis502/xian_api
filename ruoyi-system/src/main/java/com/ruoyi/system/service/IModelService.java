@@ -29,7 +29,6 @@ public interface IModelService extends IService<FactorAnalysis> {
 
     public List<XianDem> getPoliejiao(LatLonDTO latLonDTO);
 
-
     public List<XianDem> findElevationMinimumPath(Double lon, Double lat);
 
     public EffactAreaDTO getEffactArea(List<LatLonDTO> latLonDTOList);
