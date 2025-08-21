@@ -5,7 +5,7 @@ import com.ruoyi.system.domain.dto.EarthquakeRainDTO;
 import java.util.List;
 
 public interface EarthquakeRainService {
-    List<EarthquakeRainDTO> getPagedList(int pageNum, int pageSize);
+    List<EarthquakeRainDTO> getPagedList(int pageNum, int pageSize, List<String> disasterTypes);
 
-    int getTotalCount();
+    int getTotalCount(List<String> disasterTypes);
 }
