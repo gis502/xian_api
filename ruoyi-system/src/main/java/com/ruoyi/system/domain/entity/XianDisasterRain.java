@@ -35,6 +35,8 @@ public class XianDisasterRain {
   private String duration;
   @TableField("position")
   private String position;
+  @TableField("rain_type")
+  private String rainType;
   @TableField("create_time")
   private LocalDateTime createTime;
   @TableField("update_time")
