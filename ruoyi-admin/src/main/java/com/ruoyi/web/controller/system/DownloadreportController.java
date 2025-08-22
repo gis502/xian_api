@@ -21,6 +21,7 @@ import java.util.Map;
 @Validated
 @RestController
 @RequestMapping("/downloadReport")
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 public class DownloadreportController {
 
     private static final Logger log = LoggerFactory.getLogger(DownloadreportController.class);
@@ -39,6 +40,7 @@ public class DownloadreportController {
         return downloadreportService.generateRainReport(imgUrl);
     }
     @GetMapping("/file/{fileName}")
+    @CrossOrigin(origins = "*")
     public void downloadReport(@PathVariable String fileName, HttpServletResponse resp) throws IOException {
         downloadreportService.downloadReport(fileName,resp);
     }

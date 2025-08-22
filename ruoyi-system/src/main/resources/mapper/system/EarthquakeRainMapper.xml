@@ -3,7 +3,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.EarthquakeRainMapper">
 
+    <!-- 1. 分页查询（支持按灾害类型筛选） -->
     <select id="selectEarthquakeRainPage" resultType="com.ruoyi.system.domain.dto.EarthquakeRainDTO">
+        <!-- 地震数据查询 -->
         SELECT
         e.disaster_id AS earthquakeDisasterId,
         NULL AS rainDisasterId,
@@ -19,11 +21,17 @@
         NULL AS duration,
         'earthquake' AS disasterType
         FROM xian_earthquake_list e
-        WHERE e.eq_type = 'Z'
-        AND e.is_deleted = 0
+        WHERE
+        e.eq_type = 'Z'  -- 保留核心条件：只查eq_type='Z'
+        AND e.is_deleted = 0  -- 保留核心条件：未删除
+        <!-- 当不需要查询地震数据时，用AND 1=0排除；需要时不添加条件 -->
+        <if test="disasterTypes != null and !disasterTypes.contains('earthquake')">
+            AND 1=0  -- 不包含earthquake时，排除所有地震数据
+        </if>
 
         UNION ALL
 
+        <!-- 暴雨数据查询 -->
         SELECT
         NULL AS earthquakeDisasterId,
         d.disaster_id AS rainDisasterId,
@@ -39,18 +47,42 @@
         d.duration,
         'rain' AS disasterType
         FROM xian_disaster_rain d
-        WHERE d.is_deleted = '0'
+        WHERE
+        d.rain_type = 'Z'  -- 保留核心条件：只查'Z'
+        AND d.is_deleted = '0'  -- 暴雨核心条件：未删除
+        <!-- 当不需要查询暴雨数据时，用AND 1=0排除；需要时不添加条件 -->
+        <if test="disasterTypes != null and !disasterTypes.contains('rain')">
+            AND 1=0  -- 不包含rain时，排除所有暴雨数据
+        </if>
 
+        <!-- 注意：UNION ALL 连接的两个查询已有各自的WHERE子句，外层不能再加WHERE -->
         ORDER BY occurTime DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-
-
-
+    <!-- 2. 总条数查询（支持按灾害类型筛选） -->
     <select id="countTotal" resultType="int">
+        <!-- 外层添加SELECT，将两个子查询的和作为结果返回 -->
         SELECT
-                (SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0 AND eq_type = 'Z') +
-                (SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = '0')
+        (
+        -- 地震数据总条数：包含地震类型或无筛选时查询，否则为0
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('earthquake')">
+            SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0 AND eq_type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('earthquake')">
+            SELECT 0
+        </if>
+        )
+        +  -- 确保+前后有空格
+        (
+        -- 暴雨数据总条数：包含暴雨类型或无筛选时查询，否则为0
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('rain')">
+            SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = '0' AND rain_type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('rain')">
+            SELECT 0
+        </if>
+        ) AS total_count  -- 给结果起别名（可选，但规范）
     </select>
+
 </mapper>

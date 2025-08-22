@@ -22,4 +22,6 @@ public class EarthquakeRainDTO {
     private String duration;
     private String disasterType;
 
+    private String rainType;
+
 }
