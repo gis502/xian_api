@@ -1,6 +1,7 @@
 package com.ruoyi.system.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @TableName("xian_disaster_rain")
 public class XianDisasterRain {
-
+  @TableId
   @TableField("disaster_id")
   private Long disasterId;
   @TableField("disaster_name")

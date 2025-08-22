@@ -13,12 +13,12 @@ spring:
         druid:
             # 主库数据源
             master:
-#                url: jdbc:postgresql://47.92.216.173:7654/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-#                username: postgres
-#                password: zhangsan
-                url: jdbc:postgresql://localhost:5432/xian0812?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                url: jdbc:postgresql://47.92.216.173:7654/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
-                password: root
+                password: zhangsan
+#                url: jdbc:postgresql://localhost:5432/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: 123456
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭

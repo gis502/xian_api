@@ -25,6 +25,8 @@ public class XianEarthquakeListController {
 
     @GetMapping("/getAllEarthquakeList")
     public AjaxResult selectAllEq() {
+
+        System.out.println(eqListService.selectAllEq()+"eqListService.selectAllEq()");
         return AjaxResult.success(eqListService.selectAllEq()) ;
     }
     @PostMapping("/getEarthquakeEventById")
@@ -36,4 +38,6 @@ public class XianEarthquakeListController {
     public AjaxResult disasterAdd(@RequestBody EarthquakeVo earthquake) {
         return AjaxResult.success(eqListService.insertDisaster(earthquake));
     }
+
+
 }
