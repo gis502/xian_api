@@ -2,23 +2,28 @@
 spring:
     neo4j:
         uri: bolt://47.92.216.173:7687
-#        authentication:
-#              username: neo4j
-#              password: Zzw.0401
+        authentication:
+            username: neo4j
+            password: your_password_here
         pool:
-            metrics-enabled: true
+            max-connection-pool-size: 100
+            connection-acquisition-timeout: 60s
+            max-connection-lifetime: 270s    # < 中间 LB/NAT 空闲超时（如果是 5min，就设 4m30s）
+            idle-time-before-connection-test: 10s
+
+
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: org.postgresql.Driver
         druid:
             # 主库数据源
             master:
-#                url: jdbc:postgresql://47.92.216.173:7654/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-#                username: postgres
-#                password: zhangsan
-                url: jdbc:postgresql://localhost:5432/xian0812?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                url: jdbc:postgresql://47.92.216.173:7654/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
-                password: root
+                password: zhangsan
+#                url: jdbc:postgresql://localhost:5432/xian0812?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: root
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭
@@ -70,3 +75,7 @@ spring:
                     config:
                         multi-statement-allow: true
 
+management:
+    endpoint:
+        health:
+            show-details: always
