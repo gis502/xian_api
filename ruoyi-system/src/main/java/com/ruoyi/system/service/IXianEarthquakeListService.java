@@ -14,5 +14,7 @@ public interface IXianEarthquakeListService {
     // 根据Id获取地震事件
     EqDTO getEarthquakeEventById(Long Id);
 
-    boolean insertDisaster(EarthquakeVo earthquake);
+    Integer insertDisaster(EarthquakeVo earthquake);
+
+    boolean insertEarthquake(EarthquakeVo earthquake);
 }

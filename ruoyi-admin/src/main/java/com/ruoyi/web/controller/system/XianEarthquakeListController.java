@@ -36,4 +36,9 @@ public class XianEarthquakeListController {
     public AjaxResult disasterAdd(@RequestBody EarthquakeVo earthquake) {
         return AjaxResult.success(eqListService.insertDisaster(earthquake));
     }
+
+    @PostMapping("/earthquake/add")
+    public AjaxResult earthquakeAdd(@RequestBody EarthquakeVo earthquake) {
+        return AjaxResult.success(eqListService.insertEarthquake(earthquake));
+    }
 }
