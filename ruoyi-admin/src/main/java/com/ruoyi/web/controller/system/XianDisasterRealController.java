@@ -59,4 +59,24 @@ public class XianDisasterRealController {
         }
     }
 
+    /**
+     * @description: "根据plotId和plotType获取标绘点信息"
+     * @author: SWB
+     * @time: 2024/9/30 23:16
+     **/
+    @GetMapping("/getplotinfo")
+    public Object getPlotDetails(@RequestParam String plotId, @RequestParam String plotType) {
+        try {
+            Object details = XianDisasterRealService.getPlotInfos(plotType, plotId);
+            if (details != null) {
+                return details;
+            } else {
+                return "No details found for the given plotId and plotType";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred while querying details: " + e.getMessage();
+        }
+    }
+
 }
