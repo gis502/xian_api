@@ -2,13 +2,11 @@
 spring:
     neo4j:
         uri: bolt://47.92.216.173:7687
+#        authentication:
+#              username: neo4j
+#              password: Zzw.0401
         pool:
-            max-connection-pool-size: 100
-            connection-acquisition-timeout: 60s
-            max-connection-lifetime: 270s    # < 中间 LB/NAT 空闲超时（如果是 5min，就设 4m30s）
-            idle-time-before-connection-test: 10s
-
-
+            metrics-enabled: true
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: org.postgresql.Driver
@@ -18,9 +16,9 @@ spring:
                 url: jdbc:postgresql://47.92.216.173:7654/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
                 password: zhangsan
-#                url: jdbc:postgresql://localhost:5432/xian20250825?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                url: jdbc:postgresql://localhost:5432/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
-#                password: Zzw.0401
+#                password: 123456
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭
@@ -72,7 +70,3 @@ spring:
                     config:
                         multi-statement-allow: true
 
-management:
-    endpoint:
-        health:
-            show-details: always

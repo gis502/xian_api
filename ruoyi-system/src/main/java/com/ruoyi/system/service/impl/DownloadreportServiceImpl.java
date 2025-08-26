@@ -225,7 +225,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             insertTableAfterTitle(doc, lifelineProjectTableName, lifelineProjectHead, lifelineProjectData, lifelineProjectColWidths);
 
             // 插入图片
-            insertPicBeforeTitle(doc, pictitle, imgUrl);
+//            insertPicBeforeTitle(doc, pictitle, imgUrl);
 
             try (OutputStream os = Files.newOutputStream(wordPath)) {
                 doc.write(os);
@@ -837,10 +837,41 @@ public static boolean containsHighRisk(String[][] data) {
     //下载报告
     @Override
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException {
-        Path file = Paths.get("D:/report").resolve(fileName).normalize();
+        // 使用配置化的路径，而不是硬编码
+        String reportDir;
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            reportDir = "D:/report";
+        } else {
+            reportDir = "/home/xian/D:/report"; // Linux 路径
+        }
+
+        Path file = Paths.get(reportDir).resolve(fileName).normalize();
+
+        System.out.println("尝试下载文件: {}"+file.toString());
+        System.out.println("文件是否存在: {}"+Files.exists(file));
+
+        if (!Files.exists(file)) {
+            System.out.println("文件不存在: {}"+file.toString());
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().write("文件不存在: " + fileName);
+            return;
+        }
+
+        // 添加CORS响应头
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "*");
+        resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
         resp.setContentType("application/octet-stream");
         resp.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(fileName, "UTF-8"));
-        Files.copy(file, resp.getOutputStream());
+
+        try {
+            Files.copy(file, resp.getOutputStream());
+            resp.flushBuffer();
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
     @Override

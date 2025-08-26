@@ -768,7 +768,6 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     }
 
     // 获取暴雨触发模型计算隐患点的概率
-
     @Override
     public List<TriggerVO> rainTrigger(TriggerRequest factors) {
         // 参数为空

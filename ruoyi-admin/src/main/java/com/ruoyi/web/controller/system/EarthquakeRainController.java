@@ -26,8 +26,6 @@ public class EarthquakeRainController {
             int pageSize = queryDTO.getPageSize();
             List<String> disasterTypes = queryDTO.getDisasterTypes();
 
-            // 打印参数日志（方便调试）
-            System.out.println("分页参数：pageNum=" + pageNum + ", pageSize=" + pageSize);
             System.out.println("筛选的灾害类型：" + disasterTypes);
 
             // 2. 调用业务层查询数据
