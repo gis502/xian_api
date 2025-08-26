@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("xian_api_df_platform_ods_xasqxj")
+@TableName("xian_api_df_platform_ods_xasqxj_sksj_xssk")
 public class AnalysisRain {
 
     @TableField("station_name")
