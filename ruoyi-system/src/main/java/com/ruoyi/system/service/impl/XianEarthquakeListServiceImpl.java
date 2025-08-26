@@ -90,6 +90,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         float sumGdp = 0;
         int sumPeopleNum = 0;
         List<PeopleGDP> peopleGDPS = peopleGDPMapper.findInsideCircle(earthquake.getLongitude(),earthquake.getLatitude(),earthquake.getSemiMajorAxis(),earthquake.getSemiMinorAxis(),earthquake.getRotation());
+        log.info("1231231: {}", peopleGDPS);
         int count = peopleGDPS.size();
         if (count == 0) {
             log.warn("未查询到受影响区域数据！经纬度：({}, {}), 半长轴：{}, 半短轴：{}, 旋转角：{}",
@@ -105,7 +106,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
             if (gdp != null) sumGdp += gdp;
             Integer peopleNum = peopleGDP.getPeopleNum();
             if (peopleNum != null) sumPeopleNum += peopleNum;
-            xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getVillages());
+            xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getCountry());
 //            System.out.println(peopleGDP.getVillages());
         }
 

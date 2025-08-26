@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("xian_GDP_people")
+@TableName("xian_gdp_people")
 public class PeopleGDP {
 
     /**主键ID*/
@@ -34,18 +34,16 @@ public class PeopleGDP {
     private String county;
 
     /**村庄（街道）*/
-    @TableField("villages")
-    private String villages;
+    @TableField("country")
+    private String country;
 
     /**区县编码*/
-    @TableField("county_code")
-    private Integer countyCode;
+    @TableField("country_code")
+    private Integer countryCode;
 
-    /**经度*/
-    @TableField("lon")
-    private Float lon;
+    /**位置（几何类型）*/
+    @TableField("polygon")
+    private String polygon;
 
-    /**纬度*/
-    @TableField("lat")
-    private Float lat;
+    private String pointGeom;
 }
