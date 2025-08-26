@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianDisasterDebrisFlowMapper">
+  <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.entity.XianDisasterDebrisFlow">
+    <!--@mbg.generated-->
+    <!--@Table xian_disaster_debris_flow-->
+    <id column="disaster_id" jdbcType="INTEGER" property="disasterId" />
+    <result column="geom" jdbcType="OTHER" property="geom" />
+    <result column="disaster_name" jdbcType="VARCHAR" property="disasterName" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+    <result column="occurrence_time" jdbcType="TIMESTAMP" property="occurrenceTime" />
+    <result column="is_deleted" jdbcType="SMALLINT" property="isDeleted" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="longitude" jdbcType="REAL" property="longitude" />
+    <result column="latitude" jdbcType="REAL" property="latitude" />
+    <result column="rain_type" jdbcType="VARCHAR" property="rainType" />
+    <result column="flow_volume" jdbcType="VARCHAR" property="flowVolume" />
+    <result column="flow_length" jdbcType="VARCHAR" property="flowLength" />
+    <result column="flow_width" jdbcType="VARCHAR" property="flowWidth" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    disaster_id, geom, disaster_name, "position", occurrence_time, is_deleted, create_time,
+    update_time, longitude, latitude, rain_type, flow_volume, flow_length, flow_width
+  </sql>
+</mapper>
