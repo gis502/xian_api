@@ -76,8 +76,8 @@ public class XianDisasterBiological {
     /**
      * 类型（正式/测试）
      */
-    @TableField(value = "rain_type")
-    private String rainType;
+    @TableField(value = "type")
+    private String type;
 
     /**
      * 生物灾害类型（如动物疫情、植物病害等）

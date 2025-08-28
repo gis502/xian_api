@@ -2,11 +2,26 @@
 spring:
     neo4j:
         uri: bolt://47.92.216.173:7687
+        # 必须启用认证（之前被注释了，导致连接可能被拒绝或权限不足）
 #        authentication:
-#              username: neo4j
-#              password: Zzw.0401
+#            username: neo4j
+#            password: Zzw.0401
         pool:
             metrics-enabled: true
+            # 核心：解决待机闲置断连的连接池参数
+            max-idle-time: 300000  # 闲置连接5分钟后释放（小于数据库超时）
+            max-lifetime: 1800000  # 连接最长存活30分钟（定期换新）
+            connection-timeout: 5000  # 连接超时5秒
+            # 启用连接校验（从池获取时检查有效性）
+            validation-timeout: 2000
+        # 驱动级重试配置（应对临时断连）
+        driver:
+            config:
+                retry:
+                    attempts: 3  # 失败重试3次
+                    delay: 1000  # 重试间隔1秒
+                connection:
+                    keep-alive: true  # 保持连接活性
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: org.postgresql.Driver
