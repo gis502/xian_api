@@ -23,8 +23,8 @@ public class XianFactorAnalysisController {
     @Autowired
     private XianFactorAnalysisMapper xianFactorAnalysisMapper;
 
-    @PostMapping("/disasterEstimation")
-    public List queryDisasterEstimation(@RequestParam(value = "disasterId") String disasterId, @RequestParam(value = "disasterTrigger") String disasterTrigger) {
+    @PostMapping("/queryDisasterEstimationGetAll")
+    public List queryDisasterEstimationGetAll(@RequestParam(value = "disasterId") String disasterId, @RequestParam(value = "disasterTrigger") String disasterTrigger) {
         DisasterType disasterType = DisasterType.EARTHQUAKE;
         if ("暴雨".equals(disasterTrigger)) {
             disasterType = DisasterType.RAINSTORM;
@@ -34,8 +34,9 @@ public class XianFactorAnalysisController {
         Long disasterIdLong = Long.valueOf(disasterId);   // 或 parseLong
         System.out.println(disasterIdLong+"disasterIdLong"+disasterType+"disasterType");
 
-        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(152292L,  DisasterType.RAINSTORM);
-        System.out.println(disasterEstimation+"disasterEstimation");
+//        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(152292L,  DisasterType.RAINSTORM);
+        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(disasterIdLong,  disasterType);
+        System.out.println(disasterEstimation+"queryDisasterEstimationGetAll");
         return disasterEstimation;
     }
 
