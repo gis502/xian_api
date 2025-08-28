@@ -4,6 +4,8 @@ import com.ruoyi.system.domain.dto.EqDTO;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
 import io.lettuce.core.dynamic.annotation.Param;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface IXianEarthquakeListService {
@@ -17,4 +19,6 @@ public interface IXianEarthquakeListService {
     Integer insertDisaster(EarthquakeVo earthquake);
 
     boolean insertEarthquake(EarthquakeVo earthquake);
+
+    HashMap<String, Object> selectAffectPoints(EarthquakeVo earthquake);
 }

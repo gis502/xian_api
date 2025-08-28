@@ -5,10 +5,10 @@ import com.ruoyi.common.constant.XianConstants;
 import com.ruoyi.common.exception.base.ParamsException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.dto.EqDTO;
-import com.ruoyi.system.domain.entity.PeopleGDP;
-import com.ruoyi.system.domain.entity.XianDisasterRain;
-import com.ruoyi.system.domain.entity.XianEarthquakeList;
+import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
+import com.ruoyi.system.mapper.DangerousSourceMapper;
+import com.ruoyi.system.mapper.HospitalMapper;
 import com.ruoyi.system.mapper.PeopleGDPMapper;
 import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import com.ruoyi.system.service.IXianEarthquakeListService;
@@ -34,6 +34,12 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
 
     @Resource
     private PeopleGDPMapper peopleGDPMapper;
+
+    @Resource
+    private DangerousSourceMapper dangerousSourceMapper;
+
+    @Resource
+    private HospitalMapper hospitalMapper;
 
     @Autowired
     private XianEarthquakeListMapper xianEarthquakeListMapper;
@@ -169,9 +175,9 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         casualties = Math.min(casualties, maxPossible);
         casualties = Math.round(casualties);
 
-        log.info("优化后指数exponent：{}", exponent);
-        log.info("优化后伤亡人数：{}（受影响总人口：{}，最大可能：{}）",
-                sumPeopleNum, sumPeopleNum, maxPossible);
+//        log.info("优化后指数exponent：{}", exponent);
+        log.info("受伤人数：{}，最大可能死亡人数：{}）",
+                sumPeopleNum, maxPossible);
         xianEarthquakeListMapper.insertDamage(earthquake.getDisasterId(),sumPeopleNum,maxPossible);
     }
     /**
@@ -199,6 +205,127 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
             log.error("解析日期时间失败: {}", dateTime, e);
             return 0;
         }
+    }
+
+    /**
+     * 获取历史地震中影响的所有实体点
+     */
+    public HashMap<String, Object> selectAffectPoints(EarthquakeVo earthquake) {
+        // 获取两种类型的影响点数据
+        List<DangerousSource> dangerousSourceAffectList = dangerousSourceMapper.selectDangerAffectPoints(
+                earthquake.getLongitude(), earthquake.getLatitude(),
+                earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
+                earthquake.getRotation()
+        );
+        List<Hospital> hospitAffectList = hospitalMapper.selectHospitAffectPoints(
+                earthquake.getLongitude(), earthquake.getLatitude(),
+                earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
+                earthquake.getRotation()
+        );
+
+        // 处理数据并添加pointType
+        Map<String, Object> dangerousSourceAffectMap = processDangerous(dangerousSourceAffectList);
+        Map<String, Object> hospitalAffectMap = processHospital(hospitAffectList);
+
+        // 创建长度为2的数组，分别存放两种类型的数据
+        Object[] resultArray = new Object[2];
+        resultArray[0] = dangerousSourceAffectMap;  // 第一个元素：风险源数据
+        resultArray[1] = hospitalAffectMap;         // 第二个元素：医院数据
+
+        // 包装成返回对象
+        HashMap<String, Object> finalResult = new HashMap<>();
+        finalResult.put("affectPoints", resultArray);
+
+        return finalResult;
+    }
+
+    // 处理危险源数据，添加pointType
+    private Map<String, Object> processDangerous(List<DangerousSource> dangerousSourceList) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> features = new ArrayList<>();
+
+        if (dangerousSourceList != null && !dangerousSourceList.isEmpty()) {
+            for (DangerousSource dangerousSource : dangerousSourceList) {
+                Map<String, Object> feature = new HashMap<>();
+
+                Map<String, Object> properties = new HashMap<>();
+                properties.put("dangerName", dangerousSource.getName());
+                properties.put("unitCode", dangerousSource.getUnitCode());
+                properties.put("position", dangerousSource.getAddress());
+                properties.put("province", dangerousSource.getProvince());
+                properties.put("city", dangerousSource.getCity());
+                properties.put("county", dangerousSource.getCounty());
+                properties.put("country", dangerousSource.getCountry());
+                properties.put("enterpriseType", dangerousSource.getEnterpriseType());
+                properties.put("level", dangerousSource.getLevel());
+                properties.put("longitude", dangerousSource.getLongitude());
+                properties.put("latitude", dangerousSource.getLatitude());
+                properties.put("unitHead", dangerousSource.getUnitHead());
+                properties.put("phone", dangerousSource.getTelephone());
+
+                Map<String, Object> geometry = new HashMap<>();
+                List<Double> coordinates = new ArrayList<>();
+                coordinates.add(dangerousSource.getLongitude());
+                coordinates.add(dangerousSource.getLatitude());
+                geometry.put("coordinates", coordinates);
+
+                feature.put("properties", properties);
+                feature.put("geometry", geometry);
+                features.add(feature);
+            }
+        }
+
+        // 添加pointType字段（与features同级）
+        result.put("features", features);
+        result.put("pointType", "风险源");  // 明确标识为风险源类型
+        return result;
+    }
+
+    // 处理医院数据，添加pointType
+    private Map<String, Object> processHospital(List<Hospital> hospitalList) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> features = new ArrayList<>();
+
+        if (hospitalList != null && !hospitalList.isEmpty()) {
+            for (Hospital hospital : hospitalList) {
+                Map<String, Object> feature = new HashMap<>();
+
+                Map<String, Object> properties = new HashMap<>();
+                properties.put("hospitalName", hospital.getName());
+                properties.put("position", hospital.getAddress());
+                properties.put("hospitalTypeCode", hospital.getTypeCode());
+                properties.put("hospitalType", hospital.getType());
+                properties.put("level", hospital.getLevel());
+                properties.put("institutionNature", hospital.getInstitutionNature());
+                properties.put("devices", hospital.getHospitalDevices());
+                properties.put("workers", hospital.getHospitalWorkers());
+                properties.put("sumPeople", hospital.getSumPeople());
+                properties.put("beds", hospital.getBeds());
+                properties.put("province", hospital.getProvince());
+                properties.put("city", hospital.getCity());
+                properties.put("county", hospital.getCounty());
+                properties.put("country", hospital.getCountry());
+                properties.put("lon", hospital.getLongitude());
+                properties.put("lat", hospital.getLatitude());
+                properties.put("unitHead", hospital.getUnitHead());
+                properties.put("phone", hospital.getTelephone());
+
+                Map<String, Object> geometry = new HashMap<>();
+                List<Double> coordinates = new ArrayList<>();
+                coordinates.add(hospital.getLongitude());
+                coordinates.add(hospital.getLatitude());
+                geometry.put("coordinates", coordinates);
+
+                feature.put("geometry", geometry);
+                feature.put("properties", properties);
+                features.add(feature);
+            }
+        }
+
+        // 添加pointType字段（与features同级）
+        result.put("features", features);
+        result.put("pointType", "医院");  // 明确标识为医院类型
+        return result;
     }
 
 }
