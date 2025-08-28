@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianApiDfPlatformOdsSwjJcsjQxjkDzldMapper">
+    
+    <resultMap type="XianApiDfPlatformOdsSwjJcsjQxjkDzld" id="XianApiDfPlatformOdsSwjJcsjQxjkDzldResult">
+        <result property="xMax"     column="x_max"     />
+        <result property="xMin"     column="x_min"     />
+        <result property="yMax"     column="y_max"     />
+        <result property="yMin"     column="y_min"     />
+        <result property="brhref"   column="brhref"    />
+        <result property="obsdate"  column="obsdate"   />
+        <result property="r0href"   column="r0href"    />
+        <result property="r1href"   column="r1href"    />
+        <result property="radarnum" column="radarnum"  />
+    </resultMap>
+    
+    <sql id="selectXianApiDfPlatformOdsSwjJcsjQxjkDzldVo">
+        select x_max, x_min, y_max, y_min, brhref, obsdate, r0href, r1href, radarnum 
+        from xian_api_df_platform_ods_swj_jcsj_qxjk_dzld
+    </sql>
+    
+    <select id="selectByTimeRange" parameterType="java.util.Date" resultMap="XianApiDfPlatformOdsSwjJcsjQxjkDzldResult">
+        <include refid="selectXianApiDfPlatformOdsSwjJcsjQxjkDzldVo"/>
+        where obsdate between #{startTime} and #{endTime}
+        order by obsdate desc
+    </select>
+    
+    <select id="selectByRadarnum" parameterType="String" resultMap="XianApiDfPlatformOdsSwjJcsjQxjkDzldResult">
+        <include refid="selectXianApiDfPlatformOdsSwjJcsjQxjkDzldVo"/>
+        where radarnum = #{radarnum}
+        order by obsdate desc
+    </select>
+    
+    <select id="selectLatestData" parameterType="Integer" resultMap="XianApiDfPlatformOdsSwjJcsjQxjkDzldResult">
+        <include refid="selectXianApiDfPlatformOdsSwjJcsjQxjkDzldVo"/>
+        order by obsdate desc
+        limit #{limit}
+    </select>
+    
+</mapper>
