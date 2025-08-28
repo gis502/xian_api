@@ -2,36 +2,45 @@
 spring:
     neo4j:
         uri: bolt://47.92.216.173:7687
-#        uri: bolt://10.22.245.246:7687
-        #    authentication:
-        #      username: neo4j
-        #      password: neo4j123456
+        # 必须启用认证（之前被注释了，导致连接可能被拒绝或权限不足）
+#        authentication:
+#            username: neo4j
+#            password: Zzw.0401
         pool:
-            max-connection-pool-size: 100
-            connection-acquisition-timeout: 60s
-            max-connection-lifetime: 270s    # < 中间 LB/NAT 空闲超时（如果是 5min，就设 4m30s）
-            idle-time-before-connection-test: 10s
-
-
+            metrics-enabled: true
+            # 核心：解决待机闲置断连的连接池参数
+            max-idle-time: 300000  # 闲置连接5分钟后释放（小于数据库超时）
+            max-lifetime: 1800000  # 连接最长存活30分钟（定期换新）
+            connection-timeout: 5000  # 连接超时5秒
+            # 启用连接校验（从池获取时检查有效性）
+            validation-timeout: 2000
+        # 驱动级重试配置（应对临时断连）
+        driver:
+            config:
+                retry:
+                    attempts: 3  # 失败重试3次
+                    delay: 1000  # 重试间隔1秒
+                connection:
+                    keep-alive: true  # 保持连接活性
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: org.postgresql.Driver
         druid:
             # 主库数据源
             master:
-                url: jdbc:postgresql://47.92.216.173:7654/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                url: jdbc:postgresql://47.92.216.173:7654/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
                 password: zhangsan
-#                url: jdbc:postgresql://10.22.245.247:5432/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                url: jdbc:postgresql://localhost:5432/xian?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
-#                password: zhangsan
+#                password: 123456
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭
-                enabled: false
-                url:
-                username:
-                password:
+                enabled: true
+                url: jdbc:postgresql://81.70.200.28:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                username: postgres
+                password: postgres
             # 初始连接数
             initialSize: 5
             # 最小连接池数量
@@ -76,7 +85,3 @@ spring:
                     config:
                         multi-statement-allow: true
 
-management:
-    endpoint:
-        health:
-            show-details: always

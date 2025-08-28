@@ -941,6 +941,7 @@ public static boolean containsHighRisk(String[][] data) {
 
             // 获取灾情评估基本数据
             List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(disasterId, disasterType);
+            System.out.println(disasterEstimation+"disasterEstimation:");
 
             if(disasterEstimation.size() == 0) {
                 return map;

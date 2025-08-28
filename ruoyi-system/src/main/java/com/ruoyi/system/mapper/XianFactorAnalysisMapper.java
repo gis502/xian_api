@@ -17,4 +17,8 @@ public interface XianFactorAnalysisMapper {
     List<Map<String, Object>> queryDisasterEstimation(
             @Param("disasterId")Long disasterId,
             @Param("disasterType")DisasterType disasterType);
+
+    List<Map<String, Object>> queryDisasterEstimationGetAll(
+            @Param("disasterId")Long disasterId,
+            @Param("disasterType")DisasterType disasterType);
 }

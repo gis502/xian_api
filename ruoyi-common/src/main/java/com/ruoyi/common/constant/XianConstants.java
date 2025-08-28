@@ -1,5 +1,7 @@
 package com.ruoyi.common.constant;
 
+import com.alibaba.fastjson2.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,8 @@ public class XianConstants {
     public static final String PARAMS_EMPTY = "请求参数为空!";
     public static final String RESULT_EMPTY = "获取结果为空!";
     public static final String REQUEST_SUCCESS = "请求成功!";
+    public static final String AUTH_ERROR = "授权失败!";
+    public static final String TRIGGER_ERROR = "地震触发异常!";
 
     // 定义常量和映射关系
     public static final String ROCK_TYPE_ALIAS = "rockType";
@@ -36,11 +40,30 @@ public class XianConstants {
     }};
 
 
+
+    public static final JSONObject authBody = new JSONObject();
+    static {
+        authBody.put("username", "admin");
+        authBody.put("password", "admin123");
+    }
+
+
     // 触发模型接口
     public static final String BAYES_NET_MODEL_URL = "http://localhost:8085/model/bayes/prediction";
     // 修改模型参数接口
     public static final String BAYES_NET_MODEL_UPDATE_URL = "http://localhost:8085/model/bayes/change";
 
+    // 灾评系统授权
+    public static final String AUTH_URL = "http://localhost:18008/api/open/auth";
+
+    // 授权请求体
+    public static final String TRIGGER_EARTHQUAKE_URL = "http://localhost:18008/api/open/eq/trigger";
+
+    // 专题图接口
+    public static final String THEMATIC_MAP_URL = "http://localhost:18008/api/open/eq/getMap";
+
+    // 灾情报告接口
+    public static final String DISASTER_REPORT_URL = "http://localhost:18008/api/open/eq/getMap";
 
 
 

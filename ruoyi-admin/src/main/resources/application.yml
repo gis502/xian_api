@@ -69,7 +69,7 @@ spring:
   redis:
     # 地址
     host: 47.92.216.173
-#    host: 10.22.245.246
+#    host: localhost
     #端口，默认为6379
     port: 7655
 #    port: 6379
@@ -78,6 +78,7 @@ spring:
     # 密码
     password: zhangsan
 #    password:
+
     # 连接超时时间
     timeout: 10s
     lettuce:
@@ -91,6 +92,10 @@ spring:
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
 
+  web:
+    resources:
+      static-locations:
+        - classpath:/PlotsPic/   # 把 PlotsPic 加进来
 # token配置
 token:
   # 令牌自定义标识
@@ -138,6 +143,3 @@ xss:
   excludes: /system/notice
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*
-  # 报告文件存储路径
-  reportPath: ${REPORT_PATH:/home/xian/D:/report}
-

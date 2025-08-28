@@ -11,6 +11,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.n52.jackson.datatype.jts.GeometryDeserializer;
 import org.n52.jackson.datatype.jts.GeometrySerializer;
 
+import java.time.LocalDateTime;
+
 @Data
 @TableName("xian_earthquake_list")
 public class XianEarthquakeList {
@@ -34,7 +36,7 @@ public class XianEarthquakeList {
   @TableField("depth")
   private String depth;
   @TableField("occurrence_time")
-  private java.sql.Timestamp occurrenceTime;
+  private LocalDateTime occurrenceTime;
   @TableField("eq_type")
   private String eqType;
   @TableField("source")
@@ -49,9 +51,9 @@ public class XianEarthquakeList {
   @TableField("magnitude")
   private String magnitude;
   @TableField("create_time")
-  private java.sql.Date createTime;
+  private LocalDateTime createTime;
   @TableField("update_time")
-  private java.sql.Date updateTime;
+  private LocalDateTime updateTime;
   @TableField("district")
   private String district;
   @TableField("province")

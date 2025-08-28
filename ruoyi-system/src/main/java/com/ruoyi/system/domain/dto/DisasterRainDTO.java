@@ -13,6 +13,7 @@ public class DisasterRainDTO {
     private Double longitude;
     private Double latitude;
     private String position;
+    private String rainType;
     private String disasterName;
     private LocalDateTime occurrenceTime;
 
