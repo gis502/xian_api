@@ -76,8 +76,9 @@ public class XianDisasterSnowDisaster {
     /**
      * 类型（正式/测试）
      */
-    @TableField(value = "rain_type")
-    private String rainType;
+    @TableField(value = "type")
+    private String type;
+
 
     /**
      * 积雪深度

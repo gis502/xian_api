@@ -5,67 +5,373 @@
 
     <!-- 1. 分页查询（支持按灾害类型筛选） -->
     <select id="selectEarthquakeRainPage" resultType="com.ruoyi.system.domain.dto.EarthquakeRainDTO">
-        <!-- 地震数据查询 -->
-        SELECT
-        e.disaster_id AS earthquakeDisasterId,
-        NULL AS rainDisasterId,
-        e.disaster_name AS disasterName,
-        e.earthquake_full_name AS earthquakeFullName,
-        e.position AS earthquakeDisasterPosition,
-        NULL AS rainDisasterPosition,
-        e.magnitude,
-        e.intensity,
-        e.occurrence_time AS occurTime,
-        e.eq_type AS eqType,
-        NULL AS rainfall,
-        NULL AS duration,
-        'earthquake' AS disasterType
-        FROM xian_earthquake_list e
-        WHERE
-        e.eq_type = 'Z'  -- 保留核心条件：只查eq_type='Z'
-        AND e.is_deleted = 0  -- 保留核心条件：未删除
-        <!-- 当不需要查询地震数据时，用AND 1=0排除；需要时不添加条件 -->
-        <if test="disasterTypes != null and !disasterTypes.contains('earthquake')">
-            AND 1=0  -- 不包含earthquake时，排除所有地震数据
-        </if>
+        <trim prefix="" suffix="" suffixOverrides="UNION ALL">
 
-        UNION ALL
+            <!-- 1. 地震 -->
+            <if test="disasterTypes == null or disasterTypes.contains('earthquake')">
+                SELECT
+                e.disaster_id::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                e.disaster_name::text AS disasterName,
+                e.occurrence_time AS occurTime,
+                'earthquake'::text AS disasterType
+                FROM xian_earthquake_list e
+                WHERE e.is_deleted = 0 AND e.eq_type = 'Z'
+                UNION ALL
+            </if>
 
-        <!-- 暴雨数据查询 -->
-        SELECT
-        NULL AS earthquakeDisasterId,
-        d.disaster_id AS rainDisasterId,
-        d.disaster_name AS disasterName,
-        NULL AS earthquakeFullName,
-        NULL AS earthquakeDisasterPosition,
-        d.position AS rainDisasterPosition,
-        NULL AS magnitude,
-        NULL AS intensity,
-        d.occurrence_time AS occurTime,
-        NULL AS eq_type,
-        d.rainfall,
-        d.duration,
-        'rain' AS disasterType
-        FROM xian_disaster_rain d
-        WHERE
-        d.rain_type = 'Z'  -- 保留核心条件：只查'Z'
-        AND d.is_deleted = '0'  -- 暴雨核心条件：未删除
-        <!-- 当不需要查询暴雨数据时，用AND 1=0排除；需要时不添加条件 -->
-        <if test="disasterTypes != null and !disasterTypes.contains('rain')">
-            AND 1=0  -- 不包含rain时，排除所有暴雨数据
-        </if>
+            <!-- 2. 暴雨 -->
+            <if test="disasterTypes == null or disasterTypes.contains('rain')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                r.disaster_id::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                r.disaster_name::text AS disasterName,
+                r.occurrence_time AS occurTime,
+                'rain'::text AS disasterType
+                FROM xian_disaster_rain r
+                WHERE r.is_deleted = 0 AND r.rain_type = 'Z'
+                UNION ALL
+            </if>
 
-        <!-- 注意：UNION ALL 连接的两个查询已有各自的WHERE子句，外层不能再加WHERE -->
+            <!-- 3. 积雪 -->
+            <if test="disasterTypes == null or disasterTypes.contains('snow')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                sn.disaster_id::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                sn.disaster_name::text AS disasterName,
+                sn.occurrence_time AS occurTime,
+                'snow'::text AS disasterType
+                FROM xian_disaster_snow_disaster sn
+                WHERE sn.is_deleted = 0 AND sn.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 4. 冷害 -->
+            <if test="disasterTypes == null or disasterTypes.contains('coldDamage')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                c.disaster_id::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                c.disaster_name::text AS disasterName,
+                c.occurrence_time AS occurTime,
+                'coldDamage'::text AS disasterType
+                FROM xian_disaster_cold_damage c
+                WHERE c.is_deleted = 0 AND c.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 5. 崩塌 -->
+            <if test="disasterTypes == null or disasterTypes.contains('collapse')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                col.disaster_id::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                col.disaster_name::text AS disasterName,
+                col.occurrence_time AS occurTime,
+                'collapse'::text AS disasterType
+                FROM xian_disaster_collapse col
+                WHERE col.is_deleted = 0 AND col.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 6. 滑坡 -->
+            <if test="disasterTypes == null or disasterTypes.contains('landslide')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                l.disaster_id::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                l.disaster_name::text AS disasterName,
+                l.occurrence_time AS occurTime,
+                'landslide'::text AS disasterType
+                FROM xian_disaster_landslide l
+                WHERE l.is_deleted = 0 AND l.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 7. 泥石流 -->
+            <if test="disasterTypes == null or disasterTypes.contains('debrisFlow')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                d.disaster_id::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                d.disaster_name::text AS disasterName,
+                d.occurrence_time AS occurTime,
+                'debrisFlow'::text AS disasterType
+                FROM xian_disaster_debris_flow d
+                WHERE d.is_deleted = 0 AND d.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 8. 风雹 -->
+            <if test="disasterTypes == null or disasterTypes.contains('galeHail')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                g.disaster_id::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                g.disaster_name::text AS disasterName,
+                g.occurrence_time AS occurTime,
+                'galeHail'::text AS disasterType
+                FROM xian_disaster_gale_hail g
+                WHERE g.is_deleted = 0 AND g.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 9. 沙尘暴 -->
+            <if test="disasterTypes == null or disasterTypes.contains('sandstorm')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                sd.disaster_id::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                sd.disaster_name::text AS disasterName,
+                sd.occurrence_time AS occurTime,
+                'sandstorm'::text AS disasterType
+                FROM xian_disaster_sandstorm sd
+                WHERE sd.is_deleted = 0 AND sd.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 10. 干旱 -->
+            <if test="disasterTypes == null or disasterTypes.contains('drought')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                dr.disaster_id::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                dr.disaster_name::text AS disasterName,
+                dr.occurrence_time AS occurTime,
+                'drought'::text AS disasterType
+                FROM xian_disaster_drought dr
+                WHERE dr.is_deleted = 0 AND dr.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 11. 高温 -->
+            <if test="disasterTypes == null or disasterTypes.contains('heatwave')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                hw.disaster_id::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                hw.disaster_name::text AS disasterName,
+                hw.occurrence_time AS occurTime,
+                'heatwave'::text AS disasterType
+                FROM xian_disaster_heatwave hw
+                WHERE hw.is_deleted = 0 AND hw.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 12. 森林火灾 -->
+            <if test="disasterTypes == null or disasterTypes.contains('wildfire')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                wf.disaster_id::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                wf.disaster_name::text AS disasterName,
+                wf.occurrence_time AS occurTime,
+                'wildfire'::text AS disasterType
+                FROM xian_disaster_wildfire wf
+                WHERE wf.is_deleted = 0 AND wf.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 13. 生物灾害 -->
+            <if test="disasterTypes == null or disasterTypes.contains('bioDisaster')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                b.disaster_id::text AS bioDisasterId,
+                NULL::text AS safetyAccidentDisasterId,
+                b.disaster_name::text AS disasterName,
+                b.occurrence_time AS occurTime,
+                'bioDisaster'::text AS disasterType
+                FROM xian_disaster_biological b
+                WHERE b.is_deleted = 0 AND b.type = 'Z'
+                UNION ALL
+            </if>
+
+            <!-- 14. 安全事故 -->
+            <if test="disasterTypes == null or disasterTypes.contains('safetyAccident')">
+                SELECT
+                NULL::text AS earthquakeDisasterId,
+                NULL::text AS rainDisasterId,
+                NULL::text AS snowDisasterId,
+                NULL::text AS coldDamageDisasterId,
+                NULL::text AS collapseDisasterId,
+                NULL::text AS landslideDisasterId,
+                NULL::text AS debrisFlowDisasterId,
+                NULL::text AS galeHailDisasterId,
+                NULL::text AS sandstormDisasterId,
+                NULL::text AS droughtDisasterId,
+                NULL::text AS heatwaveDisasterId,
+                NULL::text AS wildfireDisasterId,
+                NULL::text AS bioDisasterId,
+                sf.disaster_id::text AS safetyAccidentDisasterId,
+                sf.disaster_name::text AS disasterName,
+                sf.occurrence_time AS occurTime,
+                'safetyAccident'::text AS disasterType
+                FROM xian_disaster_safety_accident sf
+                WHERE sf.is_deleted = 0 AND sf.type = 'Z'
+            </if>
+
+        </trim>
+
         ORDER BY occurTime DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
+
+
+
+
+
     <!-- 2. 总条数查询（支持按灾害类型筛选） -->
     <select id="countTotal" resultType="int">
-        <!-- 外层添加SELECT，将两个子查询的和作为结果返回 -->
         SELECT
         (
-        -- 地震数据总条数：包含地震类型或无筛选时查询，否则为0
+        <!-- 1. 地震 -->
         <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('earthquake')">
             SELECT COUNT(*) FROM xian_earthquake_list WHERE is_deleted = 0 AND eq_type = 'Z'
         </if>
@@ -73,16 +379,138 @@
             SELECT 0
         </if>
         )
-        +  -- 确保+前后有空格
+        +
         (
-        -- 暴雨数据总条数：包含暴雨类型或无筛选时查询，否则为0
+        <!-- 2. 暴雨 -->
         <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('rain')">
-            SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = '0' AND rain_type = 'Z'
+            SELECT COUNT(*) FROM xian_disaster_rain WHERE is_deleted = 0 AND rain_type = 'Z'
         </if>
         <if test="disasterTypes != null and !disasterTypes.contains('rain')">
             SELECT 0
         </if>
-        ) AS total_count  -- 给结果起别名（可选，但规范）
+        )
+        +
+        (
+        <!-- 3. 积雪 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('snow')">
+            SELECT COUNT(*) FROM xian_disaster_snow_disaster WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('snow')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 4. 冷害 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('coldDamage')">
+            SELECT COUNT(*) FROM xian_disaster_cold_damage WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('coldDamage')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 5. 崩塌 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('collapse')">
+            SELECT COUNT(*) FROM xian_disaster_collapse WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('collapse')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 6. 滑坡 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('landslide')">
+            SELECT COUNT(*) FROM xian_disaster_landslide WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('landslide')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 7. 泥石流 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('debrisFlow')">
+            SELECT COUNT(*) FROM xian_disaster_debris_flow WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('debrisFlow')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 8. 风雹 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('galeHail')">
+            SELECT COUNT(*) FROM xian_disaster_gale_hail WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('galeHail')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 9. 沙尘暴 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('sandstorm')">
+            SELECT COUNT(*) FROM xian_disaster_sandstorm WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('sandstorm')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 10. 干旱 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('drought')">
+            SELECT COUNT(*) FROM xian_disaster_drought WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('drought')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 11. 高温 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('heatwave')">
+            SELECT COUNT(*) FROM xian_disaster_heatwave WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('heatwave')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 12. 森林火灾 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('wildfire')">
+            SELECT COUNT(*) FROM xian_disaster_wildfire WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('wildfire')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 13. 生物灾害 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('bioDisaster')">
+            SELECT COUNT(*) FROM xian_disaster_biological WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('bioDisaster')">
+            SELECT 0
+        </if>
+        )
+        +
+        (
+        <!-- 14. 安全事故 -->
+        <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('safetyAccident')">
+            SELECT COUNT(*) FROM xian_disaster_safety_accident WHERE is_deleted = 0 AND type = 'Z'
+        </if>
+        <if test="disasterTypes != null and !disasterTypes.contains('safetyAccident')">
+            SELECT 0
+        </if>
+        )
+        AS total_count
     </select>
+
 
 </mapper>

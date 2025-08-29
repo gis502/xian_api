@@ -77,8 +77,9 @@ public class XianDisasterSafetyAccident {
     /**
      * 类型（正式/测试）
      */
-    @TableField(value = "rain_type")
-    private String rainType;
+    @TableField(value = "type")
+    private String type;
+
 
     /**
      * 事故类型（矿山、工厂、交通运输等）
