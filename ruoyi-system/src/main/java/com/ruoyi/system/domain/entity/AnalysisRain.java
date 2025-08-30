@@ -34,4 +34,7 @@ public class AnalysisRain {
     private float lon;
     @TableField("lat")
     private float lat;
+    // 添加datetime字段
+    @TableField("datetime")
+    private String datetime;
 }
