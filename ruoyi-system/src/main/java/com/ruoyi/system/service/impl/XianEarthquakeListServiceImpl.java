@@ -7,10 +7,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.dto.EqDTO;
 import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
-import com.ruoyi.system.mapper.DangerousSourceMapper;
-import com.ruoyi.system.mapper.HospitalMapper;
-import com.ruoyi.system.mapper.PeopleGDPMapper;
-import com.ruoyi.system.mapper.XianEarthquakeListMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.IXianEarthquakeListService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +37,9 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
 
     @Resource
     private HospitalMapper hospitalMapper;
+
+    @Resource
+    private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
 
     @Autowired
     private XianEarthquakeListMapper xianEarthquakeListMapper;
@@ -211,7 +211,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
      * 获取历史地震中影响的所有实体点
      */
     public HashMap<String, Object> selectAffectPoints(EarthquakeVo earthquake) {
-        // 获取两种类型的影响点数据
+
         List<DangerousSource> dangerousSourceAffectList = dangerousSourceMapper.selectDangerAffectPoints(
                 earthquake.getLongitude(), earthquake.getLatitude(),
                 earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
@@ -222,15 +222,22 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
                 earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
                 earthquake.getRotation()
         );
+        List<GeologicalDisasterHide> disasterHideAffectList = geologicalDisasterHideMapper.selectDisasterHideAffectPoints(
+                earthquake.getLongitude(), earthquake.getLatitude(),
+                earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
+                earthquake.getRotation()
+        );
 
         // 处理数据并添加pointType
         Map<String, Object> dangerousSourceAffectMap = processDangerous(dangerousSourceAffectList);
         Map<String, Object> hospitalAffectMap = processHospital(hospitAffectList);
+        Map<String, Object> disasterHideAffectMap = processDisasterHide(disasterHideAffectList);
 
         // 创建长度为2的数组，分别存放两种类型的数据
-        Object[] resultArray = new Object[2];
+        Object[] resultArray = new Object[3];
         resultArray[0] = dangerousSourceAffectMap;  // 第一个元素：风险源数据
         resultArray[1] = hospitalAffectMap;         // 第二个元素：医院数据
+        resultArray[2] = disasterHideAffectMap;     // 第三个元素：隐患点数据
 
         // 包装成返回对象
         HashMap<String, Object> finalResult = new HashMap<>();
@@ -325,6 +332,45 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         // 添加pointType字段（与features同级）
         result.put("features", features);
         result.put("pointType", "医院");  // 明确标识为医院类型
+        return result;
+    }
+
+    // 处理隐患点数据，添加pointType
+    private Map<String, Object> processDisasterHide(List<GeologicalDisasterHide> disasterHideList) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> features = new ArrayList<>();
+        if (disasterHideList != null && !disasterHideList.isEmpty()) {
+            for (GeologicalDisasterHide disasterHide : disasterHideList) {
+                Map<String, Object> feature = new HashMap<>();
+
+                Map<String, Object> properties = new HashMap<>();
+                properties.put("disaster_name", disasterHide.getDisasterName());
+                properties.put("field_code", disasterHide.getFieldCode());
+                properties.put("province", disasterHide.getProvince());
+                properties.put("city", disasterHide.getCity());
+                properties.put("county", disasterHide.getCounty());
+                properties.put("village", disasterHide.getVillage());
+                properties.put("position", disasterHide.getPosition());
+                properties.put("lon", disasterHide.getLon());
+                properties.put("lat", disasterHide.getLat());
+                properties.put("disaster_type", disasterHide.getDisasterType());
+                properties.put("scale_grade", disasterHide.getScaleGrade());
+                properties.put("risk_grade", disasterHide.getRiskGrade());
+
+                Map<String, Object> geometry = new HashMap<>();
+                List<Double> coordinates = new ArrayList<>();
+                coordinates.add(disasterHide.getLon());
+                coordinates.add(disasterHide.getLat());
+                geometry.put("coordinates", coordinates);
+
+                feature.put("geometry", geometry);
+                feature.put("properties", properties);
+                features.add(feature);
+            }
+        }
+        // 添加pointType字段（与features同级）
+        result.put("features", features);
+        result.put("pointType", "隐患点");  // 明确标识为隐患点类型
         return result;
     }
 
