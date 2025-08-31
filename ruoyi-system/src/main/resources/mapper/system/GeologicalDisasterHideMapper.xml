@@ -12,4 +12,37 @@
         )
     </select>
 
+    <select id="selectDisasterHideAffectPoints" resultType="com.ruoyi.system.domain.entity.GeologicalDisasterHide">
+         <![CDATA[
+        SELECT
+            *
+        FROM xian_disaster_hide
+        WHERE disaster_type IN ('滑坡', '泥石流')
+          AND
+            POWER(
+                    (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4490), 3857))
+                        - ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4490), 3857)))
+                        * COS(#{rotation} * PI() / 180)
+                        +
+                    (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4490), 3857))
+                        - ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4490), 3857)))
+                        * SIN(#{rotation} * PI() / 180),
+                    2
+            ) / POWER(#{semiMajorAxis}, 2)
+                +
+            POWER(
+
+                    - (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4490), 3857))
+                        - ST_X(ST_Transform(ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4490), 3857)))
+                        * SIN(#{rotation} * PI() / 180)
+                        +
+                    (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4490), 3857))
+                        - ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4490), 3857)))
+                        * COS(#{rotation} * PI() / 180),
+                    2
+            ) / POWER(#{semiMinorAxis}, 2)
+                <= 1
+        ]]>
+    </select>
+
 </mapper>

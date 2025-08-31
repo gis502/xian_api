@@ -37,4 +37,9 @@ public class DangerousSource {
     private Double longitude;
     @TableField("lat")
     private Double latitude;
+//    /**位置（几何类型）*/
+//    @TableField("point")
+//    private String point;
+//
+//    private String pointGeom;
 }

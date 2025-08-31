@@ -1,5 +1,7 @@
 package com.ruoyi.system.domain.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -8,8 +10,10 @@ import java.util.Objects;
  * @description: TODO(前端地震实体)
  * @date 2025/7/28 下午12:37
  */
+@Data
 public class EarthquakeVo implements Serializable {
     // 主数据字段
+    private Integer disasterId;
     private String name;
     private String fullName;
     private String position;
@@ -27,138 +31,22 @@ public class EarthquakeVo implements Serializable {
     private String district;
     private String province;
     private String city;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public Double getMagnitude() {
-        return magnitude;
-    }
-
-    public void setMagnitude(Double magnitude) {
-        this.magnitude = magnitude;
-    }
-
-    public Double getDepth() {
-        return depth;
-    }
-
-    public void setDepth(Double depth) {
-        this.depth = depth;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getCountyCode() {
-        return countyCode;
-    }
-
-    public void setCountyCode(String countyCode) {
-        this.countyCode = countyCode;
-    }
-
-    public String getTownshipCode() {
-        return townshipCode;
-    }
-
-    public void setTownshipCode(String townshipCode) {
-        this.townshipCode = townshipCode;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public void setDistrict(String district) {
-        this.district = district;
-    }
-
-    public String getProvince() {
-        return province;
-    }
-
-    public void setProvince(String province) {
-        this.province = province;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
+    private Double circleArea;
+    private Double rotation;
+    private Double semiMajorAxis;
+    private Double semiMinorAxis;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EarthquakeVo that = (EarthquakeVo) o;
-        return Objects.equals(name, that.name) && Objects.equals(fullName, that.fullName) && Objects.equals(position, that.position) && Objects.equals(magnitude, that.magnitude) && Objects.equals(depth, that.depth) && Objects.equals(longitude, that.longitude) && Objects.equals(latitude, that.latitude) && Objects.equals(dateTime, that.dateTime) && Objects.equals(type, that.type) && Objects.equals(source, that.source) && Objects.equals(countyCode, that.countyCode) && Objects.equals(townshipCode, that.townshipCode) && Objects.equals(district, that.district) && Objects.equals(province, that.province) && Objects.equals(city, that.city);
+        return Objects.equals(name, that.name) && Objects.equals(fullName, that.fullName) && Objects.equals(position, that.position) && Objects.equals(magnitude, that.magnitude) && Objects.equals(depth, that.depth) && Objects.equals(longitude, that.longitude) && Objects.equals(latitude, that.latitude)&& Objects.equals(semiMajorAxis, that.semiMajorAxis) && Objects.equals(semiMinorAxis, that.semiMinorAxis)&& Objects.equals(rotation, that.rotation)&& Objects.equals(circleArea, that.circleArea)&& Objects.equals(dateTime, that.dateTime) && Objects.equals(type, that.type) && Objects.equals(source, that.source) && Objects.equals(countyCode, that.countyCode) && Objects.equals(townshipCode, that.townshipCode) && Objects.equals(district, that.district) && Objects.equals(province, that.province) && Objects.equals(city, that.city);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, fullName, position, magnitude, depth, longitude, latitude, dateTime, type, source, countyCode, townshipCode, district, province, city);
+        return Objects.hash(name, fullName, position, magnitude, depth, longitude, latitude,semiMajorAxis,semiMinorAxis,rotation,circleArea, dateTime, type, source, countyCode, townshipCode, district, province, city);
     }
 
     @Override
@@ -171,6 +59,10 @@ public class EarthquakeVo implements Serializable {
                 ", depth=" + depth +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
+                ", semiMajorAxis=" + semiMajorAxis +
+                ", semiMinorAxis=" + semiMinorAxis +
+                ", rotation=" + rotation +
+                ", circleArea=" + circleArea +
                 ", dateTime='" + dateTime + '\'' +
                 ", type='" + type + '\'' +
                 ", source='" + source + '\'' +
