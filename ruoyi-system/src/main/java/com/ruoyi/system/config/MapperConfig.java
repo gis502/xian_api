@@ -83,6 +83,7 @@ public class MapperConfig {
         typeMapping.put("重伤人员", "rescueActionCasualties");
         typeMapping.put("轻伤人员", "rescueActionCasualties");
         typeMapping.put("危重伤人员", "rescueActionCasualties");
+        typeMapping.put("被困人员", "rescueActionCasualties");
 
         //救援行动类-集结缓冲区类表
         typeMapping.put("集结缓冲区", "bufferZone");
