@@ -1,6 +1,8 @@
 package com.ruoyi.common.utils.file;
 
 import com.ruoyi.common.config.DocumentConfig;
+import com.ruoyi.common.enums.ImagePositionEnum;
+import com.ruoyi.common.enums.ImageTypeEnum;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.util.Units;
 import org.apache.poi.xwpf.usermodel.*;
@@ -344,12 +346,13 @@ public class DocumentUtils {
      *
      * @param doc             Word 文档对象
      * @param imagePath       图片路径（本地路径或URL）
+     * @param imageType       图片类型
      * @param widthInCm       图片宽度（厘米），为null则使用文档宽度的80%
      * @param heightInCm      图片高度（厘米），为null则按宽度等比例缩放
      * @param caption         图片标注信息内容
      * @param captionPosition 标注位置（"before" 图前, "after" 图后）
      */
-    public static void insertImageWithCaption(XWPFDocument doc, String imagePath, Double widthInCm, Double heightInCm, String caption, String captionPosition) {
+    public static void insertImageWithCaption(XWPFDocument doc, String imagePath, ImageTypeEnum imageType, Double widthInCm, Double heightInCm, String caption, ImagePositionEnum captionPosition) {
         try {
             // 获取图片输入流（本地或网络）
             try (InputStream imageStream = getImageStream(imagePath)) {
@@ -381,10 +384,10 @@ public class DocumentUtils {
 
                 // 确定图片类型和文件名
                 String fileName = getFileNameFromPath(imagePath);
-                int pictureType = getPictureType(fileName);
+                int pictureType = getPictureType(fileName, imageType);
 
                 // 如果有标注且位置在图前，先添加标注
-                if (caption != null && caption.trim().length() > 0 && ("before".equalsIgnoreCase(captionPosition.toLowerCase()))) {
+                if (caption != null && caption.trim().length() > 0 && captionPosition == ImagePositionEnum.BEFORE) {
                     addCaptionParagraph(doc, caption);
                 }
 
@@ -402,7 +405,7 @@ public class DocumentUtils {
                 imageParagraph.setAlignment(ParagraphAlignment.CENTER);
 
                 // 如果有标注且位置在图后，添加标注
-                if (caption != null && caption.trim().length() > 0 && ("after".equalsIgnoreCase(captionPosition))) {
+                if (caption != null && caption.trim().length() > 0 && captionPosition == ImagePositionEnum.AFTER) {
                     addCaptionParagraph(doc, caption);
                 }
             }
@@ -478,12 +481,20 @@ public class DocumentUtils {
     /**
      * 根据文件名判断图片类型（POI 支持的类型）
      */
-    private static int getPictureType(String fileName) {
-        if (fileName == null || !fileName.contains(".")) {
+    private static int getPictureType(String fileName, ImageTypeEnum imageType) {
+
+        if (fileName == null || (imageType == null && !fileName.contains("."))) {
             throw new IllegalArgumentException("无法识别图片格式");
         }
 
-        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        String suffix = null;
+
+        if (imageType != null) {
+            suffix = imageType.getValue();
+        }else {
+            suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        }
+
         switch (suffix) {
             case "jpg":
             case "jpeg":

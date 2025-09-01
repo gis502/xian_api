@@ -187,8 +187,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
  * word文档生成
  */
 class CreateRainReport {
-    private static final int TABLE_ROW_HEIGHT = 567;
-    private static final int TABLE_FONT_SIZE = 12;
     /**
      * 创建word文件
      * @param filePath
