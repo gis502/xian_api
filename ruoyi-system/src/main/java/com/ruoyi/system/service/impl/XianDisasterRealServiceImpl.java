@@ -189,11 +189,12 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
         if (mapperType != null) {
             try {
                 // 1. 查询 situation_plot 表中的信息
-                QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
-                plotWrapper.eq("plot_id", plotId);  // 使用 plotId 作为查询条件
+//                QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
+//                plotWrapper.eq("plot_id", plotId);  // 使用 plotId 作为查询条件
 
                 // 获取 situation_plot 表中的记录
-                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+//                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+                XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
                 System.out.println("Plot Query result: " + plotInfo);
 
                 BaseMapper<?> mapper = mapperRegistry.get(mapperType + "Mapper");
@@ -230,10 +231,11 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
         } else {
             try {
                 // 1. 查询 situation_plot 表中的信息
-                QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
-                plotWrapper.eq("plot_id", plotId);  // 使用 plotId 作为查询条件
-                // 获取 situation_plot 表中的记录
-                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+//                QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
+//                plotWrapper.eq("plot_id", plotId);  // 使用 plotId 作为查询条件
+//                // 获取 situation_plot 表中的记录
+//                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+                XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
                 System.out.println("Plot Query result: " + plotInfo);
                 Map<String, Object> combinedResult = new HashMap<>();
                 combinedResult.put("plotInfo", plotInfo);
@@ -259,12 +261,13 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
             if (mapperType != null) {
                 try {
                     // 查询 situation_plot 表中的信息
-                    QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
-                    plotWrapper.eq("plot_id", plotId);
+//                    QueryWrapper<XianDisasterReal> plotWrapper = new QueryWrapper<>();
+//                    plotWrapper.eq("plot_id", plotId);
 
-                    XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+//                    XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
+                    XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
+                    System.out.println(plotInfo+"plotInfo");
                     BaseMapper<?> mapper = mapperRegistry.get(mapperType + "Mapper");
-
                     if (mapper != null) {
                         // 获取 Mapper 的泛型实体类型
                         Class<?> entityType = getEntityClass(mapper);
