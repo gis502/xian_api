@@ -78,6 +78,19 @@ public class FeignServiceImpl implements IFeignService {
             requestBody.put("eqDepth", triggerDTO.getEqDepth());
             requestBody.put("magnitude", triggerDTO.getMagnitude());
             requestBody.put("eqType", triggerDTO.getEqType());
+            requestBody.put("faultZone", triggerDTO.getFaultZone());
+            requestBody.put("circleArea", triggerDTO.getCircleArea());
+            requestBody.put("rotation", triggerDTO.getRotation());
+            requestBody.put("semiMajorAxis", triggerDTO.getSemiMajorAxis());
+            requestBody.put("semiMinorAxis", triggerDTO.getSemiMinorAxis());
+            requestBody.put("affectPop", triggerDTO.getAffectPop());
+            requestBody.put("diePop", triggerDTO.getDiePop());
+            requestBody.put("densityPop", triggerDTO.getDensityPop());
+            requestBody.put("country", triggerDTO.getCountry());
+            requestBody.put("intensity", triggerDTO.getIntensity());
+            requestBody.put("sumGdp", triggerDTO.getSumGdp());
+
+
 
             ParameterizedTypeReference<GeneralVO> triggerType = new ParameterizedTypeReference<GeneralVO>() {
             };
