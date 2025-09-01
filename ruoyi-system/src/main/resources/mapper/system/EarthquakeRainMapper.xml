@@ -302,7 +302,7 @@
                 wf.disaster_name::text AS disasterName,
                 wf.occurrence_time AS occurTime,
                 'wildfire'::text AS disasterType
-                FROM xian_disaster_wildfire wf
+                FROM xian_disaster_forest_fire wf
                 WHERE wf.is_deleted = 0 AND wf.type = 'Z'
                 UNION ALL
             </if>
@@ -483,7 +483,7 @@
         (
         <!-- 12. 森林火灾 -->
         <if test="disasterTypes == null or disasterTypes.size() == 0 or disasterTypes.contains('wildfire')">
-            SELECT COUNT(*) FROM xian_disaster_wildfire WHERE is_deleted = 0 AND type = 'Z'
+            SELECT COUNT(*) FROM xian_disaster_forest_fire WHERE is_deleted = 0 AND type = 'Z'
         </if>
         <if test="disasterTypes != null and !disasterTypes.contains('wildfire')">
             SELECT 0
