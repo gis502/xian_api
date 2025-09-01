@@ -1,15 +1,13 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.config.DocumentConfig;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.TypesOfSecondaryDisasters;
+import com.ruoyi.common.utils.file.DocumentUtils;
 import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.DownloadreportService;
 import org.apache.poi.xwpf.usermodel.*;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTP;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -190,14 +187,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
  * word文档生成
  */
 class CreateRainReport {
-    private static final Integer TEXT_FONT_SIZE = 16;
-    private static final String TEXT_FONT_FAMILY = "黑体";
-    // 两个字符
-    private static final Integer INDENTATION_DISTANCE = 40 * TEXT_FONT_SIZE;
-    private static final String FONT_FANG_SONG = "仿宋_GB2312";
     private static final int TABLE_ROW_HEIGHT = 567;
     private static final int TABLE_FONT_SIZE = 12;
-
     /**
      * 创建word文件
      * @param filePath
@@ -209,17 +200,17 @@ class CreateRainReport {
         try (XWPFDocument document = new XWPFDocument();
              FileOutputStream out = new FileOutputStream(filePath)) {
             // 创建保密提示
-            createConfidentialityTip(document, "对内保密");
+            createConfidentialityTip(document, "对内掌握");
             // 三个空行
-            createBlankLine(document, 3);
+            DocumentUtils.createBlankLine(document, 3);
             // 创建标题
-            createTitle(document, "暴雨应急预评估报告");
+            DocumentUtils.createTitle(document, "暴雨应急预评估报告");
             // 一个空行
-            createBlankLine(document, 1);
+            DocumentUtils.createBlankLine(document, 1);
             // 创建部门信息
             createDept(document, "西安市应急管理局               " + rainReportEntity.getReportTime());
             // 两个空行
-            createBlankLine(document, 2);
+            DocumentUtils.createBlankLine(document, 2);
             // 第一部分，降雨概况
             createRainfallOverview(document, rainReportEntity);
             // 第二部分，风险评估
@@ -238,44 +229,8 @@ class CreateRainReport {
      * @param tip - 提示文本
      */
     private void createConfidentialityTip(XWPFDocument doc, String tip) {
-        XWPFParagraph paragraph = doc.createParagraph();
-        XWPFRun run = paragraph.createRun();
-
-        run.setText(tip);
-        run.setFontSize(TEXT_FONT_SIZE);
-        run.setFontFamily(TEXT_FONT_FAMILY);
-
+        XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, tip);
         paragraph.setAlignment(ParagraphAlignment.RIGHT);
-    }
-
-    /**
-     * 创建空行
-     *
-     * @param doc - 文档对象
-     * @param n   - 行数
-     */
-    private void createBlankLine(XWPFDocument doc, int n) {
-        for (int i = 0; i < n; i++) {
-            doc.createParagraph();
-        }
-    }
-
-    /**
-     * 创建标题
-     *
-     * @param doc
-     * @param title
-     */
-    private void createTitle(XWPFDocument doc, String title) {
-        XWPFParagraph paragraph = doc.createParagraph();
-        XWPFRun run = paragraph.createRun();
-
-        run.setText(title);
-        run.setFontFamily("方正小标宋简体");
-        run.setFontSize(44);
-        run.setColor("FF0000");
-
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
     }
 
     /**
@@ -285,45 +240,15 @@ class CreateRainReport {
      * @param dept
      */
     private void createDept(XWPFDocument doc, String dept) {
-        XWPFParagraph paragraph = doc.createParagraph();
-        XWPFRun run = paragraph.createRun();
-        run.setText(dept);
-        run.setFontSize(TEXT_FONT_SIZE);
-        run.setFontFamily(FONT_FANG_SONG);
-
+        XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
         paragraph.setAlignment(ParagraphAlignment.CENTER);
+        paragraph.setFirstLineIndent(0);
+
+        XWPFRun run = DocumentUtils.addRegularRun(paragraph, dept);
+        run.setFontFamily(DocumentConfig.FONT_FANG_SONG_GB2312);
 
         // 添加边框线
-        // 获取段落的底层 XML 对象
-        CTP ctp = paragraph.getCTP();
-        CTPPr ppr = ctp.isSetPPr() ? ctp.getPPr() : ctp.addNewPPr();
-
-        // 确保段落边框属性存在
-        CTBorder border = ppr.isSetPBdr() ? ppr.getPBdr().getBottom() : ppr.addNewPBdr().addNewBottom();
-
-        // 设置边框样式为单实线
-        border.setVal(STBorder.SINGLE);
-        border.setSz(BigInteger.valueOf(12));
-        // 设置边框颜色为黑色
-        border.setColor("000000");
-    }
-
-    /**
-     * 创建段落并移除编号属性
-     *
-     * @param doc 文档对象
-     * @return 配置好的段落
-     */
-    private XWPFParagraph createParagraphWithoutNumbering(XWPFDocument doc) {
-        XWPFParagraph paragraph = doc.createParagraph();
-        CTPPr ppr = paragraph.getCTP().isSetPPr() ? paragraph.getCTP().getPPr() : paragraph.getCTP().addNewPPr();
-
-        // 移除numPr（编号属性）如果存在
-        if (ppr.isSetNumPr()) {
-            ppr.unsetNumPr();
-        }
-        paragraph.setIndentationFirstLine(INDENTATION_DISTANCE);
-        return paragraph;
+        DocumentUtils.addParagraphBorderLine(paragraph, null);
     }
 
     /**
@@ -333,37 +258,30 @@ class CreateRainReport {
      * @param rainReportEntity
      */
     private void createRainfallOverview(XWPFDocument doc, RainReportEntity rainReportEntity) {
-        XWPFParagraph titleParagraph = createParagraphWithoutNumbering(doc);
-
         // 标题
-        XWPFRun titleRun = titleParagraph.createRun();
-        titleRun.setText("一、降雨概况");
-        titleRun.setFontFamily(TEXT_FONT_FAMILY);
-        titleRun.setFontSize(TEXT_FONT_SIZE);
+        DocumentUtils.addRegularParagraph(doc, "一、降雨概况");
 
         // 内容
-        XWPFParagraph contentParagraph = createParagraphWithoutNumbering(doc);
-        XWPFRun contentRun = contentParagraph.createRun();
+        XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
         String content = String.format("%s，显示%s分别达到%s降水。" +
-                        "根据最新实时气象监测数据，未来降雨主要集中在%s一带，预计总降雨量达%s毫米，平均降雨量可达%s毫米，其中%s的降雨量%s毫米，达到%s级。" +
+                        "根据最新实时气象监测数据，降雨主要集中在%s一带，预计总降雨量达%s毫米，平均降雨量可达%s毫米，其中%s的降雨量%s毫米，达到%s级。" +
                         "其中达到特大暴雨的监测站点有%s，达到大暴雨\\暴雨监测站点有%s。",
                 rainReportEntity.getRainTime(),
-                list2Str(rainReportEntity.getRainAreaPosition(), null),
-                list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
+                DocumentUtils.list2Str(rainReportEntity.getRainAreaPosition(), null),
+                DocumentUtils.list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
                 rainReportEntity.getConcentratedAreaPosition(),
                 rainReportEntity.getConcentratedAreaQuantity(),
                 rainReportEntity.getConcentratedAreaAverageQuantity(),
-                list2Str(rainReportEntity.getConcentratedAreaDetailStreet(), null),
+                DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailStreet(), null),
                 rainReportEntity.getConcentratedAreaDetailQuantity(),
                 rainReportEntity.getConcentratedAreaDetailGrade(),
-                streetPlusRainfall(rainReportEntity.getExtremelyHeavyRainstormStreet(), rainReportEntity.getExtremelyHeavyRainQuantity()),
-                streetPlusRainfall(rainReportEntity.getRainstormStreet(), rainReportEntity.getRainstormQuantity())
+                DocumentUtils.streetPlusRainfall(rainReportEntity.getExtremelyHeavyRainstormStreet(), rainReportEntity.getExtremelyHeavyRainQuantity()),
+                DocumentUtils.streetPlusRainfall(rainReportEntity.getRainstormStreet(), rainReportEntity.getRainstormQuantity())
         );
 
-        contentRun.setText(content);
-        contentRun.setFontFamily(TEXT_FONT_FAMILY);
-        contentRun.setFontSize(TEXT_FONT_SIZE);
+        // 添加普通段落
+        DocumentUtils.addRegularRun(paragraph, content);
     }
 
     /**
@@ -373,44 +291,30 @@ class CreateRainReport {
      * @param rainReportEntity
      */
     private void createRiskAssessment(XWPFDocument doc, RainReportEntity rainReportEntity) {
-        XWPFParagraph titleParagraph = createParagraphWithoutNumbering(doc);
-
         // 标题
-        XWPFRun titleRun = titleParagraph.createRun();
-        titleRun.setText("二、风险评估");
-        titleRun.setFontFamily(TEXT_FONT_FAMILY);
-        titleRun.setFontSize(TEXT_FONT_SIZE);
+        DocumentUtils.addRegularParagraph(doc, "二、风险评估");
 
-        // 内容
-        XWPFParagraph contentParagraph = createParagraphWithoutNumbering(doc);
-        XWPFRun contentRun = contentParagraph.createRun();
+        // 第一段
+        XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content = String.format("受持续强降雨影响，灾害风险评估模型在%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s这些致灾因子进行评估，" +
+        String content1 = String.format("受持续强降雨影响，灾害风险评估模型在%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s这些致灾因子进行评估，" +
                         "评估得到%s%s的地质灾害风险显著上升，需高度警惕其中的%d个地质风险区和%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                 rainReportEntity.getRiskAreaQuantity(),
                 rainReportEntity.getHideAreaQuantity(),
-                list2Str(rainReportEntity.getHazards(), null),
+                DocumentUtils.list2Str(rainReportEntity.getHazards(), null),
                 rainReportEntity.getSignificantIncreaseArea(),
-                list2Str(rainReportEntity.getSignificantIncreaseAreaStreet(), null),
+                DocumentUtils.list2Str(rainReportEntity.getSignificantIncreaseAreaStreet(), null),
                 rainReportEntity.getSignificantIncreaseAreaRiskQuantity(),
                 rainReportEntity.getSignificantIncreaseAreaHideQuantity()
         );
+        DocumentUtils.addRegularRun(paragraph1, content1);
 
-        contentRun.setText(content);
-        contentRun.setFontFamily(TEXT_FONT_FAMILY);
-        contentRun.setFontSize(TEXT_FONT_SIZE);
-
-        // 滑坡、泥石流、山洪、内涝分别处理
-        for (int i = 0; i < rainReportEntity.getSecondaryDisasterReport().size(); i++) {
+        // 第二段，滑坡、泥石流、山洪、内涝分别处理
+       for (int i = 0; i < rainReportEntity.getSecondaryDisasterReport().size(); i++) {
             RainReportEntity.SecondaryDisasterReportEntity disasterReport = rainReportEntity.getSecondaryDisasterReport().get(i);
 
-            XWPFParagraph contentParagraph2 = createParagraphWithoutNumbering(doc);
-            XWPFRun contentRun2 = contentParagraph2.createRun();
-
+            XWPFParagraph paragraph2 = DocumentUtils.addRegularParagraph(doc, null);
             StringBuilder contentBuilder = new StringBuilder();
-            contentRun2.setFontFamily(TEXT_FONT_FAMILY);
-            contentRun2.setFontSize(TEXT_FONT_SIZE);
-
             if (i == 0) {
                 contentBuilder.append("测算结果根据降雨集中区域结合地形地势因素分析得出，");
             }
@@ -426,124 +330,46 @@ class CreateRainReport {
                             disasterReport.getRiskPointProbability(),
                             disasterReport.getInfluencePeopleQuantity(),
                             disasterReport.getDisasterType().getDisasterName(),
-                            list2Str(disasterReport.getSeriousArea(), null)
+                            DocumentUtils.list2Str(disasterReport.getSeriousArea(), null)
                     )
             );
-
-            contentRun2.setText(contentBuilder.toString());
+            DocumentUtils.addAnnotationRun(paragraph2, contentBuilder.toString());
 
             // 设置表格标题
-            XWPFParagraph tableTitleParagraph = doc.createParagraph();
-            tableTitleParagraph.setAlignment(ParagraphAlignment.CENTER);
-            XWPFRun tableTitleRun = tableTitleParagraph.createRun();
-
-            tableTitleRun.setText(String.format("%s灾害预测概率统计表", disasterReport.getDisasterType().getDisasterName()));
-            tableTitleRun.setFontFamily(FONT_FANG_SONG);
-            tableTitleRun.setFontSize(14);
+            XWPFParagraph tableParagraph = DocumentUtils.addRegularParagraph(doc, null);
+            XWPFRun tableRun = DocumentUtils.addRegularRun(tableParagraph,
+                    String.format("%s灾害预测概率统计表", disasterReport.getDisasterType().getDisasterName()));
+            tableParagraph.setAlignment(ParagraphAlignment.CENTER);
+            tableRun.setFontFamily(DocumentConfig.FONT_FANG_SONG_GB2312);
+            tableRun.setFontSize(DocumentConfig.FONT_SIZE_FOUR);
 
             // 生成表格
-            createSecondaryDisastersTable(doc, disasterReport,
-                    new String[]{"序号", "位置", disasterReport.getDisasterType().getDisasterName() + "发生概率", "灾害等级"});
+           List<String> headers = DocumentUtils.stringArray2List(
+                   "位置",
+                   disasterReport.getDisasterType().getDisasterName() + "发生概率",
+                   "灾害等级");
+           List<String> fieldNames = DocumentUtils.stringArray2List("position", "probability", "grade");
+            DocumentUtils.createGenericTable(doc,
+                    disasterReport.getDisasterTableData(),
+                    headers,
+                    fieldNames,
+                    true);
 
-            // 最后一部分
-            XWPFParagraph contentParagraph3 = doc.createParagraph();
-            XWPFRun contentRun3 = contentParagraph3.createRun();
-
-            contentRun3.setFontFamily(TEXT_FONT_FAMILY);
-            contentRun3.setFontSize(TEXT_FONT_SIZE);
-            contentRun3.setText(
-                    String.format(
-                            "其中，%s%s可能的特大型/大型灾害附近涉及%d个风险区（村庄），预计影响%d人，附近居民和风险影响区域居民必须撤离。" +
-                                    "%s%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
-                            disasterReport.getExtraLargeArea(),
-                            disasterReport.getExtraLargeAreaPoint(),
-                            disasterReport.getExtraLargeAreaRiskQuantity(),
-                            disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
-                            disasterReport.getSmallArea(),
-                            disasterReport.getSmallAreaPoint(),
-                            disasterReport.getSmallAreaRiskPeopleQuantity()
-                    )
+            // 第三段
+            String text = String.format(
+                    "其中，%s%s可能的特大型/大型灾害附近涉及%d个风险区（村庄），预计影响%d人，附近居民和风险影响区域居民必须撤离。" +
+                            "%s%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
+                    disasterReport.getExtraLargeArea(),
+                    disasterReport.getExtraLargeAreaPoint(),
+                    disasterReport.getExtraLargeAreaRiskQuantity(),
+                    disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
+                    disasterReport.getSmallArea(),
+                    disasterReport.getSmallAreaPoint(),
+                    disasterReport.getSmallAreaRiskPeopleQuantity()
             );
+            XWPFParagraph paragraph3 = DocumentUtils.addRegularParagraph(doc, text);
+            paragraph3.setIndentationFirstLine(0);      // 首行不缩进
         }
-    }
-
-    /**
-     * 设置表格数据
-     *
-     * @param doc
-     * @param secondaryDisasterReportEntity
-     * @param headers
-     */
-    private void createSecondaryDisastersTable(XWPFDocument doc,
-                                               RainReportEntity.SecondaryDisasterReportEntity secondaryDisasterReportEntity, String[] headers) {
-        int rows = secondaryDisasterReportEntity.getDisasterTableData().size() + 1;
-        int cols = headers.length;
-        XWPFTable table = doc.createTable(rows, cols);
-
-        // 设置表格宽度
-        table.setWidth("100%");
-
-        // 设置表头
-        XWPFTableRow headerRow = table.getRow(0);
-        headerRow.setHeight(TABLE_ROW_HEIGHT);
-
-        for (int i = 0; i < cols; i++) {
-            XWPFTableCell cell = headerRow.getCell(i);
-            if (cell == null) {
-                cell = headerRow.createCell();
-            }
-            setupTableCell(cell, headers[i], true);
-        }
-
-        // 设置表格数据行
-        for (int i = 1; i < rows; i++) {
-            XWPFTableRow bodyRow = table.getRow(i);
-            bodyRow.setHeight(TABLE_ROW_HEIGHT);
-
-            RainReportEntity.SecondaryDisasterReportEntity.SecondaryDisasterTableData rowData =
-                    secondaryDisasterReportEntity.getDisasterTableData().get(i - 1);
-
-            // 序号列
-            setupTableCell(bodyRow.getCell(0), String.valueOf(i), false);
-            // 位置列
-            setupTableCell(bodyRow.getCell(1), rowData.getPosition(), false);
-            // 概率列
-            setupTableCell(bodyRow.getCell(2), rowData.getProbability(), false);
-            // 等级列
-            setupTableCell(bodyRow.getCell(3), rowData.getGrade(), false);
-        }
-    }
-
-    /**
-     * 设置表格单元格内容
-     *
-     * @param cell 表格单元格
-     * @param text 单元格文本
-     * @param isHeader 是否为表头单元格
-     */
-    private void setupTableCell(XWPFTableCell cell, String text, boolean isHeader) {
-        cell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
-
-        // 清除单元格中的所有现有段落
-        for (int k = cell.getParagraphs().size() - 1; k >= 0; k--) {
-            cell.removeParagraph(k);
-        }
-
-        // 创建段落
-        XWPFParagraph paragraph = cell.addParagraph();
-        paragraph.setAlignment(ParagraphAlignment.CENTER);
-        paragraph.setSpacingAfter(0);
-
-        // 创建文本对象
-        XWPFRun run = paragraph.createRun();
-        run.setText(text);
-
-        if (isHeader) {
-            run.setBold(true); // 设置加粗
-        }
-
-        run.setFontFamily(FONT_FANG_SONG);
-        run.setFontSize(TABLE_FONT_SIZE);
     }
 
     /**
@@ -553,27 +379,22 @@ class CreateRainReport {
      * @param rainReportEntity
      */
     private void createEmergencyResponseSuggestions(XWPFDocument doc, RainReportEntity rainReportEntity) {
-        XWPFParagraph titleParagraph = createParagraphWithoutNumbering(doc);
-
         // 标题
-        XWPFRun titleRun = titleParagraph.createRun();
-        titleRun.setText("三、应急处置建议");
-        titleRun.setFontFamily(TEXT_FONT_FAMILY);
-        titleRun.setFontSize(TEXT_FONT_SIZE);
+        DocumentUtils.addRegularParagraph(doc, "三、应急处置建议");
 
         // 段落内容数组
         String[] contents = {
                 "防范总建议：",
                 String.format("1. %s政府要做好地质灾害防范工作安排部署，组织镇街、村组开展地质灾害隐患点、风险区巡查排查监测，必要时组织受威胁群众转移避险。",
-                        list2Str(rainReportEntity.getWorkScheduleArea(), null)),
+                        DocumentUtils.list2Str(rainReportEntity.getWorkScheduleArea(), null)),
                 "2. 资源规划部门要加强与相关部门沟通衔接，及时叫应预警区内地质灾害隐患点、风险区监测员和巡查员，督促指导有关单位做好重点区域巡查排查技术指导。",
                 "3.水务、交通、旅游等部门开展预警区内水库、公路、景区等重要基础设施周边地质灾害风险隐患巡查监测。",
                 "4.应急管理部门做好可能发生的地质灾害应急准备工作。",
                 "处置措施建议：",
                 String.format("人员疏散方面，建议优先组织%s中紧邻河道的民房、农家乐等高风险区域居民转移，此类区域靠近水体，受山洪和泥石流突发影响最为显著。" +
                                 "同时，应重点关注%s等城市内涝易发的低洼积水区域，确保上述重点区域人员能够及时、安全撤离，最大限度保障群众生命安全。",
-                        list2Str(rainReportEntity.getEvacuateTheCrowdArea(), null),
-                        list2Str(rainReportEntity.getFocusArea(), null)),
+                        DocumentUtils.list2Str(rainReportEntity.getEvacuateTheCrowdArea(), null),
+                        DocumentUtils.list2Str(rainReportEntity.getFocusArea(), null)),
                 "人员安置方面，应优先选择地势较高、远离河道且具备较好排水条件的安全区域，村内学校、村委会等公共设施也可作为临时安置点，具备一定容纳能力和生活配套条件。对于本地安置条件受限的村组，可组织跨区域转移，安排至周边安全城镇，利用当地酒店、学校等资源保障群众基本生活与应急避险需求。",
                 "救援队伍准备方面：建议提前联系消防、交通和医疗三类专业救援力量：",
                 "消防救援队准备生命探测设备、环境探测设备和破拆工具等，可以及时定位被困人员，评估现场环境。",
@@ -584,73 +405,9 @@ class CreateRainReport {
 
         // 创建所有段落
         for (String content : contents) {
-            XWPFParagraph contentParagraph = createParagraphWithoutNumbering(doc);
-            XWPFRun contentRun = contentParagraph.createRun();
-            contentRun.setText(content);
-            contentRun.setFontFamily(TEXT_FONT_FAMILY);
-            contentRun.setFontSize(TEXT_FONT_SIZE);
+            DocumentUtils.addRegularParagraph(doc, content);
         }
     }
 
-    /**
-     * List转为字符串
-     *
-     * @param list
-     * @param unit
-     * @return
-     */
-    private String list2Str(List<?> list, String unit) {
-        if (list == null || list.isEmpty()) {
-            return "";
-        }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            if (i > 0) {
-                sb.append("、");
-            }
-            Object item = list.get(i);
-            if (item != null) {
-                sb.append(item.toString());
-                if (unit != null) {
-                    sb.append(unit);
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 街道加降雨量
-     *
-     * @param street
-     * @param rain
-     * @return
-     */
-    private String streetPlusRainfall(List<?> street, List<?> rain) {
-        if (street == null || rain == null) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        int minSize = Math.min(street.size(), rain.size());
-
-        for (int i = 0; i < minSize; i++) {
-            if (i > 0) {
-                sb.append("、");
-            }
-
-            Object streetItem = street.get(i);
-            Object rainItem = rain.get(i);
-
-            if (streetItem != null) {
-                sb.append(streetItem.toString());
-            }
-
-            if (rainItem != null) {
-                sb.append("(").append(rainItem.toString()).append("毫米)");
-            }
-        }
-        return sb.toString();
-    }
 }
