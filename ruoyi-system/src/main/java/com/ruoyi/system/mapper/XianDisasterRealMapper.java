@@ -10,4 +10,5 @@ import java.util.List;
 @Mapper
 public interface XianDisasterRealMapper extends BaseMapper<XianDisasterReal> {
     List<XianDisasterReal> selectDisasterRealByDisasterId(@Param("disasterId") String disasterId, @Param("disasterTrigger") String disasterTrigger);
+    XianDisasterReal selectById(@Param("plot_id") String plotId);
 }

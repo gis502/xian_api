@@ -29,8 +29,6 @@ public class XianDisasterRealController {
 
     @PostMapping("/selectDisasterRealByDisasterId")
     public List<XianDisasterReal> selectDisasterRealByDisasterId(@RequestParam(value = "disasterId") String disasterId ,@RequestParam(value = "disasterTrigger") String disasterTrigger) {
-
-        System.out.println(xianDisasterRealMapper.selectDisasterRealByDisasterId(disasterId,disasterTrigger)+"xianDisasterRealMapper.selectDisasterRealByDisasterId(disasterId,disasterTrigger)");
         return xianDisasterRealMapper.selectDisasterRealByDisasterId(disasterId,disasterTrigger);
     }
     /**
