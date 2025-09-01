@@ -1,51 +1,73 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.XianEarthquakeListMapper">
 
-    <insert id="insertDisaster">
+    <insert id="insertDisaster" useGeneratedKeys="true" keyProperty="disasterId" keyColumn="disaster_id">
         INSERT INTO xian_earthquake_list (
-            disaster_name,
-            earthquake_full_name,
-            position,
-            geom,
-            longitude,
-            latitude,
-            depth,
-            occurrence_time,
-            eq_type,
-            source,
-            eq_addr_code,
-            town_code,
-            is_deleted,
-            magnitude,
-            create_time,
-            update_time,
-            district,
-            province,
-            city
+        disaster_name,
+        earthquake_full_name,
+        position,
+        geom,
+        longitude,
+        latitude,
+        depth,
+        occurrence_time,
+        eq_type,
+        source,
+        eq_addr_code,
+        town_code,
+        is_deleted,
+        magnitude,
+        create_time,
+        update_time,
+        district,
+        province,
+        city
         ) VALUES (
-            #{name},
-            #{fullName},
-            #{position},
-            ST_SetSRID(ST_MakePoint(#{longitude}, #{latitude}), 4326),
-            #{longitude,jdbcType=DOUBLE},
-            #{latitude,jdbcType=DOUBLE},
-            #{depth, jdbcType=VARCHAR},
-            to_timestamp(#{dateTime}, 'YYYY-MM-DD HH24:MI:SS'),
-            #{type},
-            #{source, jdbcType=VARCHAR},
-            #{countyCode, jdbcType=VARCHAR},
-            #{townshipCode, jdbcType=VARCHAR},
-            0,
-            #{magnitude, jdbcType=VARCHAR},
-            CURRENT_DATE,
-            CURRENT_DATE,
-            #{district, jdbcType=VARCHAR},
-            #{province, jdbcType=VARCHAR},
-            #{city, jdbcType=VARCHAR}
+        #{earthquake.name},
+        #{earthquake.fullName},
+        #{earthquake.position},
+        ST_SetSRID(ST_MakePoint(#{earthquake.longitude}, #{earthquake.latitude}), 4326),
+        #{earthquake.longitude,jdbcType=DOUBLE},
+        #{earthquake.latitude,jdbcType=DOUBLE},
+        #{earthquake.depth, jdbcType=VARCHAR},
+        to_timestamp(#{earthquake.dateTime}, 'YYYY-MM-DD HH24:MI:SS'),
+        #{earthquake.type},
+        #{earthquake.source, jdbcType=VARCHAR},
+        #{earthquake.countyCode, jdbcType=VARCHAR},
+        #{earthquake.townshipCode, jdbcType=VARCHAR},
+        0,
+        #{earthquake.magnitude, jdbcType=VARCHAR},
+        CURRENT_DATE,
+        CURRENT_DATE,
+        #{earthquake.district, jdbcType=VARCHAR},
+        #{earthquake.province, jdbcType=VARCHAR},
+        #{earthquake.city, jdbcType=VARCHAR}
         )
     </insert>
-</mapper>
 
+    <insert id="insertAffect">
+        INSERT INTO xian_earthquake_affect (
+            eq_id,
+            village
+        ) VALUES (
+                     #{eq_id},
+                     #{village}
+                 )
+    </insert>
+
+    <insert id="insertDamage">
+        INSERT INTO xian_earthquake_damage(
+            eq_id,
+            pop_injury,
+            pop_die
+        ) VALUES (
+                     #{eq_id},
+                     #{pop_injury},
+                     #{pop_die}
+                 )
+    </insert>
+
+</mapper>

@@ -5,6 +5,7 @@ import com.ruoyi.system.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Mapper;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,8 @@ public class AroundAnalysisController {
     private IEmergencyShelterService emergencyShelterService;
     @Resource
     private IStorePointsService storePointsService;
+    @Resource
+    private ISchoolService schoolService;
 
     @GetMapping("/getDangerousSource")
     @ApiOperation("获取全部风险源")
@@ -57,5 +60,10 @@ public class AroundAnalysisController {
         return AjaxResult.success(storePointsService.getAllStorePointsList());
     }
 
+    @GetMapping("/getSchool")
+    @ApiOperation("获取学校")
+    public AjaxResult getSchoolList(){
+        return AjaxResult.success(schoolService.getSchoolList());
+    }
 
 }
