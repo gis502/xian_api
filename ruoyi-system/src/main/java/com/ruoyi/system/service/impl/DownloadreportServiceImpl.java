@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.TypesOfSecondaryDisasters;
 import com.ruoyi.system.domain.entity.*;
@@ -22,8 +23,9 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import com.ruoyi.system.service.IModelService;
 
@@ -79,6 +81,111 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
 
         return R.ok(wordName);
+    }
+
+    @Override
+    public RainReportEntity generateRainReportEntity(Integer disasterId) {
+        Long id = Long.valueOf(disasterId);
+        RainReportEntity rainReportEntity = new RainReportEntity();
+        Map<String, String> areaCodeMap = new HashMap<>();
+        areaCodeMap.put("新城区", "610102");
+        areaCodeMap.put("碑林区", "610103");
+        areaCodeMap.put("莲湖区", "610104");
+        areaCodeMap.put("雁塔区", "610113");
+        areaCodeMap.put("灞桥区", "610111");
+        areaCodeMap.put("未央区", "610112");
+        areaCodeMap.put("阎良区", "610114");
+        areaCodeMap.put("临潼区", "610115");
+        areaCodeMap.put("长安区", "610116");
+        areaCodeMap.put("高陵区", "610117");
+        areaCodeMap.put("鄠邑区", "610118");
+        areaCodeMap.put("蓝田县", "610122");
+        areaCodeMap.put("周至县", "610124");
+
+        /* 报告时间 reportTime */
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter reportTimeFormatter = DateTimeFormatter.ofPattern("MM月dd日HH时mm分");
+        String reportTime = now.format(reportTimeFormatter);
+
+        /* 降雨时间 rainTime */
+        String rainTime = xianDisasterRainMapper.getRainTime(id);
+
+        /* 降雨区域 rainAreaPosition 处理position字符串，将逗号分隔的字符串转换为List*/
+        String position = xianDisasterRainMapper.getRainAreaPosition(id);
+        List<String> rainAreaPosition = new ArrayList<>();
+        if (position != null && !position.trim().isEmpty()) {
+            String[] areas = position.split(",");
+            for (String area : areas) {
+                rainAreaPosition.add(area.trim()); // trim()去除可能的空格
+            }
+        }
+
+        /* 区域降雨量 rainAreaQuantity */
+        String quantity = xianDisasterRainMapper.getRainAreaQuantity(id);
+        List<String> rainAreaQuantity = new ArrayList<>();
+        if (quantity != null && !quantity.trim().isEmpty()) {
+            String[] rains = quantity.split(",");
+            for (String rain : rains) {
+                rainAreaQuantity.add(rain.trim()); // trim()去除可能的空格
+            }
+        }
+
+        /* 降雨集中区域 concentratedAreaPosition */
+        String concentratedAreaPosition = "";
+        int maxIndex = -1;
+        if (!rainAreaQuantity.isEmpty()) {
+            double maxValue = Double.MIN_VALUE;
+            for (int i = 0; i < rainAreaQuantity.size(); i++) {
+                double currentValue = Double.parseDouble(rainAreaQuantity.get(i));
+                if (currentValue > maxValue) {
+                    maxValue = currentValue;
+                    maxIndex = i;
+                }
+            }
+        }
+        concentratedAreaPosition = rainAreaPosition.get(maxIndex);
+
+        /* 降雨集中区域雨量 concentratedAreaQuantity */
+        String concentratedAreaQuantity = "NaN";
+
+        /* 降雨集中区域平均雨量 concentratedAreaAverageQuantity */
+        String concentratedAreaAverageQuantity = "NaN";
+
+        /* 降雨集中区域街道 concentratedAreaDetailStreet */
+        List<String> extremelyHeavyRainstormStreet = new ArrayList<>();
+        String areaCode = areaCodeMap.get(concentratedAreaPosition);
+
+
+
+        /* 降雨集中街道雨量 concentratedAreaDetailQuantity */
+
+        /* 降雨集中街道等级  concentratedAreaDetailGrade */
+
+        /* 特大暴雨监测街道 extremelyHeavyRainstormStreet */
+
+        /* 特大暴雨监测雨量  extremelyHeavyRainQuantity */
+
+        /* 暴雨或大暴雨街道 rainstormStreet */
+
+        /* 暴雨或大暴雨雨量 rainstormQuantity */
+
+
+
+
+
+        // 设置报告时间到实体对象中
+        rainReportEntity.setReportTime(reportTime);
+        rainReportEntity.setRainTime(rainTime);
+        rainReportEntity.setRainAreaPosition(rainAreaPosition);
+        rainReportEntity.setRainAreaQuantity(rainAreaQuantity);
+        rainReportEntity.setConcentratedAreaPosition(concentratedAreaPosition);
+        rainReportEntity.setConcentratedAreaQuantity(concentratedAreaQuantity);
+        rainReportEntity.setConcentratedAreaAverageQuantity(concentratedAreaAverageQuantity);
+
+
+
+        System.out.println(JSON.toJSONString(rainReportEntity));
+        return rainReportEntity;
     }
 
     public static void main(String[] args) {
@@ -564,7 +671,7 @@ class CreateRainReport {
         // 段落内容数组
         String[] contents = {
                 "防范总建议：",
-                String.format("1. %s政府要做好地质灾害防范工作安排部署，组织镇街、村组开展地质灾害隐患点、风险区巡查排查监测，必要时组织受威胁群众转移避险。",
+                String.format("1. %s政府要做好地质灾害防范工作调配，组织镇街、村组开展地质灾害隐患点、风险区巡查排查监测，必要时组织受威胁群众转移避险。",
                         list2Str(rainReportEntity.getWorkScheduleArea(), null)),
                 "2. 资源规划部门要加强与相关部门沟通衔接，及时叫应预警区内地质灾害隐患点、风险区监测员和巡查员，督促指导有关单位做好重点区域巡查排查技术指导。",
                 "3.水务、交通、旅游等部门开展预警区内水库、公路、景区等重要基础设施周边地质灾害风险隐患巡查监测。",

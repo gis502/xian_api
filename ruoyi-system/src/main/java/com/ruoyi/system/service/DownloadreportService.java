@@ -2,6 +2,7 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.DisasterType;
+import com.ruoyi.system.domain.entity.RainReportEntity;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -14,4 +15,6 @@ public interface DownloadreportService {
     public R<String> generateRainReport(Integer disasterId) throws IOException, InvalidFormatException;
 
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException;
+
+    public RainReportEntity generateRainReportEntity(Integer disasterId);
 }

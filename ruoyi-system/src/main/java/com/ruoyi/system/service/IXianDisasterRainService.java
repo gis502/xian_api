@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IXianDisasterRainService {
     // 暴雨灾害存库
-    public void saveDisasterRain(DisasterRainDTO disasterRainDTO);
+    public Long saveDisasterRain(DisasterRainDTO disasterRainDTO);
     // 获取所有暴雨数据
     public List<DisasterRainDTO> selectAllEq();
     // 根据Id获取暴雨数据
