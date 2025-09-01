@@ -89,7 +89,11 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
     }
 
     @Override
-    public boolean insertEarthquake(EarthquakeVo earthquake) {
+    public  HashMap<String, Object> insertEarthquake(EarthquakeVo earthquake) {
+        HashMap<String, Object> earthquakeDamage = new HashMap<>();
+        Map<String, Object> Result = new HashMap<>();
+        String[] country;
+        int i = 0;
         xianEarthquakeListMapper.insertDisaster(earthquake);
         int disasterId = earthquake.getDisasterId();
         log.info("获取到的disasterid为: {}" , disasterId);
@@ -98,12 +102,12 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         List<PeopleGDP> peopleGDPS = peopleGDPMapper.findInsideCircle(earthquake.getLongitude(),earthquake.getLatitude(),earthquake.getSemiMajorAxis(),earthquake.getSemiMinorAxis(),earthquake.getRotation());
         log.info("1231231: {}", peopleGDPS);
         int count = peopleGDPS.size();
+        country = new String[count];
         if (count == 0) {
             log.warn("未查询到受影响区域数据！经纬度：({}, {}), 半长轴：{}, 半短轴：{}, 旋转角：{}",
                     earthquake.getLongitude(), earthquake.getLatitude(),
                     earthquake.getSemiMajorAxis(), earthquake.getSemiMinorAxis(),
                     earthquake.getRotation());
-            return false;
         }
 
         // 计算sumGdp和sumPeopleNum（仅当有数据时）
@@ -113,12 +117,18 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
             Integer peopleNum = peopleGDP.getPeopleNum();
             if (peopleNum != null) sumPeopleNum += peopleNum;
             xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getCountry());
-//            System.out.println(peopleGDP.getVillages());
+            country[i]=peopleGDP.getCountry();
+            i++;
         }
 
         // 计算伤亡人数
-        calculateCasualties(earthquake, sumGdp, sumPeopleNum, count);
-        return true;
+        Result = calculateCasualties(earthquake, sumGdp, sumPeopleNum, count);
+        earthquakeDamage.put("sumGdp", sumGdp);
+        earthquakeDamage.put("country", country);
+        earthquakeDamage.put("affectPop", Result.get("affectPop"));
+        earthquakeDamage.put("diePop", Result.get("diePop"));
+        earthquakeDamage.put("densityPop", Result.get("densityPop"));
+        return earthquakeDamage;
     }
     /**
      * 计算伤亡人数
@@ -126,7 +136,8 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
      *      − 8.963×10⁻¹⋅z − 3.175×10⁻³⋅ns + 1.148×10⁻⁶⋅ns² − 2.914×10⁻²⋅cs + 6.502×10⁻⁵⋅cs²
      *      + 2.772×10⁻³⋅GDP − 4.768×10⁻⁷⋅GDP² + 9.801×10⁻¹⋅T + 3.910×10⁻⁴⋅s + 9.414×10⁻⁵⋅x⋅GDP)
      */
-    private void calculateCasualties(EarthquakeVo earthquake, float sumGdp, int sumPeopleNum, int count) {
+    private Map<String, Object> calculateCasualties(EarthquakeVo earthquake, float sumGdp, int sumPeopleNum, int count) {
+        Map<String, Object> DamageResult = new HashMap<>();
         // 1. 基础参数（保持合理放缩）
         double x = earthquake.getMagnitude(); // 震级（如7.0）
         int T = getDayOrNight(earthquake.getDateTime()); // 夜间=1，白天=0
@@ -178,7 +189,11 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
 //        log.info("优化后指数exponent：{}", exponent);
         log.info("受伤人数：{}，最大可能死亡人数：{}）",
                 sumPeopleNum, maxPossible);
+        DamageResult.put("affectPop",sumPeopleNum);
+        DamageResult.put("diePop",maxPossible);
+        DamageResult.put("densityPop", s);
         xianEarthquakeListMapper.insertDamage(earthquake.getDisasterId(),sumPeopleNum,maxPossible);
+        return DamageResult;
     }
     /**
      * 判断地震发生在白天还是夜间
