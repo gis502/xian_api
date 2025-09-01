@@ -41,26 +41,7 @@ public class GraphController {
                 .all());
     }
 
-//    @GetMapping("/getGraphBy")
-//    public List getGraphBy(@RequestParam("eqid") String eqid) {
-//        // 查询特定 eqId 的最大知识图谱
-//        String query = "MATCH (n {eqid: '" +eqid+ "'})-[r]->(m) RETURN n, r, m";
-//
-//        return new ArrayList<>(neo4jClient.query(query)
-//                .fetchAs(Map.class)
-//                .mappedBy((typeSystem, record) -> {
-//                    Map<String, Object> result = new HashMap<>();
-//                    result.put("source", record.get("n").asNode().asMap());
-//                    Relationship rel = record.get("r").asRelationship();
-//                    Map<String, Object> relMap = new HashMap<>(rel.asMap());
-//                    relMap.put("type", rel.type());
-//                    result.put("target", record.get("m").asNode().asMap());
-//                    result.put("value", relMap);
-//                    return result;
-//                })
-//                .all());
-//
-//    }
+
 
     @GetMapping("/getGraphBy")
     public List getGraphBy(
@@ -71,11 +52,32 @@ public class GraphController {
         // 构建基础查询
         String query = "";
         // 你也可以根据 disasterType 修改 query，比如只查 earthquake 类型的图谱：
-        if ("earthquake".equals(disasterType)) {
-            query = "MATCH (n{earthquakeDisasterId: '" + eqid + "'})-[r]->(m) RETURN n, r, m";
-        } else if ("rain".equals(disasterType)) {
-            query = "MATCH (n{rainDisasterId: '" + eqid + "'})-[r]->(m) RETURN n, r, m";
+        // 建立灾害类型与对应ID字段的映射
+        Map<String, String> fieldMap = new HashMap<>();
+        fieldMap.put("earthquake", "earthquakeDisasterId");
+        fieldMap.put("rain", "rainDisasterId");
+        fieldMap.put("snow", "snowDisasterId");
+        fieldMap.put("coldDamage", "coldDamageDisasterId");
+        fieldMap.put("collapse", "collapseDisasterId");
+        fieldMap.put("landslide", "landslideDisasterId");
+        fieldMap.put("debrisFlow", "debrisFlowDisasterId");
+        fieldMap.put("galeHail", "galeHailDisasterId");
+        fieldMap.put("sandstorm", "sandstormDisasterId");
+        fieldMap.put("drought", "droughtDisasterId");
+        fieldMap.put("heatwave", "heatwaveDisasterId");
+        fieldMap.put("wildfire", "wildfireDisasterId");
+        fieldMap.put("bioDisaster", "bioDisasterId");
+        fieldMap.put("safetyAccident", "safetyAccidentDisasterId");
+
+        // 获取对应字段名，默认为空
+        String idField = fieldMap.get(disasterType);
+        if (idField != null) {
+            query = String.format("MATCH (n{%s: '%s'})-[r]->(m) RETURN n, r, m", idField, eqid);
+        } else {
+            // 处理不支持的灾害类型，可根据需求返回空列表或抛出异常
+            query = "";
         }
+
         return new ArrayList<>(neo4jClient.query(query)
                 .fetchAs(Map.class)
                 .mappedBy((typeSystem, record) -> {
