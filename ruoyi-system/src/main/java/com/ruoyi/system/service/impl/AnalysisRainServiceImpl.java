@@ -28,7 +28,10 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
 
     @Override
     public HashMap<String, List> getRainPreHours() {
-        List<AnalysisRain> rainph = analysisRainMapper.selectList(null);
+        List<String> adminCodes = Arrays.asList("610111", "610116", "610117", "610118", "610122", "610115", "610112", "610102", "610114", "610124");
+        List<AnalysisRain> rainph = analysisRainMapper.selectList(
+                new QueryWrapper<AnalysisRain>().in("admin_code_chn", adminCodes)
+        );
         Map<String, List> rainMap = processRain(rainph);
 
         return (HashMap<String, List>) rainMap;
@@ -38,11 +41,33 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
         if (rain == null || rain.isEmpty()) {
             return null;
         }
+
         // 按监测站分组，并计算每个站12小时降雨量
         Map<String, Double> station12HourRain = calculate12HourRainfall(rain);
+
+        // 按admin_code分组，找出每个行政区中降雨量最大的监测站
+        Map<String, AnalysisRain> maxRainByAdminCode = new HashMap<>();
+        Map<String, Double> maxRainfallByAdminCode = new HashMap<>();
+
+        for (AnalysisRain rainph : rain) {
+            String adminCode = rainph.getAdminCode();
+            String stationKey = rainph.getStationName();
+            double currentRainfall = station12HourRain.getOrDefault(stationKey, 0.0);
+
+            // 如果当前行政区还没有数据，或者当前降雨量更大，则更新
+            if (!maxRainfallByAdminCode.containsKey(adminCode) ||
+                    currentRainfall > maxRainfallByAdminCode.get(adminCode)) {
+                maxRainfallByAdminCode.put(adminCode, currentRainfall);
+                maxRainByAdminCode.put(adminCode, rainph);
+            }
+        }
+
         List lists = new ArrayList();
         Map<String, List> features = new HashMap<>();
-        for (AnalysisRain rainph : rain) {
+
+        // 只处理每个行政区降雨量最大的监测站
+        for (String adminCode : maxRainByAdminCode.keySet()) {
+            AnalysisRain rainph = maxRainByAdminCode.get(adminCode);
             Map<String, Object> feature = new HashMap<>();
 
             Map<String, Object> properties = new HashMap<>();
@@ -51,7 +76,8 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
             properties.put("rainPreHours", rainph.getRain1H());
             properties.put("relativeHumidity", rainph.getRelativeHumidity());
             properties.put("temperature", rainph.getTemperature());
-            // 新增12小时降雨量字段，保持原有结构不变
+
+            // 使用该行政区最大降雨量
             String stationKey = rainph.getStationName();
             double rain12Hours = station12HourRain.getOrDefault(stationKey, 0.0);
             properties.put("rainPre12Hours", rain12Hours);
