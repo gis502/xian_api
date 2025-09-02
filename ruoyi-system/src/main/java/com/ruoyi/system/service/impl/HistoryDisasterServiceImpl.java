@@ -20,8 +20,8 @@ public class HistoryDisasterServiceImpl implements IHistoryDisasterService {
     private HistoryDisasterMapper historyDisasterMapper;
 
     @Override
-    public HashMap<String, List> getHistoryDisasterList() {
-        List<HistoryDisaster> historyDisasterList = historyDisasterMapper.selectList(new QueryWrapper<HistoryDisaster>().eq("disaster_events","2023年8月西安喂子坪村山洪"));
+    public HashMap<String, List> getHistoryDisasterList(String regionName) {
+        List<HistoryDisaster> historyDisasterList = historyDisasterMapper.selectList(new QueryWrapper<HistoryDisaster>().eq("regional_name", regionName));
         Map<String, List> historyDisasterMap = processDangerous(historyDisasterList);
         return (HashMap<String, List>) historyDisasterMap;
     }
