@@ -1,7 +1,9 @@
 package com.ruoyi.web.controller.api;
 
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.domain.dto.RainTriggerDTO;
 import com.ruoyi.system.domain.dto.TriggerDTO;
+import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.params.ThematicQuery;
 import com.ruoyi.system.service.IFeignService;
 import io.swagger.annotations.Api;
@@ -20,27 +22,37 @@ import javax.annotation.Resource;
 @RequestMapping("/feign")
 public class FeignController {
 
-
     @Resource
     private IFeignService feignService;
-
 
     @ApiOperation(value = "地震触发")
     @PostMapping("/eq/trigger")
     public AjaxResult trigger(@RequestBody TriggerDTO triggerDTO) {
-        ThematicQuery triggered = feignService.trigger(triggerDTO);
-        return AjaxResult.success(triggered);
+        return AjaxResult.success(feignService.trigger(triggerDTO));
     }
 
-    @ApiOperation(value = "专题图件产出")
+    @ApiOperation(value = "地震专题图件产出")
     @GetMapping("/thematic/map")
     public AjaxResult thematicMap(@RequestBody ThematicQuery query) {
         return AjaxResult.success(feignService.thematicMap(query));
     }
 
-    @ApiOperation(value = "灾情报告产出")
+    @ApiOperation(value = "地震灾情报告产出")
     @GetMapping("/disaster/report")
     public AjaxResult disasterReport(@RequestBody ThematicQuery query) {
         return AjaxResult.success(feignService.disasterReport(query));
     }
+
+    @ApiOperation(value = "暴雨触发")
+    @PostMapping("/rain/trigger")
+    public AjaxResult trigger(@RequestBody RainTriggerDTO triggerDTO) {
+        return AjaxResult.success(feignService.trigger(triggerDTO));
+    }
+
+    @ApiOperation(value = "暴雨专题图件产出")
+    @GetMapping("/rain/map")
+    public AjaxResult thematicMap(@RequestBody RainQuery query) {
+        return AjaxResult.success(feignService.thematicMap(query));
+    }
+
 }
