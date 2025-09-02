@@ -27,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -119,6 +120,7 @@ public class FeignServiceImpl implements IFeignService {
             QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
             wrapper.eq("eq_id", query.getEqId());
             wrapper.eq("eqqueue_id", query.getEqqueueId());
+            wrapper.eq("type", 1);
             wrapper.eq("is_deleted", 0);
 
             List<AssessmentOutput> outputs = slaveAssessmentOutputMapper.selectList(wrapper);
@@ -134,9 +136,7 @@ public class FeignServiceImpl implements IFeignService {
                 BeanUtils.copyProperties(output, outputDTO);
                 outputsDTO.add(outputDTO);
             }
-
             return outputsDTO;
-
         } catch (Exception e) {
             log.error("获取专题图数据失败：{}", e.getMessage());
             e.printStackTrace();
@@ -145,10 +145,35 @@ public class FeignServiceImpl implements IFeignService {
         throw new ParamsException(XianConstants.RESULT_EMPTY);
     }
 
-    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
-    // TODO 灾情报告产出
+    @DataSource(value = DataSourceType.SLAVE)
     @Override
-    public List<OutputDTO> disasterReport(ThematicQuery query) {
-        return null;
+    public List<OutputDTO> downloadReport(ThematicQuery query){
+        try {
+            QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
+            wrapper.eq("eq_id", query.getEqId());
+            wrapper.eq("eqqueue_id", query.getEqqueueId());
+            wrapper.eq("type", 2);
+            wrapper.eq("is_deleted", 0);
+
+            List<AssessmentOutput> outputs = slaveAssessmentOutputMapper.selectList(wrapper);
+
+            // 抛异常
+            if (outputs == null || outputs.size() == 0) {
+                throw new ParamsException(XianConstants.RESULT_EMPTY);
+            }
+
+            List<OutputDTO> outputsDTO = new ArrayList<>();
+            for (AssessmentOutput output : outputs) {
+                OutputDTO outputDTO = new OutputDTO();
+                BeanUtils.copyProperties(output, outputDTO);
+                outputsDTO.add(outputDTO);
+            }
+            return outputsDTO;
+        } catch (Exception e) {
+            log.error("获取报告失败：{}", e.getMessage());
+            e.printStackTrace();
+        }
+
+        throw new ParamsException(XianConstants.RESULT_EMPTY);
     }
 }

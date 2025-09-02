@@ -38,9 +38,9 @@ public class FeignController {
         return AjaxResult.success(feignService.thematicMap(query));
     }
 
-    @ApiOperation(value = "灾情报告产出")
-    @GetMapping("/disaster/report")
-    public AjaxResult disasterReport(@RequestBody ThematicQuery query) {
-        return AjaxResult.success(feignService.disasterReport(query));
+    @ApiOperation(value = "灾情报告下载")
+    @GetMapping("/download/report")
+    public AjaxResult downloadReport(@RequestBody ThematicQuery query) {
+        return AjaxResult.success(feignService.downloadReport(query));
     }
 }
