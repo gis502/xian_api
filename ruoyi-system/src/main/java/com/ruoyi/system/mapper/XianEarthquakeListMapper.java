@@ -20,4 +20,7 @@ public interface XianEarthquakeListMapper extends BaseMapper<XianEarthquakeList>
 
     /**插入地震造成损失信息*/
     boolean insertDamage(@Param("eq_id") int eq_id,@Param("pop_injury") int pop_injury,@Param("pop_die") int pop_die);
+
+    /**插入地震造成损失范围信息*/
+    boolean insertDamageRange(@Param("eq_id") int eq_id,@Param("affectPopRange") String affectPopRange,@Param("diePopRange") String diePopRange);
 }
