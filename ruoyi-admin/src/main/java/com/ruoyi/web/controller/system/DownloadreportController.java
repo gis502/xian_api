@@ -29,15 +29,9 @@ public class DownloadreportController {
     @Resource
     private DownloadreportService downloadreportService;
 
-    @PostMapping("/saveCanvas")
-    public R<String> saveCanvas(@RequestParam("file") MultipartFile file) throws IOException {
-//        log.info(">>> 收到文件：{}，大小：{}", file.getOriginalFilename(), file.getSize());
-        return downloadreportService.saveCanvas(file);
-    }
-
     @PostMapping("/generateRainReport")
-    public R<String> generateRainReport(@RequestParam String imgUrl) throws IOException, InvalidFormatException{
-        return downloadreportService.generateRainReport(imgUrl);
+    public R<String> generateRainReport(@RequestParam Integer disasterId) throws IOException, InvalidFormatException{
+        return downloadreportService.generateRainReport(disasterId);
     }
     @GetMapping("/file/{fileName}")
     @CrossOrigin(origins = "*")

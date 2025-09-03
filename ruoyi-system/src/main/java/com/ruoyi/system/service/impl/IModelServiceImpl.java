@@ -241,6 +241,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
                     .map(factor -> (String) factor.getFactorValue())
                     .findFirst()
                     .orElse(null));
+
             double slope = Double.parseDouble(factorList.get(i).getFactorVoList().stream()
                     .filter(factor -> "坡度".equals(factor.getAttributeName()))
                     .map(factor -> (String) factor.getFactorValue())
@@ -307,7 +308,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
             ModelGetDataDTO modelGetDataDTO = getGeologicalDisasterHideByLandSlideById(hideId,factorAnalysisLevelProbability,factorVO);
             modelGetDataDTO.setEntityId(entityId);
             list.add(modelGetDataDTO);
-            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
+//            insertFactorAnalysis(modelGetDataDTO.getFactorVoList(),modelGetDataDTO.getPredict());
         }
         return list;
     }

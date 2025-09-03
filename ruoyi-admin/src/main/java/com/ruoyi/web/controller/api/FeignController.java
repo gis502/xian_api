@@ -32,7 +32,7 @@ public class FeignController {
     }
 
     @ApiOperation(value = "地震专题图件产出")
-    @GetMapping("/thematic/map")
+    @PostMapping("/thematic/map")
     public AjaxResult thematicMap(@RequestBody ThematicQuery query) {
         return AjaxResult.success(feignService.thematicMap(query));
     }

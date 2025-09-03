@@ -27,7 +27,13 @@ import com.ruoyi.system.mapper.SlaveRainAssessmentOutputMapper;
 import com.ruoyi.system.service.IFeignService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,12 +75,36 @@ public class FeignServiceImpl implements IFeignService {
                 throw new ParamsException(XianConstants.AUTH_ERROR);
             }
             // 设置请求体
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("eqName", triggerDTO.getEqName());
+            requestBody.put("eqAddr", triggerDTO.getEqAddr());
+            requestBody.put("eqTime", triggerDTO.getEqTime());
+            requestBody.put("longitude", triggerDTO.getLongitude());
+            requestBody.put("latitude", triggerDTO.getLatitude());
+            requestBody.put("eqDepth", triggerDTO.getEqDepth());
+            requestBody.put("magnitude", triggerDTO.getMagnitude());
+            requestBody.put("eqType", triggerDTO.getEqType());
+            requestBody.put("faultZone", triggerDTO.getFaultZone());
+            requestBody.put("circleArea", triggerDTO.getCircleArea());
+            requestBody.put("rotation", triggerDTO.getRotation());
+            requestBody.put("semiMajorAxis", triggerDTO.getSemiMajorAxis());
+            requestBody.put("semiMinorAxis", triggerDTO.getSemiMinorAxis());
+            requestBody.put("affectPop", triggerDTO.getAffectPop());
+            requestBody.put("diePop", triggerDTO.getDiePop());
+            requestBody.put("densityPop", triggerDTO.getDensityPop());
+            requestBody.put("country", triggerDTO.getCountry());
+            requestBody.put("intensity", triggerDTO.getIntensity());
+            requestBody.put("sumGdp", triggerDTO.getSumGdp());
+
+
+
+            ParameterizedTypeReference<GeneralVO> triggerType = new ParameterizedTypeReference<GeneralVO>() {
             JSONObject requestBody = buildEqRequestBody(triggerDTO);
             ParameterizedTypeReference<EqGeneralVO> triggerType = new ParameterizedTypeReference<EqGeneralVO>() {
             };
             // 触发地震接口
-            EqGeneralVO eqGeneralVO = httpRestClient.post(XianConstants.TRIGGER_EARTHQUAKE_URL, tokenVO.getToken(), requestBody, triggerType);
-            if (!eqGeneralVO.getCode().equals(HttpStatus.SUCCESS)) {
+            GeneralVO generalVO = httpRestClient.post(XianConstants.TRIGGER_EARTHQUAKE_URL, tokenVO.getToken(), requestBody, triggerType);
+            if (!generalVO.getCode().equals(HttpStatus.SUCCESS)) {
                 throw new ParamsException(XianConstants.RESULT_EMPTY);
             }
             log.info("地震参数已导入模型，开始评估...");
