@@ -23,8 +23,8 @@ public class AssociationAnalysisController {
 
     @GetMapping("/getHistoryDisaster")
     @ApiOperation("获取历史灾害数据")
-    public AjaxResult getHistoryDisasterList(){
-        return AjaxResult.success(historyDisasterService.getHistoryDisasterList());
+    public AjaxResult getHistoryDisasterList(@RequestParam String regionName){
+        return AjaxResult.success(historyDisasterService.getHistoryDisasterList(regionName.isEmpty()?"长安区" : regionName));
     }
 
     @GetMapping("/getRainPH")

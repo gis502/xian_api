@@ -13,7 +13,7 @@ public interface IFeignService {
 
     public List<OutputDTO> thematicMap(ThematicQuery query);
 
-    public List<OutputDTO> disasterReport(ThematicQuery query);
+    public List<OutputDTO> downloadReport(ThematicQuery query);
 
 
 }
