@@ -39,7 +39,7 @@ public class FeignController {
     }
 
     @ApiOperation(value = "灾情报告下载")
-    @GetMapping("/download/report")
+    @PostMapping("/download/report")
     public AjaxResult downloadReport(@RequestBody ThematicQuery query) {
         return AjaxResult.success(feignService.downloadReport(query));
     }
