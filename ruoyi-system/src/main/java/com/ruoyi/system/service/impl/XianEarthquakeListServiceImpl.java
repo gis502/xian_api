@@ -92,7 +92,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
     public  HashMap<String, Object> insertEarthquake(EarthquakeVo earthquake) {
         HashMap<String, Object> earthquakeDamage = new HashMap<>();
         Map<String, Object> Result = new HashMap<>();
-        List<String> addressList = new ArrayList<>();
+//        List<String> addressList = new ArrayList<>();
         int i = 0;
         xianEarthquakeListMapper.insertDisaster(earthquake);
         int disasterId = earthquake.getDisasterId();
@@ -115,26 +115,34 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
             if (gdp != null) sumGdp += gdp;
             Integer peopleNum = peopleGDP.getPeopleNum();
             if (peopleNum != null) sumPeopleNum += peopleNum;
-            xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getCountry());
-            // 拼接地址信息（处理可能的null值）
-            String province = peopleGDP.getProvince() != null ? peopleGDP.getProvince() : "";
-            String city = peopleGDP.getCity() != null ? peopleGDP.getCity() : "";
-            String county = peopleGDP.getCounty() != null ? peopleGDP.getCounty() : "";
-            String country = peopleGDP.getCountry() != null ? peopleGDP.getCountry() : "";
+//            xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getCountry());
+//            // 拼接地址信息（处理可能的null值）
+//            String province = peopleGDP.getProvince() != null ? peopleGDP.getProvince() : "";
+//            String city = peopleGDP.getCity() != null ? peopleGDP.getCity() : "";
+//            String county = peopleGDP.getCounty() != null ? peopleGDP.getCounty() : "";
+//            String country = peopleGDP.getCountry() != null ? peopleGDP.getCountry() : "";
 
             // 拼接成完整地址，例如"陕西省-西安市-临潼区-仁宗街道"
-            String fullAddress = String.join("", province, city, county, country);
-            addressList.add(fullAddress);
+//            String fullAddress = String.join("", province, city, county, country);
+//            addressList.add(fullAddress);
         }
         // 将列表转换为数组
-
+        // 对sumPeopleNum进行精度调整
+        int adjustedSumPeopleNum = sumPeopleNum;
+        if (sumPeopleNum >= 100) {
+            adjustedSumPeopleNum = (sumPeopleNum / 100) * 100;
+        } else if (sumPeopleNum >= 10) {
+            adjustedSumPeopleNum = (sumPeopleNum / 10) * 10;
+        }
         // 计算伤亡人数
-        Result = calculateCasualties(earthquake, sumGdp, sumPeopleNum, count);
-        earthquakeDamage.put("sumGdp", sumGdp);
-        earthquakeDamage.put("country", addressList);
-        earthquakeDamage.put("affectPop", Result.get("affectPop"));
-        earthquakeDamage.put("diePop", Result.get("diePop"));
-        earthquakeDamage.put("densityPop", Result.get("densityPop"));
+        Result = calculateCasualties(earthquake, sumGdp, adjustedSumPeopleNum, count);
+//        earthquakeDamage.put("sumGdp", sumGdp);
+//        earthquakeDamage.put("country", addressList);
+
+        earthquakeDamage.put("affectPopMin", Result.get("affectPopMin"));
+        earthquakeDamage.put("affectPopMax", Result.get("affectPopMax"));
+        earthquakeDamage.put("diePopMin", Result.get("diePopMin"));
+        earthquakeDamage.put("diePopMax", Result.get("diePopMax"));
         log.info("45645687: {}", earthquakeDamage);
         return earthquakeDamage;
     }
@@ -145,7 +153,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
      *      + 2.772×10⁻³⋅GDP − 4.768×10⁻⁷⋅GDP² + 9.801×10⁻¹⋅T + 3.910×10⁻⁴⋅s + 9.414×10⁻⁵⋅x⋅GDP)
      */
     private Map<String, Object> calculateCasualties(EarthquakeVo earthquake, float sumGdp, int sumPeopleNum, int count) {
-        Map<String, Object> DamageResult = new HashMap<>();
+        Map<String, Object> damageResult = new HashMap<>();
         // 1. 基础参数（保持合理放缩）
         double x = earthquake.getMagnitude(); // 震级（如7.0）
         int T = getDayOrNight(earthquake.getDateTime()); // 夜间=1，白天=0
@@ -185,23 +193,81 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         double maxExponent = 12; // exp(12)≈162755，覆盖最大可能伤亡
         double minExponent = -5; // exp(-5)≈0.0067，确保至少有1人（当人口>150时）
         exponent = Math.max(Math.min(exponent, maxExponent), minExponent);
+        if (x >= 7.0){
+            // 4. 计算伤亡人数（结合人口总数限制）
+            double casualties = Math.exp(exponent);
+            // 限制伤亡人数不超过受影响人口的30%（参考7级地震一般伤亡比例）
+            int maxPossible = (int) (sumPeopleNum * 0.05);
+            maxPossible = Math.max(maxPossible, 1); // 至少1人（强震不可能0伤亡）
+            casualties = Math.min(casualties, maxPossible);
+            casualties = Math.round(casualties);
 
-        // 4. 计算伤亡人数（结合人口总数限制）
-        double casualties = Math.exp(exponent);
-        // 限制伤亡人数不超过受影响人口的30%（参考7级地震一般伤亡比例）
-        int maxPossible = (int) (sumPeopleNum * 0.3);
-        maxPossible = Math.max(maxPossible, 1); // 至少1人（强震不可能0伤亡）
-        casualties = Math.min(casualties, maxPossible);
-        casualties = Math.round(casualties);
+            // 计算受影响人口范围并按要求格式化
+            int affectPopMinRaw = (int) Math.round(sumPeopleNum * 0.6);
+            int affectPopMaxRaw = (int) Math.round(sumPeopleNum * 1.2);
+            int affectPopMin = roundByDigit(affectPopMinRaw);
+            int affectPopMax = roundByDigit(affectPopMaxRaw);
 
-//        log.info("优化后指数exponent：{}", exponent);
-        log.info("受伤人数：{}，最大可能死亡人数：{}）",
-                sumPeopleNum, maxPossible);
-        DamageResult.put("affectPop",sumPeopleNum);
-        DamageResult.put("diePop",maxPossible);
-        DamageResult.put("densityPop", s);
-        xianEarthquakeListMapper.insertDamage(earthquake.getDisasterId(),sumPeopleNum,maxPossible);
-        return DamageResult;
+            // 确保最小值不为负
+            affectPopMin = Math.max(affectPopMin, 0);
+
+            // 计算死亡人口范围并按要求格式化
+            int diePopMinRaw = (int) Math.round(maxPossible * 0.6);
+            int diePopMaxRaw = (int) Math.round(maxPossible * 1.2);
+            int diePopMin = roundByDigit(diePopMinRaw);
+            int diePopMax = roundByDigit(diePopMaxRaw);
+
+            String affectPopRange = affectPopMin + "-" + affectPopMax;
+            String diePopRange = diePopMin + "-" + diePopMax;
+
+            log.info("受影响人口范围：{} - {}，伤亡人口范围：{} - {}",
+                    affectPopMin, affectPopMax, diePopMin, diePopMax);
+            damageResult.put("affectPopMin", affectPopMin);
+            damageResult.put("affectPopMax", affectPopMax);
+            damageResult.put("diePopMin", diePopMin);
+            damageResult.put("diePopMax", diePopMax);
+
+            xianEarthquakeListMapper.insertDamage(
+                    earthquake.getDisasterId(),
+                    sumPeopleNum,
+                    maxPossible
+            );
+            xianEarthquakeListMapper.insertDamageRange(
+                    earthquake.getDisasterId(),
+                    affectPopRange,  // 受影响人口范围字符串
+                    diePopRange      // 死亡人口范围字符串
+            );
+        }else {
+            int affectPopMinRaw = (int) Math.round(sumPeopleNum * 0.6);
+            int affectPopMaxRaw = (int) Math.round(sumPeopleNum * 1.2);
+            int affectPopMin = roundByDigit(affectPopMinRaw);
+            int affectPopMax = roundByDigit(affectPopMaxRaw);
+            damageResult.put("affectPopMin", affectPopMin);
+            damageResult.put("affectPopMax", affectPopMax);
+            damageResult.put("diePopMin", 0);
+            damageResult.put("diePopMax", 0);
+        }
+
+        return damageResult;
+    }
+
+    /**
+     * 根据数值位数进行四舍五入：
+     * - 个位数（0-9）：不修改
+     * - 十位数（10-99）：精确到十位
+     * - 百位数及以上：精确到百位
+     */
+    private int roundByDigit(int number) {
+        if (number < 10) {
+            // 个位数：不修改
+            return number;
+        } else if (number < 100) {
+            // 十位数：精确到十位
+            return (int) Math.round(number / 10.0) * 10;
+        } else {
+            // 百位数及以上：精确到百位
+            return (int) Math.round(number / 100.0) * 100;
+        }
     }
     /**
      * 判断地震发生在白天还是夜间

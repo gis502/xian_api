@@ -22,7 +22,6 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
     public HashMap<String, List> getAdminCodeRain(int adminCode) {
         List<AnalysisRain> rainList = analysisRainMapper.selectList(new QueryWrapper<AnalysisRain>().eq("admin_code_chn",adminCode));
         Map<String, List> rainMap = processRain(rainList);
-
         return (HashMap<String, List>) rainMap;
     }
 
@@ -33,7 +32,6 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
                 new QueryWrapper<AnalysisRain>().in("admin_code_chn", adminCodes)
         );
         Map<String, List> rainMap = processRain(rainph);
-
         return (HashMap<String, List>) rainMap;
     }
     //处理数据
@@ -41,14 +39,11 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
         if (rain == null || rain.isEmpty()) {
             return null;
         }
-
         // 按监测站分组，并计算每个站12小时降雨量
         Map<String, Double> station12HourRain = calculate12HourRainfall(rain);
-
         // 按admin_code分组，找出每个行政区中降雨量最大的监测站
         Map<String, AnalysisRain> maxRainByAdminCode = new HashMap<>();
         Map<String, Double> maxRainfallByAdminCode = new HashMap<>();
-
         for (AnalysisRain rainph : rain) {
             String adminCode = rainph.getAdminCodeChn();
             String stationKey = rainph.getStationName();

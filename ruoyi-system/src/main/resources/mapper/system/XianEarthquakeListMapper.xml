@@ -70,4 +70,16 @@
                  )
     </insert>
 
+    <insert id="insertDamageRange">
+        INSERT INTO xian_earthquake_damagerange(
+            eq_id,
+            affectPopRange,
+            diePopRange
+        ) VALUES (
+                     #{eq_id},
+                     #{affectPopRange},
+                     #{diePopRange}
+                 )
+    </insert>
+
 </mapper>
