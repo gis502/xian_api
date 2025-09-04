@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.domain.dto.EqDTO;
+import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
 import io.lettuce.core.dynamic.annotation.Param;
 
@@ -9,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface IXianEarthquakeListService {
+public interface IXianEarthquakeListService extends IService<XianEarthquakeList> {
 
     // 获取所有地震事件
     List<EqDTO> selectAllEq();

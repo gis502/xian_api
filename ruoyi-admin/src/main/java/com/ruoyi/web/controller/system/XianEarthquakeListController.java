@@ -1,6 +1,8 @@
 package com.ruoyi.web.controller.system;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.dto.EqDTO;
 import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
@@ -30,6 +32,27 @@ public class XianEarthquakeListController {
     @PostMapping("/getEarthquakeEventById")
     public AjaxResult getEarthquakeEventById(@RequestParam(value = "id") Long Id) {
         return AjaxResult.success(eqListService.getEarthquakeEventById(Id));
+    }
+    @GetMapping("/getEarthquakeListByKey")
+    public List<XianEarthquakeList> getEarthquakeListByKey(@RequestParam(value = "queryValue", required = false) String queryValue) {
+        System.out.println(queryValue);
+        LambdaQueryWrapper<XianEarthquakeList> queryWrapper = new LambdaQueryWrapper<>();
+        // 全局条件
+        queryWrapper.eq(XianEarthquakeList::getIsDeleted, 0);
+
+        // 模糊搜索条件封装到嵌套语句中，避免 or 冲掉 eq 条件
+        if (StringUtils.isNotBlank(queryValue)) {
+            queryWrapper.and(w -> w
+                    .like(XianEarthquakeList::getDisasterName, queryValue)
+                    .or().like(XianEarthquakeList::getEarthquakeFullName, queryValue)
+                    .or().like(XianEarthquakeList::getPosition, queryValue)
+                    .or().apply("ST_AsText(geom) LIKE {0}", "%" + queryValue + "%")
+                    .or().apply("to_char(occurrence_time, 'YYYY-MM-DD HH24:MI:SS') LIKE {0}", "%" + queryValue + "%")
+            );
+        }
+
+        queryWrapper.orderByDesc(XianEarthquakeList::getOccurrenceTime);
+        return eqListService.list(queryWrapper);
     }
 
     @PostMapping("/disaster/add")
