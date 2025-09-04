@@ -9,6 +9,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * @author: xiaodemos
@@ -38,9 +41,10 @@ public class FeignController {
         return AjaxResult.success(feignService.thematicMap(query));
     }
 
-    @ApiOperation(value = "灾情报告产出")
-    @GetMapping("/disaster/report")
-    public AjaxResult disasterReport(@RequestBody ThematicQuery query) {
-        return AjaxResult.success(feignService.disasterReport(query));
+    @ApiOperation(value = "灾情报告下载")
+    @CrossOrigin(origins = "*")
+    @GetMapping("/download/{eqId}/{eqqueueId}")
+    public void getReport(@PathVariable String eqId, @PathVariable String eqqueueId, HttpServletResponse resp) throws IOException {
+        feignService.downloadReport(eqId, eqqueueId, resp);
     }
 }

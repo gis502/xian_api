@@ -5,6 +5,8 @@ import com.ruoyi.system.domain.dto.OutputDTO;
 import com.ruoyi.system.domain.dto.TriggerDTO;
 import com.ruoyi.system.domain.params.ThematicQuery;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 public interface IFeignService {
@@ -13,7 +15,5 @@ public interface IFeignService {
 
     public List<OutputDTO> thematicMap(ThematicQuery query);
 
-    public List<OutputDTO> disasterReport(ThematicQuery query);
-
-
+    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException;
 }

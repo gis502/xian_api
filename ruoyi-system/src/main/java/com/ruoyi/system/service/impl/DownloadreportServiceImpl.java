@@ -52,6 +52,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Value("${document.path.rain.report}")
     private String wordPath;
 
+
     public DownloadreportServiceImpl(XianDisasterRainMapper xianDisasterRainMapper) {
         this.xianDisasterRainMapper = xianDisasterRainMapper;
     }

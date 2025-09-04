@@ -69,6 +69,7 @@ public class GeologicalDisasterRiskServiceImpl implements IGeologicalDisasterRis
             properties.put("lon", disaster.getLon());
             properties.put("lat", disaster.getLat());
             properties.put("area", disaster.getArea());
+            properties.put("county", disaster.getCounty());
             properties.put("residentCounts", disaster.getResidentCounts());
             properties.put("addressPopulation", disaster.getAddressPopulation());
             properties.put("riskProperty", disaster.getRiskProperty());
