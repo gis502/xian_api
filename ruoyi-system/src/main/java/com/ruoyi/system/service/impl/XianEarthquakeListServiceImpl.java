@@ -92,7 +92,7 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
     public  HashMap<String, Object> insertEarthquake(EarthquakeVo earthquake) {
         HashMap<String, Object> earthquakeDamage = new HashMap<>();
         Map<String, Object> Result = new HashMap<>();
-        String[] country;
+        List<String> addressList = new ArrayList<>();
         int i = 0;
         xianEarthquakeListMapper.insertDisaster(earthquake);
         int disasterId = earthquake.getDisasterId();
@@ -102,7 +102,6 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
         List<PeopleGDP> peopleGDPS = peopleGDPMapper.findInsideCircle(earthquake.getLongitude(),earthquake.getLatitude(),earthquake.getSemiMajorAxis(),earthquake.getSemiMinorAxis(),earthquake.getRotation());
         log.info("1231231: {}", peopleGDPS);
         int count = peopleGDPS.size();
-        country = new String[count];
         if (count == 0) {
             log.warn("未查询到受影响区域数据！经纬度：({}, {}), 半长轴：{}, 半短轴：{}, 旋转角：{}",
                     earthquake.getLongitude(), earthquake.getLatitude(),
@@ -117,17 +116,26 @@ public class XianEarthquakeListServiceImpl implements IXianEarthquakeListService
             Integer peopleNum = peopleGDP.getPeopleNum();
             if (peopleNum != null) sumPeopleNum += peopleNum;
             xianEarthquakeListMapper.insertAffect(disasterId,peopleGDP.getCountry());
-            country[i]=peopleGDP.getCountry();
-            i++;
+            // 拼接地址信息（处理可能的null值）
+            String province = peopleGDP.getProvince() != null ? peopleGDP.getProvince() : "";
+            String city = peopleGDP.getCity() != null ? peopleGDP.getCity() : "";
+            String county = peopleGDP.getCounty() != null ? peopleGDP.getCounty() : "";
+            String country = peopleGDP.getCountry() != null ? peopleGDP.getCountry() : "";
+
+            // 拼接成完整地址，例如"陕西省-西安市-临潼区-仁宗街道"
+            String fullAddress = String.join("", province, city, county, country);
+            addressList.add(fullAddress);
         }
+        // 将列表转换为数组
 
         // 计算伤亡人数
         Result = calculateCasualties(earthquake, sumGdp, sumPeopleNum, count);
         earthquakeDamage.put("sumGdp", sumGdp);
-        earthquakeDamage.put("country", country);
+        earthquakeDamage.put("country", addressList);
         earthquakeDamage.put("affectPop", Result.get("affectPop"));
         earthquakeDamage.put("diePop", Result.get("diePop"));
         earthquakeDamage.put("densityPop", Result.get("densityPop"));
+        log.info("45645687: {}", earthquakeDamage);
         return earthquakeDamage;
     }
     /**
