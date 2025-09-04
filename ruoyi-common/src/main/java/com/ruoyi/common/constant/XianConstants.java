@@ -23,20 +23,20 @@ public class XianConstants {
     // 定义常量和映射关系
     public static final String ROCK_TYPE_ALIAS = "rockType";
     public static final Map<String, String> ROCK_TYPE_MAPPING = new HashMap<String, String>() {{
-        put("花岗岩", "1");
-        put("黄土-古土壤", "2");
-        put("黄土-砂岩互层", "3");
-        put("片麻岩", "4");
-        put("砂岩", "5");
-        put("页岩", "6");
+        put("花岗岩", "0");
+        put("黄土-古土壤", "1");
+        put("黄土-砂岩互层", "2");
+        put("片麻岩", "3");
+        put("砂岩", "4");
+        put("页岩", "5");
     }};
     public static final Map<String, String> ROCK_TYPE_PARSE = new HashMap<String, String>() {{
-        put("1", "花岗岩");
-        put("2", "黄土-古土壤");
-        put("3", "黄土-砂岩互层");
-        put("4", "片麻岩");
-        put("5", "砂岩");
-        put("6", "页岩");
+        put("0", "花岗岩");
+        put("1", "黄土-古土壤");
+        put("2", "黄土-砂岩互层");
+        put("3", "片麻岩");
+        put("4", "砂岩");
+        put("5", "页岩");
     }};
 
 
@@ -56,12 +56,13 @@ public class XianConstants {
     // 灾评系统授权
     public static final String AUTH_URL = "http://localhost:18008/api/open/auth";
 
-    // 授权请求体
+    // 地震触发接口
     public static final String TRIGGER_EARTHQUAKE_URL = "http://localhost:18008/api/open/eq/trigger";
+    // 暴雨触发接口
+    public static final String TRIGGER_STORM_URL = "http://localhost:18008/api/open/rain/trigger";
 
     // 专题图接口
     public static final String THEMATIC_MAP_URL = "http://localhost:18008/api/open/eq/getMap";
-
     // 灾情报告接口
     public static final String DISASTER_REPORT_URL = "http://localhost:18008/api/open/eq/getMap";
 

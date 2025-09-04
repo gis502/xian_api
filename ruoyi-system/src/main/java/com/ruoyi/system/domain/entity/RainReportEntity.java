@@ -26,8 +26,8 @@ public class RainReportEntity {
     private String concentratedAreaQuantity;                // 降雨集中区域雨量
     private String concentratedAreaAverageQuantity;         // 降雨集中区域平均雨量
     private List<String> concentratedAreaDetailStreet;      // 降雨集中区域街道
-    private String concentratedAreaDetailQuantity;          // 降雨集中街道雨量
-    private Integer concentratedAreaDetailGrade;            // 降雨集中街道等级
+    private List<String> concentratedAreaDetailQuantity;    // 降雨集中街道雨量
+    private List<String> concentratedAreaDetailGrade;       // 降雨集中街道等级
     private List<String> extremelyHeavyRainstormStreet;     // 特大暴雨监测街道
     private List<String> extremelyHeavyRainQuantity;        // 特大暴雨监测雨量
     private List<String> rainstormStreet;                   // 暴雨或大暴雨街道

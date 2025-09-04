@@ -38,9 +38,9 @@ public class DownloadreportController {
     public void downloadReport(@PathVariable String fileName, HttpServletResponse resp) throws IOException {
         downloadreportService.downloadReport(fileName,resp);
     }
-//    @GetMapping("/test")
-//    public ResponseEntity<?> test(){
-//        return ResponseEntity.ok(downloadreportService.calPeople());
-//    }
-
+    @GetMapping("/test")
+    public ResponseEntity<?> test(@RequestParam Integer disasterId){
+        downloadreportService.generateRainReportEntity(disasterId);
+        return ResponseEntity.ok("ckw");
+    }
 }

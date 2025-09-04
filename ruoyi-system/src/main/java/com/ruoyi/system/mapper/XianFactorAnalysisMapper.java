@@ -15,8 +15,7 @@ import java.util.Map;
 @Mapper
 public interface XianFactorAnalysisMapper {
     List<Map<String, Object>> queryDisasterEstimation(
-            @Param("disasterId")Long disasterId,
-            @Param("disasterType")DisasterType disasterType);
+            @Param("disasterId")Long disasterId);
 
     List<Map<String, Object>> queryDisasterEstimationGetAll(
             @Param("disasterId")Long disasterId,

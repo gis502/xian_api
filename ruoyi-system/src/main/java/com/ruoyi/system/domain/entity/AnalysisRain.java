@@ -4,6 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+
+/*
+* 20250902 0328
+* 映射的名字一定要一致，不然老麻烦了 */
+
 @Data
 @TableName("xian_api_df_platform_ods_xasqxj_sksj_xssk")
 public class AnalysisRain {
@@ -13,14 +18,14 @@ public class AnalysisRain {
     @TableField("vis")
     private String visible;
     @TableField("admin_code_chn")
-    private String adminCode;
+    private String adminCodeChn;
     @TableField("win_s_max")
     private String winSpeed;
     @TableField("pre_1h")
-    private String rain1H;
+    private String pre1h;
     @TableField("win_d_s_max")
     private String winSpeedDirection;
-    @TableField("win_d_inst_max")
+    @TableField("win_s_inst_max")
     private String winSpeedMax;
     @TableField("tem")
     private String temperature;

@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.system;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.dto.DisasterRainDTO;
@@ -15,7 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Validated
@@ -74,9 +77,17 @@ public class XianDisasterRainController {
     @PostMapping("/saver/rain")
     @ApiOperation(value = "保存暴雨灾害信息")
     public AjaxResult saveRain(@RequestBody DisasterRainDTO disasterRainDTO) {
-        disasterRainService.saveDisasterRain(disasterRainDTO);
-        return AjaxResult.success("保存成功");
+        Long data = disasterRainService.saveDisasterRain(disasterRainDTO);
+        System.out.println("1mdmdmdmdm"+data);
+        Map<String,Long> rainDisasterId = new HashMap<>();
+        rainDisasterId.put("rainDisasterId",data);
+        System.out.println("data123"+JSON.toJSONString(rainDisasterId));
+        return AjaxResult.success(rainDisasterId);
     }
 
-
+    @GetMapping("/getRainFallHours")
+    public AjaxResult getRainFallHours() {
+//        disasterRainService
+        return AjaxResult.success();
+    }
 }
