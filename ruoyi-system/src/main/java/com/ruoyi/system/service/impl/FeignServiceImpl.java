@@ -160,9 +160,6 @@ public class FeignServiceImpl implements IFeignService {
             wrapper.eq("type", 2);
             wrapper.eq("is_deleted", 0);
 
-            System.out.println("eqId:" + query.getEqId());
-            System.out.println("eqqueueId:" + query.getEqqueueId());
-
             List<AssessmentOutput> outputs = slaveAssessmentOutputMapper.selectList(wrapper);
 
             // 抛异常
