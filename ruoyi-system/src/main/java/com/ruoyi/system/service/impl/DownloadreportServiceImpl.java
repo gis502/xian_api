@@ -125,7 +125,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         /* 降雨时间 rainTime */
         String rainTimeStr = xianDisasterRainMapper.getRainTime(id);
         String rainTime = LocalDateTime.parse(rainTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            .format(DateTimeFormatter.ofPattern("YY年MM月dd日HH时"));
+            .format(DateTimeFormatter.ofPattern("YYYY年MM月dd日HH时"));
 
         /* 降雨区域 rainAreaPosition 处理position字符串，将逗号分隔的字符串转换为List*/
         String position = xianDisasterRainMapper.getRainAreaPosition(id);
@@ -618,20 +618,19 @@ class CreateRainReport {
         // 内容
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content = String.format("%s，显示%s分别达到%s降水。" +
-                        "根据最新实时气象监测数据，降雨主要集中在%s一带，预计总降雨量达%s毫米，平均降雨量可达%s毫米，其中%s的降雨量%s毫米，达到%s级。" +
-                        "其中达到特大暴雨的监测站点有%s，达到大暴雨\\暴雨监测站点有%s。",
+        String content = String.format("%s，%s降雨量达到%s。" +
+                        "根据最新实时气象监测数据，降雨主要集中在%s一带，其中%s的降雨量%s毫米，达到%s级。",
                 rainReportEntity.getRainTime(),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaPosition(), null),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
                 rainReportEntity.getConcentratedAreaPosition(),
-                rainReportEntity.getConcentratedAreaQuantity(),
-                rainReportEntity.getConcentratedAreaAverageQuantity(),
+//                rainReportEntity.getConcentratedAreaQuantity(),
+//                rainReportEntity.getConcentratedAreaAverageQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailStreet(), null),
                 DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailQuantity(), null),
-                DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailGrade(),null),
-                DocumentUtils.streetPlusRainfall(rainReportEntity.getExtremelyHeavyRainstormStreet(), rainReportEntity.getExtremelyHeavyRainQuantity()),
-                DocumentUtils.streetPlusRainfall(rainReportEntity.getRainstormStreet(), rainReportEntity.getRainstormQuantity())
+                DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailGrade(),null)
+//                DocumentUtils.streetPlusRainfall(rainReportEntity.getExtremelyHeavyRainstormStreet(), rainReportEntity.getExtremelyHeavyRainQuantity()),
+//                DocumentUtils.streetPlusRainfall(rainReportEntity.getRainstormStreet(), rainReportEntity.getRainstormQuantity())
         );
 
         // 添加普通段落
@@ -651,14 +650,14 @@ class CreateRainReport {
         // 第一段
         XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content1 = String.format("受持续强降雨影响，灾害风险评估模型在%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s这些致灾因子进行评估，" +
-                        "评估得到%s%s的地质灾害风险显著上升，需高度警惕其中的%d个地质风险区和%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+        String content1 = String.format("受持续强降雨影响，灾害风险评估模型在%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子进行评估，" +
+                        "评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                 rainReportEntity.getRiskAreaQuantity(),
                 rainReportEntity.getHideAreaQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getHazards(), null),
                 rainReportEntity.getSignificantIncreaseArea(),
                 DocumentUtils.list2Str(rainReportEntity.getSignificantIncreaseAreaStreet(), null),
-                rainReportEntity.getSignificantIncreaseAreaRiskQuantity(),
+//                rainReportEntity.getSignificantIncreaseAreaRiskQuantity(),
                 rainReportEntity.getSignificantIncreaseAreaHideQuantity()
         );
         DocumentUtils.addRegularRun(paragraph1, content1);
@@ -677,16 +676,15 @@ class CreateRainReport {
 
             // 灾害类型
             contentBuilder.append(
-                    String.format("%s风险主要集中在%s附近区域，其中%s点位滑坡发生概率达%s。" +
-                                    "预计受影响的人数为%d人，灾害等级将达特大型，为本轮强降雨期间%s风险最高区域，需要提前疏散居民，严加防范。" +
-                                    "除此之外，在持续性降雨背景下，%s可能发生的灾害等级将达到大型、中型。",
+                    String.format("%s风险主要集中在%s附近区域，" +
+                                    "为本轮强降雨期间%s风险最高区域，需要提前疏散居民，严加防范。",
                             disasterReport.getDisasterType().getDisasterName(),
                             disasterReport.getRiskStreet(),
-                            disasterReport.getRiskPointName(),
-                            disasterReport.getRiskPointProbability(),
-                            disasterReport.getInfluencePeopleQuantity(),
-                            disasterReport.getDisasterType().getDisasterName(),
-                            DocumentUtils.list2Str(disasterReport.getSeriousArea(), null)
+//                            disasterReport.getRiskPointName(),
+//                            disasterReport.getRiskPointProbability(),
+//                            disasterReport.getInfluencePeopleQuantity(),
+                            disasterReport.getDisasterType().getDisasterName()
+//                            DocumentUtils.list2Str(disasterReport.getSeriousArea(), null)
                     )
             );
             DocumentUtils.addAnnotationRun(paragraph2, contentBuilder.toString());
