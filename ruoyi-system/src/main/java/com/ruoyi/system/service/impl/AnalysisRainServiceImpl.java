@@ -50,7 +50,7 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
         Map<String, Double> maxRainfallByAdminCode = new HashMap<>();
 
         for (AnalysisRain rainph : rain) {
-            String adminCode = rainph.getAdminCode();
+            String adminCode = rainph.getAdminCodeChn();
             String stationKey = rainph.getStationName();
             double currentRainfall = station12HourRain.getOrDefault(stationKey, 0.0);
 
@@ -72,8 +72,8 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
 
             Map<String, Object> properties = new HashMap<>();
             properties.put("stationName", rainph.getStationName());
-            properties.put("adminCode", rainph.getAdminCode());
-            properties.put("rainPreHours", rainph.getRain1H());
+            properties.put("adminCode", rainph.getAdminCodeChn());
+            properties.put("rainPreHours", rainph.getPre1h());
             properties.put("relativeHumidity", rainph.getRelativeHumidity());
             properties.put("temperature", rainph.getTemperature());
 
@@ -130,7 +130,7 @@ public class AnalysisRainServiceImpl implements IAnalysisRainService {
             int count = Math.min(12, stationData.size());
             for (int i = 0; i < count; i++) {
                 try {
-                    totalRainfall += Double.parseDouble(stationData.get(i).getRain1H());
+                    totalRainfall += Double.parseDouble(stationData.get(i).getPre1h());
                 } catch (NumberFormatException e) {
                     // 忽略格式错误的数据
                 }

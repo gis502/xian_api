@@ -3,6 +3,8 @@ package com.ruoyi.system.service.impl;
 import com.ruoyi.common.config.DocumentConfig;
 import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.enums.ImagePositionEnum;
+import com.ruoyi.common.enums.ImageTypeEnum;
 import com.ruoyi.common.enums.TypesOfSecondaryDisasters;
 import com.ruoyi.common.utils.file.DocumentUtils;
 import com.ruoyi.system.domain.entity.*;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +28,8 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.ruoyi.system.service.IModelService;
 
 import javax.annotation.Resource;
@@ -43,9 +48,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Resource
     private PeopleMapper peopleMapper;
 
+    @Resource
+    private AnalysisRainMapper  analysisRainMapper;
+
+    @Resource
     private final XianDisasterRainMapper xianDisasterRainMapper;
 
-    @Autowired
+    @Resource
+    private FactorAttributeMapper factorAttributeMapper;
+
+    @Resource
+    private XianStreetMapper xianStreetMapper;
+
+    @Resource
     private XianFactorAnalysisMapper xianFactorAnalysisMapper;
 
     // word保存路径
@@ -61,7 +76,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Override
     public R<String> generateRainReport(Integer disasterId) throws IOException {
         // 获取报告数据
-        RainReportEntity rainReportEntity = new RainReportEntity();
+        RainReportEntity rainReportEntity = generateRainReportEntity(disasterId);
 
         // 生成 Word 路径
         Path wordDir = Paths.get(wordPath);
@@ -101,13 +116,16 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         areaCodeMap.put("蓝田县", "610122");
         areaCodeMap.put("周至县", "610124");
 
+        /* 第一部分 */
         /* 报告时间 reportTime */
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter reportTimeFormatter = DateTimeFormatter.ofPattern("MM月dd日HH时mm分");
         String reportTime = now.format(reportTimeFormatter);
 
         /* 降雨时间 rainTime */
-        String rainTime = xianDisasterRainMapper.getRainTime(id);
+        String rainTimeStr = xianDisasterRainMapper.getRainTime(id);
+        String rainTime = LocalDateTime.parse(rainTimeStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            .format(DateTimeFormatter.ofPattern("YY年MM月dd日HH时"));
 
         /* 降雨区域 rainAreaPosition 处理position字符串，将逗号分隔的字符串转换为List*/
         String position = xianDisasterRainMapper.getRainAreaPosition(id);
@@ -151,26 +169,116 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String concentratedAreaAverageQuantity = "NaN";
 
         /* 降雨集中区域街道 concentratedAreaDetailStreet */
-        List<String> extremelyHeavyRainstormStreet = new ArrayList<>();
+        List<String> concentratedAreaDetailStreet = new ArrayList<>();
         String areaCode = areaCodeMap.get(concentratedAreaPosition);
+        List<AnalysisRain> analysisRains = analysisRainMapper.getRainStation(areaCode);
+        // 按站点名称分组
+        Map<String, List<AnalysisRain>> stationGroups = new HashMap<>();
+        for (AnalysisRain rain : analysisRains) {
+            String stationName = rain.getStationName();
+            if (!stationGroups.containsKey(stationName)) {
+                stationGroups.put(stationName, new ArrayList<>());
+            }
+            stationGroups.get(stationName).add(rain);
+        }
+        // 对每个站点的数据按时间排序
+        for (String stationName : stationGroups.keySet()) {
+            List<AnalysisRain> stationData = stationGroups.get(stationName);
+            // 按时间降序排序（最新的在前面）
+            stationData.sort((a, b) -> b.getDatetime().compareTo(a.getDatetime()));
+        }
+        // 创建结果列表
+        List<Map<String, String>> rainfallSummary = new ArrayList<>();
+        // 遍历每个站点分组
+        for (String stationName : stationGroups.keySet()) {
+            List<AnalysisRain> stationData = stationGroups.get(stationName);
+            // 累加该站点的所有pre1h值
+            double totalRainfall = 0.0;
+            float lat = 0;
+            float lon = 0;
+            for (AnalysisRain rain : stationData) {
+                if (rain.getPre1h() != null) {
+                    try {
+                        totalRainfall += Double.parseDouble(rain.getPre1h());
+                    } catch (NumberFormatException e) {
+                        // 如果转换失败，跳过这个值
+                        System.out.println("无法解析降雨量数据: " + rain.getPre1h());
+                    }
+                }
+                if(lat == 0 && lon == 0){
+                    lat =rain.getLat();
+                    lon = rain.getLon();
+                }
+            }
+            // 创建Map存储站点名称和累计降雨量
+            Map<String, String> stationRainfall = new HashMap<>();
+            stationRainfall.put("stationName", stationName);
+            stationRainfall.put("rainfall", String.valueOf(totalRainfall));
+            stationRainfall.put("lat", String.valueOf(lat));
+            stationRainfall.put("lon", String.valueOf(lon));
+            // 添加到结果列表
+            rainfallSummary.add(stationRainfall);
+        }
+        rainfallSummary.sort(
+            (a, b) -> Double.compare(
+                Double.parseDouble(b.get("rainfall")),
+                Double.parseDouble(a.get("rainfall"))
+            )
+        );
+        String stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")),Float.parseFloat(rainfallSummary.get(0).get("lon")));
+        String stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")),Float.parseFloat(rainfallSummary.get(1).get("lon")));
+        String stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")),Float.parseFloat(rainfallSummary.get(2).get("lon")));
 
-
+        concentratedAreaDetailStreet.add(stationStreet1);
+        concentratedAreaDetailStreet.add(stationStreet2);
+        concentratedAreaDetailStreet.add(stationStreet3);
+        // 查看结果
+        // System.out.println("=== 分组并排序后的数据 ===");
+        // for (String stationName : stationGroups.keySet()) {
+        //     List<AnalysisRain> stationData = stationGroups.get(stationName);
+        //     System.out.println("站点: " + stationName + ", 数据条数: " + stationData.size());
+        //     for (AnalysisRain rain : stationData) {
+        //         System.out.println("  时间: " + rain.getDatetime() + ", 经度: " + rain.getLon() + ", 纬度: " + rain.getLat() + ",降雨量：" + rain.getPre1h());
+        //     }
+        // }
+        // System.out.println(JSON.toJSONString(stationGroups));
+        // System.out.println(JSON.toJSONString(rainfallSummary));
 
         /* 降雨集中街道雨量 concentratedAreaDetailQuantity */
+        List<String> concentratedAreaDetailQuantity = new ArrayList<>();
+        concentratedAreaDetailQuantity.add(rainfallSummary.get(0).get("rainfall"));
+        concentratedAreaDetailQuantity.add(rainfallSummary.get(1).get("rainfall"));
+        concentratedAreaDetailQuantity.add(rainfallSummary.get(2).get("rainfall"));
 
         /* 降雨集中街道等级  concentratedAreaDetailGrade */
+        List<String> concentratedAreaDetailGrade = new ArrayList<>();
+        // 降雨等级阈值和对应名称
+        double[] thresholds = {0.1, 5.0, 15.0, 30.0, 70.0, 140.0};
+        String[] grades = {"微量降雨(零星小雨)", "小雨", "中雨", "大雨", "暴雨", "大暴雨", "特大暴雨"};
+
+        for(String item : concentratedAreaDetailQuantity){
+            boolean flag = true;
+            double rainfall = Double.parseDouble(item);
+            for (int i = 0; i < thresholds.length; i++) {
+                if (rainfall < thresholds[i]) {
+                    concentratedAreaDetailGrade.add(grades[i]);
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag){
+                concentratedAreaDetailGrade.add(grades[grades.length - 1]);
+            }
+        }
 
         /* 特大暴雨监测街道 extremelyHeavyRainstormStreet */
-
+        List<String> extremelyHeavyRainstormStreet = new ArrayList<>();
         /* 特大暴雨监测雨量  extremelyHeavyRainQuantity */
-
+        List<String> extremelyHeavyRainQuantity = new ArrayList<>();
         /* 暴雨或大暴雨街道 rainstormStreet */
-
+        List<String> rainstormStreet = new ArrayList<>();
         /* 暴雨或大暴雨雨量 rainstormQuantity */
-
-
-
-
+        List<String> rainstormQuantity = new ArrayList<>();
 
         // 设置报告时间到实体对象中
         rainReportEntity.setReportTime(reportTime);
@@ -180,12 +288,151 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         rainReportEntity.setConcentratedAreaPosition(concentratedAreaPosition);
         rainReportEntity.setConcentratedAreaQuantity(concentratedAreaQuantity);
         rainReportEntity.setConcentratedAreaAverageQuantity(concentratedAreaAverageQuantity);
+        rainReportEntity.setConcentratedAreaDetailStreet(concentratedAreaDetailStreet);
+        rainReportEntity.setConcentratedAreaDetailQuantity(concentratedAreaDetailQuantity);
+        rainReportEntity.setConcentratedAreaDetailGrade(concentratedAreaDetailGrade);
 
 
+        /* 第二部分 */
+
+        // 获取此次灾害所有次生灾害计算的概率
+        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(id);
+        Map<String, List<Map<String, Object>>> groupedByDisasterType = new HashMap<>();
+        // 遍历disasterEstimation列表进行分组
+        for (Map<String, Object> item : disasterEstimation) {
+            String disasterType = (String) item.get("disaster_type");
+            // 如果该disaster_type还没有对应的列表，创建一个新的列表
+            if (!groupedByDisasterType.containsKey(disasterType)) {
+                groupedByDisasterType.put(disasterType, new ArrayList<>());
+            }
+            // 将当前元素添加到对应的列表中
+            groupedByDisasterType.get(disasterType).add(item);
+        }
+        // 对每个分组内的列表按disaster_probability从高到低排序
+        for (List<Map<String, Object>> list : groupedByDisasterType.values()) {
+            // 修改排序逻辑，使用BigDecimal
+            list.sort((o1, o2) -> {
+                BigDecimal prob1 = (BigDecimal) o1.get("disaster_probability");
+                BigDecimal prob2 = (BigDecimal) o2.get("disaster_probability");
+                return prob2.compareTo(prob1); // 降序排列
+            });
+        }
+        System.out.println(JSON.toJSONString(groupedByDisasterType));
+
+        /* riskAreaQuantity 风险区数量 */
+        Integer riskAreaQuantity = 569;
+        /* hideAreaQuantity 隐患点数量 */
+        Integer hideAreaQuantity = 296;
+        /* hazards 致灾因子 */
+        List<String> hazards = new ArrayList<>();
+        hazards = factorAttributeMapper.getFactorAttributeName();
+        hazards.remove("持续时间");
+        hazards.remove("土壤沙砾度");
+        hazards.remove("坡型");
+        /* significantIncreaseArea 风险显著上升区域 */
+        String significantIncreaseArea = concentratedAreaPosition+stationStreet1+"、"+stationStreet2+"、"+stationStreet3;
+        /* significantIncreaseAreaRiskQuantity 显著上升区域中重点关注风险点 */
+        Integer significantIncreaseAreaRiskQuantity;
+        /* significantIncreaseAreaHideQuantity 显著上升区域中重点关注隐患点 */
+        Integer significantIncreaseAreaHideQuantity = 0;
+        for(String key : groupedByDisasterType.keySet()){
+            significantIncreaseAreaHideQuantity = significantIncreaseAreaHideQuantity + groupedByDisasterType.get(key).size();
+        }
+
+
+        /* 次生灾害 */
+
+        /* 滑坡 */
+        RainReportEntity.SecondaryDisasterReportEntity landslide = handleSecondaryDisasterReport(TypesOfSecondaryDisasters.LANDSLIDE,groupedByDisasterType,"滑坡");
+        /* 泥石流 */
+        RainReportEntity.SecondaryDisasterReportEntity debrisFlow = handleSecondaryDisasterReport(TypesOfSecondaryDisasters.DEBRIS_FLOW,groupedByDisasterType,"泥石流");
+        /* 山洪 */
+        RainReportEntity.SecondaryDisasterReportEntity torrentialFlood = handleSecondaryDisasterReport(TypesOfSecondaryDisasters.TORRENTIAL_FLOOD,groupedByDisasterType,"山洪");
+        /* 内涝 */
+        RainReportEntity.SecondaryDisasterReportEntity waterLogging = handleSecondaryDisasterReport(TypesOfSecondaryDisasters.WATER_LOGGING,groupedByDisasterType,"内涝");
+
+
+
+        rainReportEntity.setRiskAreaQuantity(riskAreaQuantity);
+        rainReportEntity.setHideAreaQuantity(hideAreaQuantity);
+        rainReportEntity.setHazards(hazards);
+        rainReportEntity.setSignificantIncreaseArea(significantIncreaseArea);
+        rainReportEntity.setSignificantIncreaseAreaHideQuantity(significantIncreaseAreaHideQuantity);
+        rainReportEntity.getSecondaryDisasterReport().add(landslide);
+        rainReportEntity.getSecondaryDisasterReport().add(debrisFlow);
+        rainReportEntity.getSecondaryDisasterReport().add(torrentialFlood);
+        rainReportEntity.getSecondaryDisasterReport().add(waterLogging);
+
+        /* 第三部分 */
+
+        /* workScheduleArea 工作安排部署区域 */
+        List<String> workScheduleArea = rainAreaPosition;
+
+        /* evacuateTheCrowdArea 山洪、泥石流人员疏散区域 */
+        List<String> evacuateTheCrowdArea = concentratedAreaDetailStreet;
+
+        /* focusArea 内涝关注区域 */
+        List<String> focusArea = new ArrayList<>();
+
+        rainReportEntity.setWorkScheduleArea(workScheduleArea);
+        rainReportEntity.setEvacuateTheCrowdArea(evacuateTheCrowdArea);
+        rainReportEntity.setFocusArea(focusArea);
 
         System.out.println(JSON.toJSONString(rainReportEntity));
         return rainReportEntity;
     }
+
+    private RainReportEntity.SecondaryDisasterReportEntity handleSecondaryDisasterReport(TypesOfSecondaryDisasters t, Map<String, List<Map<String, Object>>> groupedByDisasterType,String type){
+        RainReportEntity.SecondaryDisasterReportEntity secondaryDisasterReportEntity = new RainReportEntity().new SecondaryDisasterReportEntity();
+        /* 灾害类型（滑坡、泥石流等） */
+        secondaryDisasterReportEntity.setDisasterType(t);
+        if(!groupedByDisasterType.containsKey(type)){
+            return secondaryDisasterReportEntity;
+        }
+        /* 风险集中的街道 */
+        String riskStreet;
+        List<String> riskStreetList = new ArrayList<>();
+        for(Map<String, Object> item : groupedByDisasterType.get(type)){
+            if(riskStreetList.contains(item.get("village")) && item.get("village")!="[高]"){
+                continue;
+            }
+            riskStreetList.add(item.get("village").toString());
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < riskStreetList.size(); i++) {
+            sb.append(riskStreetList.get(i));
+            if (i < riskStreetList.size() - 1) {
+                sb.append("、");
+            }
+        }
+        riskStreet = sb.toString();
+        secondaryDisasterReportEntity.setRiskStreet(riskStreet);
+        // System.out.println(riskStreet);
+        /* 风险集中点位 */
+        String riskPointName;
+
+        /* 风险集中点位概率 */
+        String riskPointProbability;
+
+        /* 影响人数 */
+        Long influencePeopleQuantity;
+
+        /* 中大型区域 */
+        List<String> seriousArea;
+
+        /* 表格数据 */
+        // List<RainReportEntity.SecondaryDisasterReportEntity.SecondaryDisasterTableData> disasterTableDataList = new ArrayList<>();
+
+        for(Map<String, Object> item : groupedByDisasterType.get(type)){
+            RainReportEntity.SecondaryDisasterReportEntity.SecondaryDisasterTableData secondaryDisasterTableData = new RainReportEntity().new SecondaryDisasterReportEntity().new SecondaryDisasterTableData();
+            secondaryDisasterTableData.setPosition(item.get("position").toString());
+            secondaryDisasterTableData.setProbability(item.get("disaster_probability").toString());
+            secondaryDisasterTableData.setGrade(item.get("level").toString());
+            secondaryDisasterReportEntity.getDisasterTableData().add(secondaryDisasterTableData);
+        }
+        return secondaryDisasterReportEntity;
+    }
+
 
     public static void main(String[] args) {
         try {
@@ -198,8 +445,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             rainReportEntity.setConcentratedAreaQuantity("500");
             rainReportEntity.setConcentratedAreaAverageQuantity("300");
             rainReportEntity.setConcentratedAreaDetailStreet(Arrays.asList("第一街道", "第二街道"));
-            rainReportEntity.setConcentratedAreaDetailQuantity("234");
-            rainReportEntity.setConcentratedAreaDetailGrade(10);
+            rainReportEntity.setConcentratedAreaDetailQuantity(Arrays.asList("234"));
+            rainReportEntity.setConcentratedAreaDetailGrade(Arrays.asList("10"));
             rainReportEntity.setExtremelyHeavyRainstormStreet(Arrays.asList("x街道", "y街道"));
             rainReportEntity.setExtremelyHeavyRainQuantity(Arrays.asList("100", "300.6"));
             rainReportEntity.setRainstormStreet(Arrays.asList("z街道", "d街道"));
@@ -381,8 +628,8 @@ class CreateRainReport {
                 rainReportEntity.getConcentratedAreaQuantity(),
                 rainReportEntity.getConcentratedAreaAverageQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailStreet(), null),
-                rainReportEntity.getConcentratedAreaDetailQuantity(),
-                rainReportEntity.getConcentratedAreaDetailGrade(),
+                DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailQuantity(), null),
+                DocumentUtils.list2Str(rainReportEntity.getConcentratedAreaDetailGrade(),null),
                 DocumentUtils.streetPlusRainfall(rainReportEntity.getExtremelyHeavyRainstormStreet(), rainReportEntity.getExtremelyHeavyRainQuantity()),
                 DocumentUtils.streetPlusRainfall(rainReportEntity.getRainstormStreet(), rainReportEntity.getRainstormQuantity())
         );
@@ -415,6 +662,8 @@ class CreateRainReport {
                 rainReportEntity.getSignificantIncreaseAreaHideQuantity()
         );
         DocumentUtils.addRegularRun(paragraph1, content1);
+
+        DocumentUtils.insertImageWithCaption(doc, "", ImageTypeEnum.JPEG, null, null, "图1", ImagePositionEnum.AFTER);
 
         // 第二段，滑坡、泥石流、山洪、内涝分别处理
        for (int i = 0; i < rainReportEntity.getSecondaryDisasterReport().size(); i++) {
