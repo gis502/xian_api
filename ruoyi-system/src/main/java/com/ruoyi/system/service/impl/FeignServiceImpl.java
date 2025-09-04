@@ -222,15 +222,15 @@ public class FeignServiceImpl implements IFeignService {
         requestBody.put("eqType", triggerDTO.getEqType());
         requestBody.put("faultZone", triggerDTO.getFaultZone());
         requestBody.put("circleArea", triggerDTO.getCircleArea());
-        requestBody.put("rotation", triggerDTO.getRotation());
-        requestBody.put("semiMajorAxis", triggerDTO.getSemiMajorAxis());
-        requestBody.put("semiMinorAxis", triggerDTO.getSemiMinorAxis());
-        requestBody.put("affectPop", triggerDTO.getAffectPop());
-        requestBody.put("diePop", triggerDTO.getDiePop());
-        requestBody.put("densityPop", triggerDTO.getDensityPop());
-        requestBody.put("country", triggerDTO.getCountry());
-        requestBody.put("intensity", triggerDTO.getIntensity());
-        requestBody.put("sumGdp", triggerDTO.getSumGdp());
+//        requestBody.put("rotation", triggerDTO.getRotation());
+//        requestBody.put("semiMajorAxis", triggerDTO.getSemiMajorAxis());
+//        requestBody.put("semiMinorAxis", triggerDTO.getSemiMinorAxis());
+//        requestBody.put("affectPop", triggerDTO.getAffectPop());
+//        requestBody.put("diePop", triggerDTO.getDiePop());
+//        requestBody.put("densityPop", triggerDTO.getDensityPop());
+//        requestBody.put("country", triggerDTO.getCountry());
+//        requestBody.put("intensity", triggerDTO.getIntensity());
+//        requestBody.put("sumGdp", triggerDTO.getSumGdp());
 
         return requestBody;
     }
