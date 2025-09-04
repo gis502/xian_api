@@ -1,9 +1,12 @@
 package com.ruoyi.web.controller.system;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.dto.DisasterRainDTO;
 import com.ruoyi.system.domain.entity.XianDisasterRain;
+import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.mapper.XianDisasterRainMapper;
 import com.ruoyi.system.mapper.XianRainfallDuringPeriodMapper;
 import com.ruoyi.system.service.IXianDisasterRainService;
@@ -45,6 +48,27 @@ public class XianDisasterRainController {
         System.out.println(Id+"getRainPeriodInfo Id");
         System.out.println(xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id)+"xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id)");
         return AjaxResult.success(xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id));
+    }
+
+    @GetMapping("/getDisasterRainByKey")
+    public List<XianDisasterRain> getDisasterRainByKey(@RequestParam(value = "queryValue", required = false) String queryValue) {
+        System.out.println(queryValue);
+        LambdaQueryWrapper<XianDisasterRain> queryWrapper = new LambdaQueryWrapper<>();
+        // 全局条件
+        queryWrapper.eq(XianDisasterRain::getIsDeleted, 0);
+
+        // 模糊搜索条件封装到嵌套语句中，避免 or 冲掉 eq 条件
+        if (StringUtils.isNotBlank(queryValue)) {
+            queryWrapper.and(w -> w
+                    .like(XianDisasterRain::getDisasterName, queryValue)
+                    .or().like(XianDisasterRain::getPosition, queryValue)
+                    .or().apply("ST_AsText(geom) LIKE {0}", "%" + queryValue + "%")
+                    .or().apply("to_char(occurrence_time, 'YYYY-MM-DD HH24:MI:SS') LIKE {0}", "%" + queryValue + "%")
+            );
+        }
+
+        queryWrapper.orderByDesc(XianDisasterRain::getOccurrenceTime);
+        return disasterRainService.list(queryWrapper);
     }
 
     @PostMapping("/saver/rain")
