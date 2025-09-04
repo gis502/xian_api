@@ -36,7 +36,9 @@ public class RainReportEntity {
     /*
      * 风险评估
      */
+    private List<String> riskArea;                          // 风险地区
     private Integer riskAreaQuantity;                       // 风险区数量
+    private List<String> hideArea;                          // 隐患地区
     private Integer hideAreaQuantity;                       // 隐患点数量
     private List<String> hazards;                           // 致灾因子
     private String significantIncreaseArea;                 // 风险显著上升区域
@@ -106,6 +108,8 @@ public class RainReportEntity {
         this.extremelyHeavyRainQuantity = new ArrayList<>();
         this.rainstormStreet = new ArrayList<>();
         this.rainstormQuantity = new ArrayList<>();
+        this.riskArea = new ArrayList<>();
+        this.hideArea = new ArrayList<>();
         this.hazards = new ArrayList<>();
         this.significantIncreaseAreaStreet = new ArrayList<>();
         this.secondaryDisasterReport = new ArrayList<>();
