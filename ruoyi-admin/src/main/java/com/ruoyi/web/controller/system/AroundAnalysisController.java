@@ -29,6 +29,8 @@ public class AroundAnalysisController {
     private IStorePointsService storePointsService;
     @Resource
     private ISchoolService schoolService;
+    @Resource
+    private IGeologicalDisasterHideService geologicalDisasterHideService;
 
     @GetMapping("/getDangerousSource")
     @ApiOperation("获取全部风险源")
@@ -64,6 +66,18 @@ public class AroundAnalysisController {
     @ApiOperation("获取学校")
     public AjaxResult getSchoolList(){
         return AjaxResult.success(schoolService.getSchoolList());
+    }
+
+    @GetMapping("/getWater")
+    @ApiOperation("获取内涝")
+    public AjaxResult getWaterList(){
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByWaterList());
+    }
+
+    @GetMapping("/getFlood")
+    @ApiOperation("获取山洪")
+    public AjaxResult getFloodList(){
+        return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByFloodList());
     }
 
 }
