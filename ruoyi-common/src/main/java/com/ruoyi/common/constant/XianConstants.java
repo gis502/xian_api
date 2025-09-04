@@ -56,12 +56,13 @@ public class XianConstants {
     // 灾评系统授权
     public static final String AUTH_URL = "http://localhost:18008/api/open/auth";
 
-    // 授权请求体
+    // 地震触发接口
     public static final String TRIGGER_EARTHQUAKE_URL = "http://localhost:18008/api/open/eq/trigger";
+    // 暴雨触发接口
+    public static final String TRIGGER_STORM_URL = "http://localhost:18008/api/open/rain/trigger";
 
     // 专题图接口
     public static final String THEMATIC_MAP_URL = "http://localhost:18008/api/open/eq/getMap";
-
     // 灾情报告接口
     public static final String DISASTER_REPORT_URL = "http://localhost:18008/api/open/eq/getMap";
 

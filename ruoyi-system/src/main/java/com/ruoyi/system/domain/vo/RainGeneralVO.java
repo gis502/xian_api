@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain.vo;
 
+import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.params.ThematicQuery;
 import lombok.Data;
 
@@ -10,9 +11,9 @@ import lombok.Data;
  */
 
 @Data
-public class GeneralVO {
+public class RainGeneralVO {
 
     private String msg;
     private Integer code;
-    private ThematicQuery data;
+    private RainQuery data;
 }
