@@ -21,6 +21,7 @@ import com.ruoyi.system.domain.vo.TokenVO;
 import com.ruoyi.system.mapper.SlaveAssessmentOutputMapper;
 import com.ruoyi.system.service.IFeignService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +58,7 @@ public class FeignServiceImpl implements IFeignService {
 
     @Resource
     private HttpRestClient httpRestClient;
+
 
     // 地震触发
     @Override
@@ -143,11 +152,11 @@ public class FeignServiceImpl implements IFeignService {
 
     @DataSource(value = DataSourceType.SLAVE)
     @Override
-    public List<OutputDTO> downloadReport(ThematicQuery query){
+    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException{
         try {
             QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
-            wrapper.eq("eq_id", query.getEqId());
-            wrapper.eq("eqqueue_id", query.getEqqueueId());
+            wrapper.eq("eq_id", eqId);
+            wrapper.eq("eqqueue_id", eqqueueId);
             wrapper.eq("type", 2);
             wrapper.eq("is_deleted", 0);
 
@@ -161,18 +170,40 @@ public class FeignServiceImpl implements IFeignService {
                 throw new ParamsException(XianConstants.RESULT_EMPTY);
             }
 
-            List<OutputDTO> outputsDTO = new ArrayList<>();
+            OutputDTO outputDTO = new OutputDTO();
             for (AssessmentOutput output : outputs) {
-                OutputDTO outputDTO = new OutputDTO();
                 BeanUtils.copyProperties(output, outputDTO);
-                outputsDTO.add(outputDTO);
             }
-            return outputsDTO;
+
+            // 处理Windows路径分隔符
+            String filePath = outputDTO.getLocalSourceFile().replace("\\", File.separator);
+            Path file = Paths.get(filePath).normalize();
+
+            System.out.println("尝试下载文件: {}" + file);
+            System.out.println("文件是否存在: {}" + Files.exists(file));
+
+            if (!Files.exists(file)) {
+                System.out.println("文件不存在: {}" + file);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("文件不存在: " + outputDTO.getFileName());
+                return;
+            }
+
+            // 添加CORS响应头
+            resp.setHeader("Access-Control-Allow-Origin", "*");
+            resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            resp.setHeader("Access-Control-Allow-Headers", "*");
+            resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+            resp.setContentType("application/octet-stream");
+            resp.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(outputDTO.getFileName(), "UTF-8"));
+
+            Files.copy(file, resp.getOutputStream());
+            resp.flushBuffer();
+
         } catch (Exception e) {
             log.error("获取报告失败：{}", e.getMessage());
             e.printStackTrace();
         }
-
-        throw new ParamsException(XianConstants.RESULT_EMPTY);
     }
 }

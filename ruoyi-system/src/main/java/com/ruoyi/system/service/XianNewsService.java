@@ -6,5 +6,5 @@ import com.ruoyi.system.domain.XianNews;
 public interface XianNewsService extends IService<XianNews> {
 
 
-    IPage<XianNews> getFilteredNews(int pageNum, int pageSize, String disasterType, Integer earthquakeDisasterId, Integer rainDisasterId);
+    IPage<XianNews> getFilteredNews(int pageNum, int pageSize, String disasterType, Integer disasterId);
 }
