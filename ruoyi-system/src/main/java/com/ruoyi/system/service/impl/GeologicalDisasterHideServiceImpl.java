@@ -157,12 +157,8 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     @Override
     public HashMap<String,List> getGeologicalDisasterBySlideList() {
 
-        QueryWrapper wrapper = new QueryWrapper();
-        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
-        wrapper.eq("disaster_type","滑坡");
         // 滑坡数据
         List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
-        // 泥石流数据
         Map<String,List> map = processDisasters(landSlide, "滑坡");
 
         return (HashMap<String, List>) map;
@@ -171,9 +167,6 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     @Override
     public HashMap<String,List> getGeologicalDisasterByFlowList() {
 
-        QueryWrapper wrapper = new QueryWrapper();
-        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
-        wrapper.eq("disaster_type","泥石流");
         // 泥石流数据
         List<GeologicalDisasterHide> Flow = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
         // 泥石流数据
@@ -275,6 +268,24 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         }
 
         return hideVOlist;
+    }
+
+    @Override
+    public HashMap<String,List> getGeologicalDisasterByFloodList() {
+        // 泥石流数据
+        List<GeologicalDisasterHide> Water = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "山洪"));
+        // 泥石流数据
+        Map<String,List> map = processDisasters(Water, "山洪");
+        return (HashMap<String, List>) map;
+    }
+
+    @Override
+    public HashMap<String,List> getGeologicalDisasterByWaterList() {
+        // 泥石流数据
+        List<GeologicalDisasterHide> Water = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "内涝"));
+        // 泥石流数据
+        Map<String,List> map = processDisasters(Water, "内涝");
+        return (HashMap<String, List>) map;
     }
 
     private Map<String, List> processDisasters(List<GeologicalDisasterHide> disasters, String disasterType) {

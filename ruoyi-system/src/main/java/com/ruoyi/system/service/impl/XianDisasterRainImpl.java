@@ -1,5 +1,7 @@
 package com.ruoyi.system.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.constant.XianConstants;
@@ -36,10 +38,10 @@ public class XianDisasterRainImpl extends ServiceImpl<XianDisasterRainMapper, Xi
     private XianDisasterRainMapper disasterRainMapper;
 
     // 暴雨灾害存库
-    @Async("taskExecutor")
+//    @Async("taskExecutor")
     @Override
-    public void saveDisasterRain(DisasterRainDTO disasterRainDTO) {
-
+    public Long saveDisasterRain(DisasterRainDTO disasterRainDTO) {
+        LocalDateTime time = LocalDateTime.now();
         if (disasterRainDTO == null) {
             throw new ParamsException(XianConstants.PARAMS_EMPTY);
         }
@@ -51,14 +53,19 @@ public class XianDisasterRainImpl extends ServiceImpl<XianDisasterRainMapper, Xi
         BeanUtils.copyProperties(disasterRainDTO, disasterRain);
         // 处理 geom
         disasterRain.setIsDeleted(0);
-        disasterRain.setCreateTime(LocalDateTime.now());
-        disasterRain.setUpdateTime(LocalDateTime.now());
+        disasterRain.setCreateTime(time);
+        disasterRain.setUpdateTime(time);
         disasterRain.setGeom(GeometryUtils.convertPoint(disasterRainDTO.getLongitude(), disasterRainDTO.getLatitude()));
 
         log.info("正在处理数据...{}", disasterRain);
 
         disasterRainMapper.insert(disasterRain);
         log.info("存储暴雨灾害数据成功！");
+//        Long id = disasterRain.getDisasterId();
+         Long id = disasterRainMapper.getLatestRainDisasterId();
+        System.out.println("暴雨id"+id);
+
+        return id;
     }
 
     // 获取所有暴雨灾害数据

@@ -26,8 +26,8 @@ public class RainReportEntity {
     private String concentratedAreaQuantity;                // 降雨集中区域雨量
     private String concentratedAreaAverageQuantity;         // 降雨集中区域平均雨量
     private List<String> concentratedAreaDetailStreet;      // 降雨集中区域街道
-    private String concentratedAreaDetailQuantity;          // 降雨集中街道雨量
-    private Integer concentratedAreaDetailGrade;            // 降雨集中街道等级
+    private List<String> concentratedAreaDetailQuantity;    // 降雨集中街道雨量
+    private List<String> concentratedAreaDetailGrade;       // 降雨集中街道等级
     private List<String> extremelyHeavyRainstormStreet;     // 特大暴雨监测街道
     private List<String> extremelyHeavyRainQuantity;        // 特大暴雨监测雨量
     private List<String> rainstormStreet;                   // 暴雨或大暴雨街道
@@ -36,7 +36,9 @@ public class RainReportEntity {
     /*
      * 风险评估
      */
+    private List<String> riskArea;                          // 风险地区
     private Integer riskAreaQuantity;                       // 风险区数量
+    private List<String> hideArea;                          // 隐患地区
     private Integer hideAreaQuantity;                       // 隐患点数量
     private List<String> hazards;                           // 致灾因子
     private String significantIncreaseArea;                 // 风险显著上升区域
@@ -106,6 +108,8 @@ public class RainReportEntity {
         this.extremelyHeavyRainQuantity = new ArrayList<>();
         this.rainstormStreet = new ArrayList<>();
         this.rainstormQuantity = new ArrayList<>();
+        this.riskArea = new ArrayList<>();
+        this.hideArea = new ArrayList<>();
         this.hazards = new ArrayList<>();
         this.significantIncreaseAreaStreet = new ArrayList<>();
         this.secondaryDisasterReport = new ArrayList<>();
