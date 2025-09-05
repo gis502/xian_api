@@ -157,9 +157,6 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     @Override
     public HashMap<String,List> getGeologicalDisasterBySlideList() {
 
-        QueryWrapper wrapper = new QueryWrapper();
-        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
-        wrapper.eq("disaster_type","滑坡");
         // 滑坡数据
         List<GeologicalDisasterHide> landSlide = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "滑坡"));
         Map<String,List> map = processDisasters(landSlide, "滑坡");
@@ -170,9 +167,6 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
     @Override
     public HashMap<String,List> getGeologicalDisasterByFlowList() {
 
-        QueryWrapper wrapper = new QueryWrapper();
-        // 崩塌、地裂缝、地面塌陷、滑坡、泥石流
-        wrapper.eq("disaster_type","泥石流");
         // 泥石流数据
         List<GeologicalDisasterHide> Flow = geologicalDisasterHideMapper.selectList(new QueryWrapper<GeologicalDisasterHide>().eq("disaster_type", "泥石流"));
         // 泥石流数据
