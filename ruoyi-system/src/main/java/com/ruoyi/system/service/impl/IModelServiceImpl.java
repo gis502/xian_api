@@ -61,6 +61,9 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     private FactorAnalysisServiceImpl factorAnalysisService;
     @Autowired
     private XianDisasterRainMapper disasterRainMapper;
+    @Resource
+    private XianEarthquakeListMapper earthquakeListMapper;
+
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
@@ -814,9 +817,60 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
             factorAnalysisList.add(factorAnalysis);
         }
         // 异步存库
-        saveModelData(factorAnalysisList);
+        saveModelData(factorAnalysisList,XianConstants.STORM_TYPE);
         return probabilitiesVOList;
     }
+
+    @Override
+    public List<TriggerVO> eqTrigger(TriggerRequest factors) {
+        // 参数为空
+        if (factors == null) {
+            throw new ParamsException(XianConstants.PARAMS_EMPTY);
+        }
+        log.info("请求贝叶斯模型...");
+        // 处理模型计算参数
+        TriggerRequest requestFactors = processParams(factors);
+        // 指定httpclient返回的格式类型
+        ParameterizedTypeReference<List<TriggerVO>> typeRef = new ParameterizedTypeReference<List<TriggerVO>>() {};
+        // 请求模型 贝叶斯网络模型接口，请求参数，返回结果
+        List<TriggerVO> probabilitiesVOList = httpRestClient.post(XianConstants.BAYES_NET_MODEL_URL, requestFactors, typeRef);
+        // 解析岩土类型
+        probabilitiesVOList = parseModelData(probabilitiesVOList);
+        // 结果为空
+        if (probabilitiesVOList == null) {
+            throw new ParamsException(XianConstants.RESULT_EMPTY);
+        }
+        log.info("请求成功,已经获取数据...");
+        // 存库..
+        List<FactorAnalysis> factorAnalysisList = new ArrayList<>();
+
+        for (TriggerVO res : probabilitiesVOList) {
+            // 创建因子分析对象
+            FactorAnalysis factorAnalysis = new FactorAnalysis();
+
+            factorAnalysis.setEntityId(res.getEntityId());
+            factorAnalysis.setProbability(res.getProbability().toString());
+            factorAnalysis.setLevel(res.getLevel().toString());
+            factorAnalysis.setDisasterType(res.getDisasterType());
+            factorAnalysis.setDisasters(res.getDisaster().toString());
+
+            // 单值变量
+            for (FactorVO factor : res.getFactors()) {
+                factorAnalysis.setAttributeId(factor.getAttributeId());
+                factorAnalysis.setValueId(factor.getValueId());
+                factorAnalysis.setFactorValue(factor.getFactorValue());
+            }
+            factorAnalysis.setCreateTime(LocalDateTime.now());
+            factorAnalysis.setUpdateTime(LocalDateTime.now());
+            factorAnalysis.setIsDeleted(0);
+            // 添加到列表
+            factorAnalysisList.add(factorAnalysis);
+        }
+        // 异步存库
+        saveModelData(factorAnalysisList,XianConstants.SEISMIC_TYPE);
+        return probabilitiesVOList;
+    }
+
     // 修改模型参数
     @Override
     public String rainFactorUpdate(TriggerUpdate factors) {
@@ -834,19 +888,37 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     }
     // 异步保存数据
     @Async("taskExecutor")
-    protected void saveModelData(List<FactorAnalysis> factorAnalysisList) {
+    protected void saveModelData(List<FactorAnalysis> factorAnalysisList, boolean flag) {
 
-        QueryWrapper<XianDisasterRain> wrapper = new QueryWrapper<XianDisasterRain>()
-                .select("disaster_id")
-                .orderByDesc("disaster_id")
-                .last("limit 1");
+        // flag，T：暴雨，F：地震
+        if(flag == true) {
 
-        // 获取最新的disasterId
-        XianDisasterRain disasterRain = disasterRainMapper.selectOne(wrapper);
+            QueryWrapper<XianDisasterRain> wrapper = new QueryWrapper<XianDisasterRain>()
+                    .select("disaster_id")
+                    .orderByDesc("disaster_id")
+                    .last("limit 1");
 
-        // 每条分析数据都加上 disasterId
-        for (FactorAnalysis factorAnalysis : factorAnalysisList) {
-            factorAnalysis.setRainDisasterId(disasterRain.getDisasterId());
+            // 获取最新的disasterId
+            XianDisasterRain disasterRain = disasterRainMapper.selectOne(wrapper);
+
+            // 每条分析数据都加上 disasterId
+            for (FactorAnalysis factorAnalysis : factorAnalysisList) {
+                factorAnalysis.setRainDisasterId(disasterRain.getDisasterId());
+            }
+        } else {
+
+            QueryWrapper<XianEarthquakeList> wrapper = new QueryWrapper<XianEarthquakeList>()
+                    .select("disaster_id")
+                    .orderByDesc("disaster_id")
+                    .last("limit 1");
+
+            // 获取最新的disasterId
+            XianEarthquakeList disasterEarthquake = earthquakeListMapper.selectOne(wrapper);
+
+            // 每条分析数据都加上 disasterId
+            for (FactorAnalysis factorAnalysis : factorAnalysisList) {
+                factorAnalysis.setEqDisasterId(disasterEarthquake.getDisasterId());
+            }
         }
 
         log.info("数据正在入库...");

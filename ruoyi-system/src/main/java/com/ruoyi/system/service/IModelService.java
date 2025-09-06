@@ -38,6 +38,8 @@ public interface IModelService extends IService<FactorAnalysis> {
     // 获取触发数据
     public List<TriggerVO> rainTrigger(TriggerRequest factors);
 
+    public List<TriggerVO> eqTrigger(TriggerRequest factors);
+
     // 修改因子数据
     public String rainFactorUpdate(TriggerUpdate factors);
 

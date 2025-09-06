@@ -41,6 +41,8 @@ public class FactorAnalysis {
     private Integer actualOccur;
     @TableField("rain_disaster_id")
     private Long rainDisasterId;
+    @TableField("eq_disaster_id")
+    private Long eqDisasterId;
     @TableField("create_time")
     private LocalDateTime createTime;
     @TableField("update_time")

@@ -75,6 +75,13 @@ public class ModelController {
     }
 
 
+    @ApiOperation(value = "地震触发接口")
+    @PostMapping("/eq/trigger")
+    public AjaxResult eqTrigger(@RequestBody TriggerRequest request)
+    {
+        return AjaxResult.success(modelService.eqTrigger(request));
+    }
+
     @ApiOperation(value = "模型因子修改接口")
     @PostMapping("/factor/update")
     public AjaxResult rainFactorUpdate(@RequestBody TriggerUpdate request)
