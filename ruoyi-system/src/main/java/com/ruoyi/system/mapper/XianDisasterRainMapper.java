@@ -28,7 +28,6 @@ public interface XianDisasterRainMapper extends BaseMapper<XianDisasterRain> {
 
     // @Select("SELECT street FROM xian_disaster_rain where disaster_Id = #{disasterId}")
     // List<> getRainStreet(@Param("disasterId") Long disasterId);
-
-
+    List<Map<String, Object>> queryDisasterNames();
 
 }
