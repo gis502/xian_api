@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ import java.util.List;
 
 @Mapper
 public interface GeologicalDisasterHideMapper extends BaseMapper<GeologicalDisasterHide> {
-    
+
     /**
      * 查询圆形范围内的危险源数据
      * @param centerLon 中心点经度
@@ -24,7 +27,7 @@ public interface GeologicalDisasterHideMapper extends BaseMapper<GeologicalDisas
      * @return 危险源列表
      */
     List<GeologicalDisasterHide> findWithinCircle(@Param("centerLon") Double centerLon,
-                                                   @Param("centerLat") Double centerLat, 
+                                                   @Param("centerLat") Double centerLat,
                                                    @Param("radiusMeters") Double radiusMeters);
 
     /**
@@ -40,4 +43,7 @@ public interface GeologicalDisasterHideMapper extends BaseMapper<GeologicalDisas
                                                                 @Param("semiMajorAxis") Double semiMajorAxis,
                                                                 @Param("semiMinorAxis") Double semiMinorAxis,
                                                                 @Param("rotation") Double rotation);
+
+    @Select("SELECT count(*) FROM xian_disaster_risk where county = #{county}")
+    Integer getRiskNumByCounty(String county);
 }

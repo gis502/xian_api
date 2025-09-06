@@ -41,6 +41,7 @@ public class RainReportEntity {
     private List<String> hideArea;                          // 隐患地区
     private Integer hideAreaQuantity;                       // 隐患点数量
     private List<String> hazards;                           // 致灾因子
+    private String disasterChain;                           // 灾害链
     private String significantIncreaseArea;                 // 风险显著上升区域
     private List<String> significantIncreaseAreaStreet;     // 显著上升街道
     private Integer significantIncreaseAreaRiskQuantity;    // 显著上升区域中重点关注风险点

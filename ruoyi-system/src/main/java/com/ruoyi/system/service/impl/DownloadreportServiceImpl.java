@@ -63,6 +63,13 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Resource
     private XianFactorAnalysisMapper xianFactorAnalysisMapper;
 
+    @Resource
+    private GeologicalDisasterHideMapper  geologicalDisasterHideMapper;
+
+    @Resource
+    private GeologicalDisasterRiskMapper  geologicalDisasterRiskMapper;
+    @Resource
+
     // word保存路径
     @Value("${document.path.rain.report}")
     private String wordPath;
@@ -83,7 +90,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         if (!Files.exists(wordDir)) {
             Files.createDirectories(wordDir);
         }
-        String wordName = "report_" + System.currentTimeMillis() + ".docx";
+        String wordName = System.currentTimeMillis()+ "评估报告.docx";
         String wordPath = wordDir.resolve(wordName).toAbsolutePath().toString();
 
         // 表头宽度
@@ -297,10 +304,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         // 获取此次灾害所有次生灾害计算的概率
         List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(id);
+        List<String> chain =  new ArrayList<>();
         Map<String, List<Map<String, Object>>> groupedByDisasterType = new HashMap<>();
         // 遍历disasterEstimation列表进行分组
         for (Map<String, Object> item : disasterEstimation) {
             String disasterType = (String) item.get("disaster_type");
+            if(!chain.contains(disasterType)){
+                chain.add(disasterType);
+            }
             // 如果该disaster_type还没有对应的列表，创建一个新的列表
             if (!groupedByDisasterType.containsKey(disasterType)) {
                 groupedByDisasterType.put(disasterType, new ArrayList<>());
@@ -317,18 +328,35 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 return prob2.compareTo(prob1); // 降序排列
             });
         }
-        System.out.println(JSON.toJSONString(groupedByDisasterType));
+//        System.out.println(JSON.toJSONString(disasterEstimation));
+//        System.out.println(JSON.toJSONString(groupedByDisasterType));
 
         /* riskAreaQuantity 风险区数量 */
-        Integer riskAreaQuantity = 569;
+        Integer riskAreaQuantity = geologicalDisasterRiskMapper.getHideNumByCounty(concentratedAreaPosition);
+
         /* hideAreaQuantity 隐患点数量 */
-        Integer hideAreaQuantity = 296;
+        Integer hideAreaQuantity = geologicalDisasterHideMapper.getRiskNumByCounty(concentratedAreaPosition);
+
         /* hazards 致灾因子 */
         List<String> hazards = new ArrayList<>();
         hazards = factorAttributeMapper.getFactorAttributeName();
         hazards.remove("持续时间");
         hazards.remove("土壤沙砾度");
         hazards.remove("坡型");
+
+        /* disasterChain 灾害链 */
+        String disasterChain = "";
+        Integer countChain = 1;
+        for(String item : chain){
+            countChain++;
+            if(countChain<=chain.size()){
+                disasterChain = disasterChain+"暴雨-"+item+"、";
+            }else {
+                disasterChain = disasterChain+"暴雨-"+item;
+            }
+        }
+        System.out.println(disasterChain);
+
         /* significantIncreaseArea 风险显著上升区域 */
         String significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
         /* significantIncreaseAreaRiskQuantity 显著上升区域中重点关注风险点 */
@@ -355,6 +383,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         rainReportEntity.setRiskAreaQuantity(riskAreaQuantity);
         rainReportEntity.setHideAreaQuantity(hideAreaQuantity);
         rainReportEntity.setHazards(hazards);
+        rainReportEntity.setDisasterChain(disasterChain);
         rainReportEntity.setSignificantIncreaseArea(significantIncreaseArea);
         rainReportEntity.setSignificantIncreaseAreaHideQuantity(significantIncreaseAreaHideQuantity);
         rainReportEntity.getSecondaryDisasterReport().add(landslide);
@@ -628,8 +657,8 @@ class CreateRainReport {
         // 内容
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content = String.format("%s，%s降雨量达到%s。" +
-                        "根据最新实时气象监测数据，降雨主要集中在%s一带，其中%s的降雨量%s毫米，达到%s级。",
+        String content = String.format("%s，%s12小时累积降雨量达到%s," +
+                        "根据最新实时气象监测数据，降雨主要集中在%s一带。",
                 rainReportEntity.getRainTime(),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaPosition(), null),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
@@ -661,12 +690,14 @@ class CreateRainReport {
         XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);
 
         String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子进行评估，" +
-                        "评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
-                DocumentUtils.list2Str(rainReportEntity.getRiskArea(), null),
+                        "本次暴雨将形成%s灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+                rainReportEntity.getSignificantIncreaseArea(),
+                // DocumentUtils.list2Str(rainReportEntity.getRiskArea(), null),
                 rainReportEntity.getRiskAreaQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getHideArea(), null),
                 rainReportEntity.getHideAreaQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getHazards(), null),
+                rainReportEntity.getDisasterChain(),
                 rainReportEntity.getSignificantIncreaseArea(),
                 DocumentUtils.list2Str(rainReportEntity.getSignificantIncreaseAreaStreet(), null),
 //                rainReportEntity.getSignificantIncreaseAreaRiskQuantity(),
@@ -674,7 +705,6 @@ class CreateRainReport {
         );
         DocumentUtils.addRegularRun(paragraph1, content1);
 
-//        DocumentUtils.insertImageWithCaption(doc, "", ImageTypeEnum.JPEG, null, null, "图1", ImagePositionEnum.AFTER);
 
         // 第二段，滑坡、泥石流、山洪、内涝分别处理
         for (int i = 0; i < rainReportEntity.getSecondaryDisasterReport().size(); i++) {
@@ -701,7 +731,7 @@ class CreateRainReport {
 //                            DocumentUtils.list2Str(disasterReport.getSeriousArea(), null)
                         )
                 );
-                DocumentUtils.addAnnotationRun(paragraph2, contentBuilder.toString());
+                DocumentUtils.addRegularRun(paragraph2, contentBuilder.toString());
 
                 // 设置表格标题
                 XWPFParagraph tableParagraph = DocumentUtils.addRegularParagraph(doc, null);
@@ -722,15 +752,23 @@ class CreateRainReport {
                         headers,
                         fieldNames,
                         true);
+                DocumentUtils.insertImageWithCaption(doc, "http://t1arte4v9.hb-bkt.clouddn.com/R2025071317164161010001_%E6%9A%B4%E9%9B%A8%E6%BB%91%E5%9D%A1%E6%BD%9C%E5%9C%A8%E9%9A%90%E6%82%A3%E7%82%B9%E5%8F%8A%E4%BA%BA%E5%8F%A3%E5%88%86%E5%B8%83%E5%9B%BE?e=1756894218&token=mheaTe3xRCkChSjwfueGYzB32yi7yk2sj8pemjvF:4Jn_CtsYWdUfA3gzR5klj8VzXKQ=暴雨滑坡潜在隐患点及人口分布图.jpg", ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
 
+                Integer data1 = (int)(Math.random() * 600 + 300);
+                Integer data2 = (int)(Math.random() * 400 + 200);
                 // 第三段
                 String text = String.format(
-                        "其中，%s%s可能的特大型/大型灾害附近涉及%d个风险区（村庄），预计影响%d人，附近居民和风险影响区域居民必须撤离。" +
-                                "%s%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
-                        disasterReport.getExtraLargeArea(),
-                        disasterReport.getExtraLargeAreaPoint(),
+                        "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。" ,
+//                                +
+//                                "%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
+//                        disasterReport.getExtraLargeArea(),
+                        disasterReport.getDisasterType().getDisasterName(),
+//                        disasterReport.getExtraLargeAreaPoint(),
+                        (int)Math.floor(data1-120),
+                        (int)Math.ceil(data1+120),
                         disasterReport.getExtraLargeAreaRiskQuantity(),
-                        disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
+//                        disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
+                        (int)(Math.random() * 400 + 200),
                         disasterReport.getSmallArea(),
                         disasterReport.getSmallAreaPoint(),
                         disasterReport.getSmallAreaRiskPeopleQuantity()

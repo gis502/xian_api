@@ -18,14 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,6 +32,8 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
     @Resource
     private FactorAnalysisMapper factorAnalysisMapper;
+    @Resource
+    private XianImpactInAreaMapper  xianImpactInAreaMapper;
     @Resource
     private FactorValueMapper factorValueMapper;
     @Resource
@@ -64,6 +63,84 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
     @Resource
     private XianEarthquakeListMapper earthquakeListMapper;
 
+
+    @Override
+    public String impactInsert(List<ImpactAreaRequest> request){
+        System.out.println(request);
+
+         
+        List<XianImpactInAreaEntity> xianImpactInAreaEntityList = new ArrayList<>();
+        for (ImpactAreaRequest area : request) {
+            XianImpactInAreaEntity xianImpactInAreaEntity = new XianImpactInAreaEntity();  
+            // 将polygon坐标转换为WKT格式
+            String polygonWkt = convertPolygonToWkt(area.getPolygon());
+            System.out.println("灾害类型: " + area.getType());
+            System.out.println("实体ID: " + area.getEntityId());
+
+            // 计算总人口数
+            Integer totalPeople = xianImpactInAreaMapper.getTotalPeopleInPolygon(polygonWkt);
+            System.out.println("影响人口数: " + totalPeople);
+
+            Integer totalHighway = xianImpactInAreaMapper.getIntersectingHighwayCount(polygonWkt);
+            System.out.println("影响高速公路数: " + totalHighway);
+
+            Integer nationalRoadCount = xianImpactInAreaMapper.getIntersectingNationalRoadCount(polygonWkt);
+            System.out.println("影响国道数: " + nationalRoadCount);
+
+            Integer roadCount = xianImpactInAreaMapper.getIntersectingRoadCount(polygonWkt);
+            System.out.println("影响普通道路数: " + roadCount);
+
+            Integer subwayStationCount = xianImpactInAreaMapper.getSubwayStationCountInPolygon(polygonWkt);
+            System.out.println("影响地铁站数: " + subwayStationCount);
+
+            // 在impactInsert方法中添加危险源查询
+            Integer dangerousSourceCount = xianImpactInAreaMapper.getDangerousSourceCountInPolygon(polygonWkt);
+            System.out.println("影响危险源数: " + dangerousSourceCount);
+
+            xianImpactInAreaEntity.setDisasterId(area.getDisasterId());
+            xianImpactInAreaEntity.setSecondDisasterId(area.getEntityId());
+            xianImpactInAreaEntity.setPeople(totalPeople);
+            xianImpactInAreaEntity.setHeightway(totalHighway);
+            xianImpactInAreaEntity.setNationalRoad(nationalRoadCount);
+            xianImpactInAreaEntity.setStreet(roadCount);
+            xianImpactInAreaEntity.setStation(subwayStationCount);
+            xianImpactInAreaEntity.setDangerousPoint(dangerousSourceCount);
+            xianImpactInAreaEntity.setDistrict(area.getCounty());
+
+            xianImpactInAreaEntityList.add(xianImpactInAreaEntity);
+        }
+        System.out.println(xianImpactInAreaEntityList);
+
+        xianImpactInAreaMapper.insertBatch(xianImpactInAreaEntityList);
+
+        return "ok";
+    }
+
+    /**
+     * 将坐标点列表转换为WKT格式的多边形字符串
+     * @param polygon 坐标点列表
+     * @return WKT格式字符串
+     */
+    private String convertPolygonToWkt(List<Map<String, Double>> polygon) {
+        StringBuilder wkt = new StringBuilder("POLYGON((");
+
+        for (int i = 0; i < polygon.size(); i++) {
+            Map<String, Double> point = polygon.get(i);
+            wkt.append(point.get("lon")).append(" ").append(point.get("lat"));
+            if (i < polygon.size() - 1) {
+                wkt.append(", ");
+            }
+        }
+
+        // 闭合多边形（第一个点和最后一个点相同）
+        if (!polygon.isEmpty()) {
+            Map<String, Double> firstPoint = polygon.get(0);
+            wkt.append(", ").append(firstPoint.get("lon")).append(" ").append(firstPoint.get("lat"));
+        }
+
+        wkt.append("))");
+        return wkt.toString();
+    }
 
     @Override
     public List<ModelGetDataDTO> rainSlideTrigger(List<List<FactorVO>> factorList){
