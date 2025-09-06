@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.XianImpactInAreaMapper">
+    <select id="queryPeople" resultType="com.ruoyi.system.domain.entity.XianImpactInAreaEntity">
+        SELECT
+            district, SUM(people)people
+        FROM xian_impact_in_area
+        <where>
+            disaster_id = #{disasterId}
+        </where>
+        GROUP BY district
+    </select>
+
+    <select id="queryTraffic" resultType="com.ruoyi.system.domain.entity.XianImpactInAreaEntity">
+        SELECT
+            SUM(national_road)national_road, SUM(heightway) heightway, SUM(street) street
+        FROM xian_impact_in_area
+        <where>
+            disaster_id = #{disasterId}
+        </where>
+    </select>
+
+    <select id="queryDanger" resultType="com.ruoyi.system.domain.entity.XianImpactInAreaEntity">
+        SELECT
+        district, SUM(dangerous_point)dangerous_point
+        FROM xian_impact_in_area
+        <where>
+            disaster_id = #{disasterId}
+        </where>
+        GROUP BY district
+    </select>
+
+    <select id="queryStation" resultType="com.ruoyi.system.domain.entity.XianImpactInAreaEntity">
+        SELECT
+        district, SUM(station)station
+        FROM xian_impact_in_area
+        <where>
+            disaster_id = #{disasterId}
+        </where>
+        GROUP BY district
+    </select>
+</mapper>
