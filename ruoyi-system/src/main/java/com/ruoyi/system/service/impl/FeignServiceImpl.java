@@ -115,7 +115,7 @@ public class FeignServiceImpl implements IFeignService {
 
             // 抛异常
             if (outputs == null || outputs.size() == 0) {
-                throw new ParamsException(XianConstants.RESULT_EMPTY);
+                throw new ParamsException(XianConstants.THEMATIC_EMPTY);
             }
 
             List<OutputDTO> outputsDTO = new ArrayList<>();
@@ -229,15 +229,12 @@ public class FeignServiceImpl implements IFeignService {
         requestBody.put("eqType", triggerDTO.getEqType());
         requestBody.put("faultZone", triggerDTO.getFaultZone());
         requestBody.put("circleArea", triggerDTO.getCircleArea());
-//        requestBody.put("rotation", triggerDTO.getRotation());
-//        requestBody.put("semiMajorAxis", triggerDTO.getSemiMajorAxis());
-//        requestBody.put("semiMinorAxis", triggerDTO.getSemiMinorAxis());
-//        requestBody.put("affectPop", triggerDTO.getAffectPop());
-//        requestBody.put("diePop", triggerDTO.getDiePop());
-//        requestBody.put("densityPop", triggerDTO.getDensityPop());
-//        requestBody.put("country", triggerDTO.getCountry());
-//        requestBody.put("intensity", triggerDTO.getIntensity());
-//        requestBody.put("sumGdp", triggerDTO.getSumGdp());
+        requestBody.put("affectPopMax", triggerDTO.getAffectPopMax());
+        requestBody.put("affectPopMin", triggerDTO.getAffectPopMin());
+        requestBody.put("diePopMax", triggerDTO.getDiePopMax());
+        requestBody.put("diePopMin", triggerDTO.getDiePopMin());
+        requestBody.put("intensity", triggerDTO.getIntensity());
+
 
         return requestBody;
     }

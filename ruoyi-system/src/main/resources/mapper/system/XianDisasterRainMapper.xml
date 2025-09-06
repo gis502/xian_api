@@ -35,4 +35,16 @@
 <!--        ORDER BY T2.rainfall DESC-->
 <!--    </select>-->
 
+    <!-- 查询灾害名称 -->
+    <resultMap id="DisasterMap" type="map">
+        <result property="disasterId" column="disaster_id"/>
+        <result property="name" column="disaster_name"/>
+    </resultMap>
+
+    <select id="queryDisasterNames" resultMap="DisasterMap">
+        SELECT
+            disaster_id, disaster_name
+        FROM xian_disaster_rain
+        ORDER BY disaster_id DESC
+    </select>
 </mapper>

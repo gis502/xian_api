@@ -18,6 +18,7 @@ public class XianConstants {
     public static final String REQUEST_SUCCESS = "请求成功!";
     public static final String AUTH_ERROR = "授权失败!";
     public static final String TRIGGER_ERROR = "地震触发异常!";
+    public static final String THEMATIC_EMPTY = "正在生成专题图,请等待...";
 
     public static final boolean SEISMIC_TYPE = false;
     public static final boolean STORM_TYPE = true;

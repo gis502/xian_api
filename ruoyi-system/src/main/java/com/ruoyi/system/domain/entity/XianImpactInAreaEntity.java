@@ -26,22 +26,22 @@ public class XianImpactInAreaEntity {
     private Integer secondDisasterId;
     
     @TableField("people")
-    private String people;
+    private Integer people;
     
     @TableField("national_road")
-    private String nationalRoad;
+    private Integer nationalRoad;
     
-    @TableField("heighway")
-    private String heighway;
+    @TableField("heightway")
+    private Integer heightway;
     
     @TableField("street")
-    private String street;
+    private Integer street;
     
     @TableField("dangerous_point")
-    private String dangerousPoint;
+    private Integer dangerousPoint;
     
     @TableField("station")
-    private String station;
+    private Integer station;
     
     @TableField("dangerous_point_pos")
     private String dangerousPointPos;

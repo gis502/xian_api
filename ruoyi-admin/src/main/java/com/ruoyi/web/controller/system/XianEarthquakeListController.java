@@ -8,6 +8,8 @@ import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.domain.vo.EarthquakeVo;
 import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import com.ruoyi.system.service.IXianEarthquakeListService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,7 @@ import java.util.List;
 
 public class XianEarthquakeListController {
 
+    private static final Logger log = LoggerFactory.getLogger(XianEarthquakeListController.class);
     @Resource
     private IXianEarthquakeListService eqListService;
 
