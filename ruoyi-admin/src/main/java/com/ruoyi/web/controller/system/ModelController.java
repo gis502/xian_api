@@ -4,6 +4,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.dto.DemSlopeDTO;
 import com.ruoyi.system.domain.dto.ModelGetDataFactorListEntityIdDTO;
 import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.vo.ImpactAreaRequest;
 import com.ruoyi.system.domain.vo.TriggerRequest;
 import com.ruoyi.system.domain.vo.TriggerUpdate;
 import com.ruoyi.system.service.IModelService;
@@ -89,6 +90,13 @@ public class ModelController {
         return AjaxResult.success(modelService.rainFactorUpdate(request));
     }
 
+    @ApiOperation(value = "插入impact_in_area数据")
+    @PostMapping("/impactinsert")
+    public AjaxResult impactInsert(@RequestBody List<ImpactAreaRequest> request)
+
+    {
+        return AjaxResult.success(modelService.impactInsert(request));
+    }
 
 
 

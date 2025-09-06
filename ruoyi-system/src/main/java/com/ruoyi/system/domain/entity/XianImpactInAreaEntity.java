@@ -16,7 +16,7 @@ import lombok.Data;
 @TableName("xian_impact_in_area")
 public class XianImpactInAreaEntity {
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Integer id;
     
     @TableField("disaster_id")

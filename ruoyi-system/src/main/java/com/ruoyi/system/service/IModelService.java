@@ -4,11 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.ruoyi.system.domain.dto.*;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.entity.FactorValue;
-import com.ruoyi.system.domain.vo.FactorVO;
+import com.ruoyi.system.domain.vo.*;
 import com.ruoyi.system.domain.entity.XianDem;
-import com.ruoyi.system.domain.vo.TriggerRequest;
-import com.ruoyi.system.domain.vo.TriggerUpdate;
-import com.ruoyi.system.domain.vo.TriggerVO;
 
 
 import java.util.List;
@@ -42,5 +39,7 @@ public interface IModelService extends IService<FactorAnalysis> {
 
     // 修改因子数据
     public String rainFactorUpdate(TriggerUpdate factors);
+
+    public String impactInsert(List<ImpactAreaRequest> request);
 
 }
