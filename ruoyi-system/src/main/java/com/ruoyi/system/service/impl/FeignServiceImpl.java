@@ -35,6 +35,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -248,6 +255,60 @@ public class FeignServiceImpl implements IFeignService {
         requestBody.put("rainType", triggerDTO.getRainType());
 
         return requestBody;
+    }
+
+    @DataSource(value = DataSourceType.SLAVE)
+    @Override
+    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException {
+        try {
+            QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
+            wrapper.eq("eq_id", eqId);
+            wrapper.eq("eqqueue_id", eqqueueId);
+            wrapper.eq("type", 2);
+            wrapper.eq("is_deleted", 0);
+
+            List<AssessmentOutput> outputs = slaveAssessmentOutputMapper.selectList(wrapper);
+
+            // 抛异常
+            if (outputs == null || outputs.size() == 0) {
+                throw new ParamsException(XianConstants.RESULT_EMPTY);
+            }
+
+            OutputDTO outputDTO = new OutputDTO();
+            for (AssessmentOutput output : outputs) {
+                BeanUtils.copyProperties(output, outputDTO);
+            }
+
+            // 处理Windows路径分隔符
+            String filePath = outputDTO.getLocalSourceFile().replace("\\", File.separator);
+            Path file = Paths.get(filePath).normalize();
+
+            System.out.println("尝试下载文件: {}" + file);
+            System.out.println("文件是否存在: {}" + Files.exists(file));
+
+            if (!Files.exists(file)) {
+                System.out.println("文件不存在: {}" + file);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.getWriter().write("文件不存在: " + outputDTO.getFileName());
+                return;
+            }
+
+            // 添加CORS响应头
+            resp.setHeader("Access-Control-Allow-Origin", "*");
+            resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            resp.setHeader("Access-Control-Allow-Headers", "*");
+            resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+            resp.setContentType("application/octet-stream");
+            resp.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(outputDTO.getFileName(), "UTF-8"));
+
+            Files.copy(file, resp.getOutputStream());
+            resp.flushBuffer();
+
+        } catch (Exception e) {
+            log.error("获取报告失败：{}", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 

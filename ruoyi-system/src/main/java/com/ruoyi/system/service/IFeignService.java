@@ -8,6 +8,8 @@ import com.ruoyi.system.domain.dto.TriggerDTO;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.params.ThematicQuery;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 public interface IFeignService {
@@ -23,6 +25,8 @@ public interface IFeignService {
     public RainQuery trigger(RainTriggerDTO triggerDTO);
     // 第三方暴雨专题图件产出
     public List<RainOutputDTO> thematicMap(RainQuery query);
+
+    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException;
 
 
 

@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author: xiaodemos
@@ -53,6 +55,13 @@ public class FeignController {
     @GetMapping("/rain/map")
     public AjaxResult thematicMap(@RequestBody RainQuery query) {
         return AjaxResult.success(feignService.thematicMap(query));
+    }
+
+    @ApiOperation(value = "灾情报告下载")
+    @CrossOrigin(origins = "*")
+    @GetMapping("/download/{eqId}/{eqqueueId}")
+    public void getReport(@PathVariable String eqId, @PathVariable String eqqueueId, HttpServletResponse resp) throws IOException {
+        feignService.downloadReport(eqId, eqqueueId, resp);
     }
 
 }
