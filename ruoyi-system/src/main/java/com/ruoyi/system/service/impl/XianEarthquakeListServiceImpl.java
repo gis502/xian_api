@@ -104,7 +104,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
         for (int i=0;i<earthquake.getCircleParam().size();i++){
 //           log.info("7879784554564131313 {}" , earthquake.getCircleParam().get(i).getCircleArea());
            //计算影响人口：7度区以上覆盖的人口格网均为影响人口
-            if (earthquake.getCircleParam().get(i).getIntensity()==7) {
+            if (earthquake.getCircleParam().get(i).getIntensity()==8) {
                 List<PeopleGDP> AffectPeopleGDPS = peopleGDPMapper.findInsideCircle(earthquake.getLongitude(),
                         earthquake.getLatitude(),
                         earthquake.getCircleParam().get(i).getSemiMajorAxis(),
@@ -147,7 +147,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
         }
 
         // 计算受影响人口范围并按要求格式化
-        int affectPopMinRaw = (int) Math.round(AffectPeople * 0.6);
+        int affectPopMinRaw = (int) Math.round(AffectPeople * 0.8);
         int affectPopMaxRaw = (int) Math.round(AffectPeople * 1.2);
         int affectPopMin = roundByDigit(affectPopMinRaw);
         int affectPopMax = roundByDigit(affectPopMaxRaw);
@@ -230,7 +230,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
 
 
             // 计算死亡人口范围并按要求格式化
-            int diePopMinRaw = (int) Math.round(casualties * 0.6);
+            int diePopMinRaw = (int) Math.round(casualties * 0.8);
             int diePopMaxRaw = (int) Math.round(casualties * 1.2);
             int diePopMin = roundByDigit(diePopMinRaw);
             int diePopMax = roundByDigit(diePopMaxRaw);
@@ -254,9 +254,9 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
 //            );
 
         } else {
-            double randomRatio = 0.05 + Math.random() * 0.05;
+            double randomRatio = 0.07 + Math.random() * 0.05;
             double casualties = AffectPeople * randomRatio;
-            int diePopMinRaw = (int) Math.round(casualties * 0.6);
+            int diePopMinRaw = (int) Math.round(casualties * 0.8);
             int diePopMaxRaw = (int) Math.round(casualties * 1.2);
             int diePopMin = roundByDigit(diePopMinRaw);
             int diePopMax = roundByDigit(diePopMaxRaw);

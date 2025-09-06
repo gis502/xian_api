@@ -65,8 +65,6 @@ public class XianEarthquakeListController {
 
     @PostMapping("/earthquake/add")
     public AjaxResult earthquakeAdd(@RequestBody EarthquakeVo earthquake) {
-        System.out.println(earthquake);
-        log.info("87474155654656546464665 {}", earthquake);
         return AjaxResult.success(eqListService.insertEarthquake(earthquake));
     }
 

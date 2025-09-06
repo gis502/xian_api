@@ -8,6 +8,7 @@ import com.ruoyi.system.domain.params.ThematicQuery;
 import com.ruoyi.system.service.IFeignService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -17,7 +18,7 @@ import javax.annotation.Resource;
  * @date: 2025-08-26 11:38
  * @description: 第三方接口调用
  */
-
+@Slf4j
 @RestController
 @RequestMapping("/feign")
 public class FeignController {
@@ -28,6 +29,7 @@ public class FeignController {
     @ApiOperation(value = "地震触发")
     @PostMapping("/eq/trigger")
     public AjaxResult trigger(@RequestBody TriggerDTO triggerDTO) {
+        log.info("触发参数：{}", triggerDTO);
         return AjaxResult.success(feignService.trigger(triggerDTO));
     }
 
