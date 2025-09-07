@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface DownloadreportService {
 
-    public R<String> generateRainReport(String rainId,String rainQueueId) throws IOException, InvalidFormatException;
+    public R<String> generateRainReport(String rainId,String rainQueueId,Integer rainDisasterId) throws IOException, InvalidFormatException;
 
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException;
 

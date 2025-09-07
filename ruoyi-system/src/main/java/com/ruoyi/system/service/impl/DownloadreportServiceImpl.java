@@ -91,9 +91,9 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     //生成报告
     @Override
-    public R<String> generateRainReport(String rainId,String rainQueueId) throws IOException {
+    public R<String> generateRainReport(String rainId,String rainQueueId,Integer rainDisasterId) throws IOException {
         // 获取报告数据
-        RainReportEntity rainReportEntity = generateRainReportEntity(Integer.valueOf(rainId));
+        RainReportEntity rainReportEntity = generateRainReportEntity(Integer.valueOf(rainDisasterId));
         rainReportEntity.setRainQueueId(rainQueueId);
         rainReportEntity.setRainId(rainId);
 

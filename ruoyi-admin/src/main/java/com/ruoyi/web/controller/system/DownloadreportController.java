@@ -31,8 +31,8 @@ public class DownloadreportController {
     private DownloadreportService downloadreportService;
 
     @PostMapping("/generateRainReport")
-    public R<String> generateRainReport(@RequestBody RainQuery rainQuery) throws IOException, InvalidFormatException{
-        return downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId());
+    public R<String> generateRainReport(@RequestBody RainQuery rainQuery,@RequestBody Integer rainDisasterId) throws IOException, InvalidFormatException{
+        return downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(),rainDisasterId);
     }
     @GetMapping("/file/{fileName}")
     @CrossOrigin(origins = "*")
