@@ -11,6 +11,11 @@ import java.util.List;
  */
 @Data
 public class RainReportEntity {
+
+    private String rainQueueId;
+
+    private String rainId;
+
     /*
      * 表头时间
      */

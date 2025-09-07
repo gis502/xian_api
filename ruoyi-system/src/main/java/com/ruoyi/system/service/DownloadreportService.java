@@ -12,9 +12,9 @@ import java.util.Map;
 
 public interface DownloadreportService {
 
-    public R<String> generateRainReport(Integer disasterId) throws IOException, InvalidFormatException;
+    public R<String> generateRainReport(String rainId,String rainQueueId) throws IOException, InvalidFormatException;
 
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException;
 
-    public RainReportEntity generateRainReportEntity(Integer disasterId);
+//    public RainReportEntity generateRainReportEntity(Integer disasterId);
 }

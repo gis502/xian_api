@@ -8,8 +8,10 @@ import com.ruoyi.common.enums.ImageTypeEnum;
 import com.ruoyi.common.enums.TypesOfSecondaryDisasters;
 import com.ruoyi.common.utils.file.DocumentUtils;
 import com.ruoyi.system.domain.entity.*;
+import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.DownloadreportService;
+import com.ruoyi.system.service.IFeignService;
 import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,6 +73,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     @Resource
     private GeologicalDisasterRiskMapper  geologicalDisasterRiskMapper;
+
+    @Autowired
+    private IFeignService feignService;
+
     @Resource
 
     // word保存路径
@@ -84,9 +90,11 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     //生成报告
     @Override
-    public R<String> generateRainReport(Integer disasterId) throws IOException {
+    public R<String> generateRainReport(String rainId,String rainQueueId) throws IOException {
         // 获取报告数据
-        RainReportEntity rainReportEntity = generateRainReportEntity(disasterId);
+        RainReportEntity rainReportEntity = generateRainReportEntity(Integer.valueOf(rainId));
+        rainReportEntity.setRainQueueId(rainQueueId);
+        rainReportEntity.setRainId(rainId);
 
         // 生成 Word 路径
         Path wordDir = Paths.get(wordPath);
@@ -107,7 +115,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return R.ok(wordName);
     }
 
-    @Override
+
     public RainReportEntity generateRainReportEntity(Integer disasterId) {
         Long id = Long.valueOf(disasterId);
         RainReportEntity rainReportEntity = new RainReportEntity();
@@ -587,6 +595,10 @@ public class DownloadreportServiceImpl implements DownloadreportService {
  * word文档生成
  */
 class CreateRainReport {
+
+    @Resource
+    private IFeignService feignService;
+
     /**
      * 创建word文件
      *
@@ -764,13 +776,19 @@ class CreateRainReport {
                         headers,
                         fieldNames,
                         true);
+
+                RainQuery rainQuery = new RainQuery();
+                rainQuery.setRainId(rainReportEntity.getRainId());
+                rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
+                feignService.thematicMap(rainQuery);
+
                 DocumentUtils.insertImageWithCaption(doc, "http://t1arte4v9.hb-bkt.clouddn.com/R2025071317164161010001_%E6%9A%B4%E9%9B%A8%E6%BB%91%E5%9D%A1%E6%BD%9C%E5%9C%A8%E9%9A%90%E6%82%A3%E7%82%B9%E5%8F%8A%E4%BA%BA%E5%8F%A3%E5%88%86%E5%B8%83%E5%9B%BE?e=1756894218&token=mheaTe3xRCkChSjwfueGYzB32yi7yk2sj8pemjvF:4Jn_CtsYWdUfA3gzR5klj8VzXKQ=暴雨滑坡潜在隐患点及人口分布图.jpg", ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
 
                 Long originalData = disasterReport.getInfluencePeopleQuantity();
                 Long[] bounds = calculateFloatBounds(originalData);
                 Long data1 = bounds[0]; // 较小值
                 Long data2 = bounds[1]; // 较大值
-                
+
                 // 第三段
                 String text = String.format(
                         "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。" ,
@@ -854,10 +872,10 @@ class CreateRainReport {
         if (value == null || value == 0) {
             return 10; // 默认浮动范围
         }
-        
+
         // 计算数值的位数
         int digits = String.valueOf(Math.abs(value)).length();
-        
+
         // 根据位数计算浮动范围
         if (digits <= 2) {
             return 10;
@@ -877,10 +895,10 @@ class CreateRainReport {
         if (value == null || value == 0) {
             return value;
         }
-        
+
         // 计算数值的位数
         int digits = String.valueOf(Math.abs(value)).length();
-        
+
         if (digits == 1) {
             // 个位数不处理
             return value;
@@ -916,16 +934,16 @@ class CreateRainReport {
         if (originalValue == null) {
             return new Long[]{0L, 0L};
         }
-        
+
         int floatRange = calculateFloatRange(originalValue);
-        
+
         Long lowerBound = Math.max(0L, originalValue - floatRange);
         Long upperBound = originalValue + floatRange;
-        
+
         // 对边界值进行截断处理
         lowerBound = truncateByDigits(lowerBound);
         upperBound = truncateByDigits(upperBound);
-        
+
         return new Long[]{lowerBound, upperBound};
     }
 

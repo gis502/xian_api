@@ -30,17 +30,17 @@ public class DownloadreportController {
     private DownloadreportService downloadreportService;
 
     @PostMapping("/generateRainReport")
-    public R<String> generateRainReport(@RequestParam Integer disasterId) throws IOException, InvalidFormatException{
-        return downloadreportService.generateRainReport(disasterId);
+    public R<String> generateRainReport(@RequestParam String rainId,@RequestParam String rainQueueId) throws IOException, InvalidFormatException{
+        return downloadreportService.generateRainReport(rainId,rainQueueId);
     }
     @GetMapping("/file/{fileName}")
     @CrossOrigin(origins = "*")
     public void downloadReport(@PathVariable String fileName, HttpServletResponse resp) throws IOException {
         downloadreportService.downloadReport(fileName,resp);
     }
-    @GetMapping("/test")
-    public ResponseEntity<?> test(@RequestParam Integer disasterId){
-        downloadreportService.generateRainReportEntity(disasterId);
-        return ResponseEntity.ok("ckw");
-    }
+//    @GetMapping("/test")
+//    public ResponseEntity<?> test(@RequestParam Integer disasterId){
+//        downloadreportService.generateRainReportEntity(disasterId);
+//        return ResponseEntity.ok("ckw");
+//    }
 }
