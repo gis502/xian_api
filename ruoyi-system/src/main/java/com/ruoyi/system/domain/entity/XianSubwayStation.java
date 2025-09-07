@@ -9,7 +9,7 @@ import lombok.Data;
 public class XianSubwayStation {
 
     @TableField("id")
-    private String id;
+    private Integer id;
     @TableField("station_name")
     private String stationName;
     @TableField("line")
