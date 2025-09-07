@@ -43,14 +43,11 @@ public class XianConstants {
         put("5", "页岩");
     }};
 
-
-
     public static final JSONObject authBody = new JSONObject();
     static {
         authBody.put("username", "admin");
         authBody.put("password", "admin123");
     }
-
 
     // 触发模型接口
     public static final String BAYES_NET_MODEL_URL = "http://localhost:8085/model/bayes/prediction";
