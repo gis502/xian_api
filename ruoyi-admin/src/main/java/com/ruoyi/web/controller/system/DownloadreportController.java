@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.service.DownloadreportService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.slf4j.Logger;
@@ -30,8 +31,8 @@ public class DownloadreportController {
     private DownloadreportService downloadreportService;
 
     @PostMapping("/generateRainReport")
-    public R<String> generateRainReport(@RequestParam String rainId,@RequestParam String rainQueueId) throws IOException, InvalidFormatException{
-        return downloadreportService.generateRainReport(rainId,rainQueueId);
+    public R<String> generateRainReport(@RequestBody RainQuery rainQuery) throws IOException, InvalidFormatException{
+        return downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId());
     }
     @GetMapping("/file/{fileName}")
     @CrossOrigin(origins = "*")
