@@ -782,11 +782,23 @@ class CreateRainReport {
                 rainQuery.setRainId(rainReportEntity.getRainId());
                 rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
                 List<RainOutputDTO> rainOutputDTOS =  feignService.thematicMap(rainQuery);
+
+                String imageName;
+                if(disasterReport.getDisasterType().getDisasterName().equals("滑坡")){
+                    imageName = "暴雨滑坡潜在隐患点及人口分布图";
+                }else if(disasterReport.getDisasterType().getDisasterName().equals("泥石流")){
+                    imageName = "暴雨泥石流潜在隐患点及人口分布图";
+                }else if(disasterReport.getDisasterType().getDisasterName().equals("内涝")){
+                    imageName = "暴雨内涝潜在隐患点及人口分布图";
+                }else {
+                    imageName = "暴雨山洪潜在隐患点及人口分布图";
+                }
                 boolean imageFound = false;
                 while (!imageFound) {
                     try {
                         for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
-                            if (rainOutputDTO.getFileName().equals("暴雨滑坡潜在隐患点及人口分布图")){
+
+                            if (rainOutputDTO.getFileName().equals(imageName)){
                                 DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
                                 imageFound = true;
                                 break;
