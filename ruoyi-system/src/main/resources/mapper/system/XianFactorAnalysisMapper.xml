@@ -36,7 +36,8 @@
             ORDER BY
             fv.hide_id, fa.value_id
             ) AS fa ON dh.id = fa.hide_id
-            WHERE fa.level IN ('[高]' , '[中]')
+            WHERE fa.level IN ('[高]')
+--             WHERE fa.level IN ('[高]' , '[中]')
             ORDER BY disaster_probability DESC
         </select>
 <!--    <select id="queryDisasterEstimation" resultType="map">-->

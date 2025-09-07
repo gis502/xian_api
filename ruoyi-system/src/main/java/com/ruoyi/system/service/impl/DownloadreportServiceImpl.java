@@ -67,6 +67,9 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     private GeologicalDisasterHideMapper  geologicalDisasterHideMapper;
 
     @Resource
+    private XianImpactInAreaMapper xianImpactInAreaMapper;
+
+    @Resource
     private GeologicalDisasterRiskMapper  geologicalDisasterRiskMapper;
     @Resource
 
@@ -442,8 +445,17 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         /* 风险集中点位概率 */
         String riskPointProbability;
 
+
         /* 影响人数 */
-        Long influencePeopleQuantity;
+        Long influencePeopleQuantity = 0L;
+        System.out.println(JSON.toJSONString(groupedByDisasterType));
+        for (Map<String, Object> item : groupedByDisasterType.get(type)) {
+            System.out.println(JSON.toJSONString(item));
+            influencePeopleQuantity = influencePeopleQuantity + xianImpactInAreaMapper.getPeopleByLatLon(item.get("lat").toString(), item.get("lon").toString());
+            System.out.println(influencePeopleQuantity);
+        }
+        secondaryDisasterReportEntity.setInfluencePeopleQuantity(influencePeopleQuantity);
+        System.out.println(influencePeopleQuantity);
 
         /* 中大型区域 */
         List<String> seriousArea;
@@ -691,7 +703,7 @@ class CreateRainReport {
 
         String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子进行评估，" +
                         "本次暴雨将形成%s灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
-                rainReportEntity.getSignificantIncreaseArea(),
+                rainReportEntity.getConcentratedAreaPosition(),
                 // DocumentUtils.list2Str(rainReportEntity.getRiskArea(), null),
                 rainReportEntity.getRiskAreaQuantity(),
                 DocumentUtils.list2Str(rainReportEntity.getHideArea(), null),
@@ -754,8 +766,11 @@ class CreateRainReport {
                         true);
                 DocumentUtils.insertImageWithCaption(doc, "http://t1arte4v9.hb-bkt.clouddn.com/R2025071317164161010001_%E6%9A%B4%E9%9B%A8%E6%BB%91%E5%9D%A1%E6%BD%9C%E5%9C%A8%E9%9A%90%E6%82%A3%E7%82%B9%E5%8F%8A%E4%BA%BA%E5%8F%A3%E5%88%86%E5%B8%83%E5%9B%BE?e=1756894218&token=mheaTe3xRCkChSjwfueGYzB32yi7yk2sj8pemjvF:4Jn_CtsYWdUfA3gzR5klj8VzXKQ=暴雨滑坡潜在隐患点及人口分布图.jpg", ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
 
-                Integer data1 = (int)(Math.random() * 600 + 300);
-                Integer data2 = (int)(Math.random() * 400 + 200);
+                Long originalData = disasterReport.getInfluencePeopleQuantity();
+                Long[] bounds = calculateFloatBounds(originalData);
+                Long data1 = bounds[0]; // 较小值
+                Long data2 = bounds[1]; // 较大值
+                
                 // 第三段
                 String text = String.format(
                         "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。" ,
@@ -764,8 +779,8 @@ class CreateRainReport {
 //                        disasterReport.getExtraLargeArea(),
                         disasterReport.getDisasterType().getDisasterName(),
 //                        disasterReport.getExtraLargeAreaPoint(),
-                        (int)Math.floor(data1-120),
-                        (int)Math.ceil(data1+120),
+                        data1.intValue(),
+                        data2.intValue(),
                         disasterReport.getExtraLargeAreaRiskQuantity(),
 //                        disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
                         (int)(Math.random() * 400 + 200),
@@ -830,5 +845,89 @@ class CreateRainReport {
         }
     }
 
+    /**
+     * 根据数值位数计算浮动范围
+     * @param value 原始数值
+     * @return 浮动范围值
+     */
+    private int calculateFloatRange(Long value) {
+        if (value == null || value == 0) {
+            return 10; // 默认浮动范围
+        }
+        
+        // 计算数值的位数
+        int digits = String.valueOf(Math.abs(value)).length();
+        
+        // 根据位数计算浮动范围
+        if (digits <= 2) {
+            return 10;
+        } else if (digits <= 7) {
+            return (int) Math.pow(10, digits - 1);
+        } else {
+            return 1000000; // 7位数的浮动范围
+        }
+    }
+
+    /**
+     * 根据位数截断数值
+     * @param value 原始数值
+     * @return 截断后的数值
+     */
+    private Long truncateByDigits(Long value) {
+        if (value == null || value == 0) {
+            return value;
+        }
+        
+        // 计算数值的位数
+        int digits = String.valueOf(Math.abs(value)).length();
+        
+        if (digits == 1) {
+            // 个位数不处理
+            return value;
+        } else if (digits == 2 || digits == 3) {
+            // 2位数和3位数：除了最高位其他为0
+            long divisor = (long) Math.pow(10, digits - 1);
+            long highestDigit = value / divisor;
+            return highestDigit * divisor;
+        } else if (digits == 4) {
+            // 4位数：最后两位为0
+            return (value / 100) * 100;
+        } else if (digits == 5) {
+            // 5位数：最后三位为0
+            return (value / 1000) * 1000;
+        } else if (digits == 6) {
+            // 6位数：最后四位为0
+            return (value / 10000) * 10000;
+        } else if (digits == 7) {
+            // 7位数：最后四位为0
+            return (value / 10000) * 10000;
+        } else {
+            // 超过7位数，按7位数处理
+            return (value / 10000) * 10000;
+        }
+    }
+
+    /**
+     * 计算浮动范围的上下边界（带截断处理）
+     * @param originalValue 原始值
+     * @return 长度为2的数组，[0]为下边界，[1]为上边界
+     */
+    private Long[] calculateFloatBounds(Long originalValue) {
+        if (originalValue == null) {
+            return new Long[]{0L, 0L};
+        }
+        
+        int floatRange = calculateFloatRange(originalValue);
+        
+        Long lowerBound = Math.max(0L, originalValue - floatRange);
+        Long upperBound = originalValue + floatRange;
+        
+        // 对边界值进行截断处理
+        lowerBound = truncateByDigits(lowerBound);
+        upperBound = truncateByDigits(upperBound);
+        
+        return new Long[]{lowerBound, upperBound};
+    }
 
 }
+

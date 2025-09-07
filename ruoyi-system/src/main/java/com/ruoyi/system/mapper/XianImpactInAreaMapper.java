@@ -2,7 +2,7 @@ package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.domain.entity.XianImpactInAreaEntity;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Insert;
@@ -19,6 +19,11 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
     List<XianImpactInAreaEntity> queryDanger(Long disasterId);
 
     List<XianImpactInAreaEntity> queryStation(Long disasterId);
+
+
+    @Select("SELECT people_num FROM xian_people WHERE ST_Contains(point, ST_SetSRID(ST_MakePoint(#{lon}::DOUBLE PRECISION, #{lat}::DOUBLE PRECISION), 4490))")
+    Long getPeopleByLatLon(@Param("lat") String lat, @Param("lon") String lon);
+
     /**
      * 根据多边形坐标查询相交区域的人口数量
      * @param polygonWkt 多边形的WKT格式字符串
@@ -166,7 +171,7 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
     // 查询危险源 - 按类型统计与多边形相交的危险源数量
     @Select("SELECT name, COUNT(*) as count FROM xian_dangerous_source WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490)) GROUP BY source_type")
     List<Map<String, Object>> getDangerousSourceCountByTypeInPolygon(@Param("polygonWkt") String polygonWkt);
-    
+
     /**
      * 批量插入影响区域数据
      * @param entityList 实体列表
