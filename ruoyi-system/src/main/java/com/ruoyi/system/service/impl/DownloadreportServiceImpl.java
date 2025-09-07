@@ -7,6 +7,7 @@ import com.ruoyi.common.enums.ImagePositionEnum;
 import com.ruoyi.common.enums.ImageTypeEnum;
 import com.ruoyi.common.enums.TypesOfSecondaryDisasters;
 import com.ruoyi.common.utils.file.DocumentUtils;
+import com.ruoyi.system.domain.dto.RainOutputDTO;
 import com.ruoyi.system.domain.entity.*;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.mapper.*;
@@ -780,9 +781,25 @@ class CreateRainReport {
                 RainQuery rainQuery = new RainQuery();
                 rainQuery.setRainId(rainReportEntity.getRainId());
                 rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
-                feignService.thematicMap(rainQuery);
-
-                DocumentUtils.insertImageWithCaption(doc, "http://t1arte4v9.hb-bkt.clouddn.com/R2025071317164161010001_%E6%9A%B4%E9%9B%A8%E6%BB%91%E5%9D%A1%E6%BD%9C%E5%9C%A8%E9%9A%90%E6%82%A3%E7%82%B9%E5%8F%8A%E4%BA%BA%E5%8F%A3%E5%88%86%E5%B8%83%E5%9B%BE?e=1756894218&token=mheaTe3xRCkChSjwfueGYzB32yi7yk2sj8pemjvF:4Jn_CtsYWdUfA3gzR5klj8VzXKQ=暴雨滑坡潜在隐患点及人口分布图.jpg", ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                List<RainOutputDTO> rainOutputDTOS =  feignService.thematicMap(rainQuery);
+                boolean imageFound = false;
+                while (!imageFound) {
+                    try {
+                        for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
+                            if (rainOutputDTO.getFileName().equals("暴雨滑坡潜在隐患点及人口分布图")){
+                                DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                                imageFound = true;
+                                break;
+                            }
+                        }
+                        if (!imageFound) {
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // DocumentUtils.insertImageWithCaption(doc, "http://t1arte4v9.hb-bkt.clouddn.com/R2025071317164161010001_%E6%9A%B4%E9%9B%A8%E6%BB%91%E5%9D%A1%E6%BD%9C%E5%9C%A8%E9%9A%90%E6%82%A3%E7%82%B9%E5%8F%8A%E4%BA%BA%E5%8F%A3%E5%88%86%E5%B8%83%E5%9B%BE?e=1756894218&token=mheaTe3xRCkChSjwfueGYzB32yi7yk2sj8pemjvF:4Jn_CtsYWdUfA3gzR5klj8VzXKQ=暴雨滑坡潜在隐患点及人口分布图.jpg", ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
 
                 Long originalData = disasterReport.getInfluencePeopleQuantity();
                 Long[] bounds = calculateFloatBounds(originalData);
