@@ -11,10 +11,7 @@ import com.ruoyi.common.exception.base.ParamsException;
 import com.ruoyi.common.exception.base.TriggerException;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import com.ruoyi.common.utils.http.HttpRestClient;
-import com.ruoyi.system.domain.dto.OutputDTO;
-import com.ruoyi.system.domain.dto.RainOutputDTO;
-import com.ruoyi.system.domain.dto.RainTriggerDTO;
-import com.ruoyi.system.domain.dto.TriggerDTO;
+import com.ruoyi.system.domain.dto.*;
 import com.ruoyi.system.domain.entity.AssessmentOutput;
 import com.ruoyi.system.domain.entity.RainAssessmentOutput;
 import com.ruoyi.system.domain.params.RainQuery;
@@ -256,57 +253,28 @@ public class FeignServiceImpl implements IFeignService {
 
     @DataSource(value = DataSourceType.SLAVE)
     @Override
-    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException {
+    public String downloadReport(ReportDTO reportDTO) {
         try {
             QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
-            wrapper.eq("eq_id", eqId);
-            wrapper.eq("eqqueue_id", eqqueueId);
+            wrapper.eq("eq_id", reportDTO.getEqId());
+            wrapper.eq("eqqueue_id", reportDTO.getEqqueueId());
             wrapper.eq("type", 2);
             wrapper.eq("is_deleted", 0);
 
-            List<AssessmentOutput> outputs = slaveAssessmentOutputMapper.selectList(wrapper);
+            AssessmentOutput output = slaveAssessmentOutputMapper.selectOne(wrapper);
 
             // 抛异常
-            if (outputs == null || outputs.size() == 0) {
+            if (output == null) {
                 throw new ParamsException(XianConstants.RESULT_EMPTY);
             }
 
-            OutputDTO outputDTO = new OutputDTO();
-            for (AssessmentOutput output : outputs) {
-                BeanUtils.copyProperties(output, outputDTO);
-            }
-
-            // 处理Windows路径分隔符
-            String filePath = outputDTO.getSourceFile().replace("\\", File.separator);
-            Path file = Paths.get(filePath).normalize();
-
-            System.out.println("尝试下载文件: {}" + file);
-            System.out.println("文件是否存在: {}" + Files.exists(file));
-
-            if (!Files.exists(file)) {
-                System.out.println("文件不存在: {}" + file);
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("文件不存在: " + outputDTO.getFileName());
-                return;
-            }
-
-            // 添加CORS响应头
-            resp.setHeader("Access-Control-Allow-Origin", "*");
-            resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-            resp.setHeader("Access-Control-Allow-Headers", "*");
-            resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-
-            resp.setContentType("application/octet-stream");
-            resp.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + URLEncoder.encode(outputDTO.getFileName(), "UTF-8"));
-
-            Files.copy(file, resp.getOutputStream());
-            resp.flushBuffer();
+            return output.getSourceFile();
 
         } catch (Exception e) {
             log.error("获取报告失败：{}", e.getMessage());
             e.printStackTrace();
         }
+
+        throw new ParamsException(XianConstants.RESULT_EMPTY);
     }
-
-
 }

@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.api;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.dto.RainTriggerDTO;
+import com.ruoyi.system.domain.dto.ReportDTO;
 import com.ruoyi.system.domain.dto.TriggerDTO;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.params.ThematicQuery;
@@ -60,10 +61,9 @@ public class FeignController {
     }
 
     @ApiOperation(value = "灾情报告下载")
-    @CrossOrigin(origins = "*")
-    @GetMapping("/download/{eqId}/{eqqueueId}")
-    public void getReport(@PathVariable String eqId, @PathVariable String eqqueueId, HttpServletResponse resp) throws IOException {
-        feignService.downloadReport(eqId, eqqueueId, resp);
+    @GetMapping("/download")
+    public String getReport(@RequestParam ReportDTO reportDTO){
+        return feignService.downloadReport(reportDTO);
     }
 
 }

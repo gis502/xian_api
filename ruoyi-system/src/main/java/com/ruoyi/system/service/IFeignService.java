@@ -1,10 +1,7 @@
 package com.ruoyi.system.service;
 
 
-import com.ruoyi.system.domain.dto.OutputDTO;
-import com.ruoyi.system.domain.dto.RainOutputDTO;
-import com.ruoyi.system.domain.dto.RainTriggerDTO;
-import com.ruoyi.system.domain.dto.TriggerDTO;
+import com.ruoyi.system.domain.dto.*;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.params.ThematicQuery;
 
@@ -26,7 +23,7 @@ public interface IFeignService {
     // 第三方暴雨专题图件产出
     public List<RainOutputDTO> thematicMap(RainQuery query);
 
-    public void downloadReport(String eqId, String eqqueueId, HttpServletResponse resp) throws IOException;
+    public String downloadReport(ReportDTO reportDTO);
 
 
 
