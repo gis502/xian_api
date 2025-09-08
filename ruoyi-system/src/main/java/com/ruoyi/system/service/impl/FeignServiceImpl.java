@@ -277,7 +277,7 @@ public class FeignServiceImpl implements IFeignService {
             }
 
             // 处理Windows路径分隔符
-            String filePath = outputDTO.getLocalSourceFile().replace("\\", File.separator);
+            String filePath = outputDTO.getSourceFile().replace("\\", File.separator);
             Path file = Paths.get(filePath).normalize();
 
             System.out.println("尝试下载文件: {}" + file);

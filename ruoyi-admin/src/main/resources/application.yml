@@ -148,4 +148,4 @@ xss:
 document:
   path:
     rain:
-      report: /data/documents/rain
+      report: /home/output/storm-disaster/reports/
