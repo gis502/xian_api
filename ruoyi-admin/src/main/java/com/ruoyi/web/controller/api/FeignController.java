@@ -61,8 +61,8 @@ public class FeignController {
     }
 
     @ApiOperation(value = "灾情报告下载")
-    @GetMapping("/download")
-    public String getReport(@RequestParam ReportDTO reportDTO){
+    @PostMapping("/download")
+    public String getReport(@RequestBody ReportDTO reportDTO){
         return feignService.downloadReport(reportDTO);
     }
 

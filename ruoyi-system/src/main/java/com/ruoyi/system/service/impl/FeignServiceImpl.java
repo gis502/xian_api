@@ -253,7 +253,8 @@ public class FeignServiceImpl implements IFeignService {
 
     @DataSource(value = DataSourceType.SLAVE)
     @Override
-    public String downloadReport(ReportDTO reportDTO) {
+    public String downloadReport(ReportDTO reportDTO){
+        String url = "";
         try {
             QueryWrapper<AssessmentOutput> wrapper = new QueryWrapper<>();
             wrapper.eq("eq_id", reportDTO.getEqId());
@@ -268,13 +269,11 @@ public class FeignServiceImpl implements IFeignService {
                 throw new ParamsException(XianConstants.RESULT_EMPTY);
             }
 
-            return output.getSourceFile();
-
+            url = output.getSourceFile();
         } catch (Exception e) {
             log.error("获取报告失败：{}", e.getMessage());
             e.printStackTrace();
         }
-
-        throw new ParamsException(XianConstants.RESULT_EMPTY);
+        return url;
     }
 }
