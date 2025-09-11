@@ -34,7 +34,7 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
         // 获取相关信息
         List<Map<String, String>> keyInfo = dataManagementMapper.selectKeyInfo(dataManagementVO.getTableName());
-        List<Map<String, String>> primaryKey = dataManagementMapper.selectPrimaryKey(dataManagementVO.getTableName());
+        List<String> primaryKey = generatorKey(dataManagementMapper.selectPrimaryKey(dataManagementVO.getTableName()));
         Integer allPage = dataManagementMapper.selectAllPage(dataManagementVO.getTableName());
 
 
@@ -43,7 +43,7 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
         List<Map<String, Object>> InfoList = dataManagementMapper.selectTableList(dataManagementVO.getTableName(),dataManagementVO.getPageSize(),offset,dataManagementVO.getQueryInfo(), fieldList);
 
-        datas.put("allPage",allPage);
+        datas.put("allPage",Math.ceil((allPage * 1.0) / dataManagementVO.getPageSize()));
         datas.put("primaryKey",primaryKey);
         datas.put("keyInfo",keyInfo);
         datas.put("tableInfo",InfoList);
@@ -68,5 +68,20 @@ public class DataManagementServiceImpl implements IDataManagementService {
                 fieldList.add(key);
             }
         }
+    }
+
+    /**
+     * 构建主键列表
+     * @param primaryKeys sql查询的主键列表
+     * @return 主键列表
+     */
+    private List<String> generatorKey(List<Map<String, String>> primaryKeys){
+        List<String> primaryKeyList = new ArrayList<>();
+        for(Map<String, String> map : primaryKeys){
+            System.out.println(map);
+            String key = map.get("primarykey");
+            primaryKeyList.add(key);
+        }
+        return primaryKeyList;
     }
 }
