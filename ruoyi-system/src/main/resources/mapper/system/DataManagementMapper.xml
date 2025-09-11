@@ -75,4 +75,16 @@
         SELECT COUNT(*) FROM ${tableName}
     </select>
 
+    <delete id="deleteInfo">
+        DELETE FROM ${tableName}
+        WHERE
+        <foreach collection="conditions" item="conditionMap" separator="OR" open="(" close=")">
+            <foreach collection="conditionMap" item="value" index="key" separator="AND" open="(" close=")">
+                <if test='value != null and value != ""'>
+                    ${key} = #{value}
+                </if>
+            </foreach>
+        </foreach>
+    </delete>
+
 </mapper>

@@ -52,8 +52,8 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
     @Override
     public boolean deleteInformation(DataManagementVO dataManagementVO){
+        dataManagementMapper.deleteInfo(dataManagementVO.getTableName(),dataManagementVO.getConditions());
         return true;
-
     }
 
     /**

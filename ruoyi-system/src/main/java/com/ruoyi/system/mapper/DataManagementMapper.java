@@ -46,8 +46,9 @@ public interface DataManagementMapper {
     /**
      * 根据DataManagementVO删除数据库表中对应的记录
      * @param tableName 表名
-     * @param id 数据库记录索引
-     * @param primaryKey 数据库表的主键
+     * @param conditions 数据库记录
      */
+    int deleteInfo(@Param("tableName") String tableName,
+                   @Param("conditions") List<Map<String, Object>> conditions);
 
 }

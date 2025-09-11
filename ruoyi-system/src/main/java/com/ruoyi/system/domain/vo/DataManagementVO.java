@@ -3,8 +3,8 @@ package com.ruoyi.system.domain.vo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class DataManagementVO implements Serializable {
@@ -12,14 +12,6 @@ public class DataManagementVO implements Serializable {
     private Integer pageSize; // 一页数量
     private Integer pageNum; // 页码
     private String queryInfo; // 模糊匹配字段
-    private List<Conditions> conditions; // 删除记录信息
-    public DataManagementVO(){
-        this.conditions = new ArrayList<>();
-    }
+    private List<Map<String, Object>> conditions; // 删除记录信息
 
-    @Data
-    public static class Conditions{
-        private Integer id; // 数据库表的记录条数
-        private String primaryKey; // 数据库主键
-    }
 }
