@@ -191,7 +191,7 @@ public class FeignServiceImpl implements IFeignService {
 
             // 抛异常
             if (outputs == null || outputs.size() == 0) {
-                throw new ParamsException(XianConstants.RESULT_EMPTY);
+                throw new ParamsException(XianConstants.RESULT_EMPTY_RAIN);
             }
 
             List<RainOutputDTO> outputsDTO = new ArrayList<>();
