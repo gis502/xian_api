@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DataManagementMapper">
+
+    <select id="selectTable" resultType="java.util.Map">
+        SELECT
+        table_name AS "tableName",
+        obj_description(
+        ('"' || table_schema || '"."' || table_name || '"')::regclass,
+        'pg_class'
+        ) AS "remark"
+        FROM information_schema.tables
+        WHERE table_type = 'BASE TABLE'
+        AND table_catalog = current_database()
+        <if test="remark != null and remark != ''">
+            AND obj_description(('"' || table_schema || '"."' || table_name || '"')::regclass, 'pg_class')
+            LIKE CONCAT('%', REPLACE(#{remark}, '"', ''), '%')
+        </if>
+        <if test="remark == null or remark == ''">
+            AND obj_description(('"' || table_schema || '"."' || table_name || '"')::regclass, 'pg_class') IS NOT NULL
+        </if>
+        ORDER BY table_schema, table_name
+    </select>
+
+    <select id="selectTableList" resultType="java.util.Map">
+        SELECT * FROM ${tableName}
+        <!-- 动态生成模糊查询条件 -->
+        <where>
+            <if test='queryInfo != null and queryInfo != ""'>
+                <foreach collection="fieldList" item="col" separator=" OR ">
+                    (${col} LIKE CONCAT('%', '${queryInfo}', '%'))
+                </foreach>
+            </if>
+        </where>
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="selectKeyInfo" resultType="java.util.Map">
+        SELECT
+            a.attname AS "key",  -- 字段名
+            col_description(a.attrelid, a.attnum) AS "value",  -- 字段注释
+            t.typname AS "type"  -- 字段类型
+        FROM
+            pg_class c
+                JOIN
+            pg_attribute a ON a.attrelid = c.oid
+                JOIN
+            pg_type t ON a.atttypid = t.oid  -- 关联类型表获取字段类型
+        WHERE
+            c.relname = #{tableName}  -- 表名
+          AND a.attnum > 0  -- 排除系统字段
+          AND NOT a.attisdropped  -- 排除已删除字段
+        ORDER BY
+            a.attnum;  -- 按字段顺序排列
+    </select>
+
+    <select id="selectPrimaryKey" resultType="java.util.Map">
+        SELECT
+            pg_attribute.attname AS primaryKey
+        FROM
+            pg_index
+                JOIN
+            pg_class ON pg_index.indrelid = pg_class.oid
+                JOIN
+            pg_attribute ON pg_attribute.attrelid = pg_class.oid
+                AND pg_attribute.attnum = ANY(pg_index.indkey)
+        WHERE
+            pg_class.relname = #{tableName}
+          AND pg_index.indisprimary -- 只查询主键
+        ORDER BY
+            pg_attribute.attnum -- 按字段顺序排列（针对联合主键）
+    </select>
+
+    <select id="selectAllPage" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM ${tableName}
+    </select>
+
+</mapper>

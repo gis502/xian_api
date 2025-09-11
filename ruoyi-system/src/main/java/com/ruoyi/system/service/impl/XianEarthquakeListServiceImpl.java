@@ -93,16 +93,15 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
     public  HashMap<String, Object> insertEarthquake(EarthquakeVo earthquake) {
         HashMap<String, Object> earthquakeDamage = new HashMap<>();
         Map<String, Object> Result = new HashMap<>();
-//        xianEarthquakeListMapper.insertDisaster(earthquake);
-//        int disasterId = earthquake.getDisasterId();
-//        log.info("获取到的disasterid为: {}" , disasterId);
+        xianEarthquakeListMapper.insertDisaster(earthquake);
+        int disasterId = earthquake.getDisasterId();
+        log.info("获取到的disasterid为: {}" , disasterId);
         double sumGdp = 0;
         int AffectPeople = 0;
         int DeathPeople = 0;
         int num = 0;
         double circleArea = 0;
         for (int i=0;i<earthquake.getCircleParam().size();i++){
-//           log.info("7879784554564131313 {}" , earthquake.getCircleParam().get(i).getCircleArea());
            //计算影响人口：7度区以上覆盖的人口格网均为影响人口
             if (earthquake.getCircleParam().get(i).getIntensity()==8) {
                 List<PeopleGDP> AffectPeopleGDPS = peopleGDPMapper.findInsideCircle(earthquake.getLongitude(),
