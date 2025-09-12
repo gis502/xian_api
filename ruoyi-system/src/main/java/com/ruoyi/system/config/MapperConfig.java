@@ -29,17 +29,11 @@ public class MapperConfig {
         Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(PlotInfoMapper.class);
         for (Object bean : beansWithAnnotation.values()) {
             if (bean instanceof BaseMapper) {
-                // 获取实际的接口
-                Class<?>[] interfaces = bean.getClass().getInterfaces();
-                if (interfaces.length > 0) {
-                    System.out.println("Actual Mapper Interface: " + interfaces[0].getName());
-                }
+
                 String mapperType = determineMapperType((BaseMapper<?>) bean);
-                System.out.println("Registering mapper: " + mapperType + " -> " + bean.getClass().getName());
                 registry.put(mapperType, (BaseMapper<?>) bean);
             }
         }
-        System.out.println(registry);
         return registry;
     }
     private String determineMapperType(BaseMapper<?> mapper) {
@@ -168,9 +162,6 @@ public class MapperConfig {
         //应急避难功能区-救灾物资储备库表
         typeMapping.put("救灾物资储备库", "disasterReliefSupplyDepot");
 
-        typeMapping.forEach((key, value) ->
-                System.out.println("PlotType to MapperType mapping: " + key + " -> " + value)
-        );
         // 添加其他类型的映射
         return typeMapping;
     }

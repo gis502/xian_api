@@ -41,9 +41,6 @@ public class GeometryTypeHandler extends BaseTypeHandler<Geometry> {
         // 设置为 PGobject 类型，明确指定为 "geometry"
         preparedStatement.setObject(i, pgObject, java.sql.Types.OTHER);
         // preparedStatement.setObject(i, toPGobject(geometry));
-        System.out.println("Setting geometry: " + pgObject.getValue());
-
-
     }
 
     private static Geometry toGeometry(String geometryString) {

@@ -48,7 +48,6 @@ public class XianDisasterRealController {
 
             // 查询多条标绘数据
             List<Object> ExcelPlotInfoList = XianDisasterRealService.getExcelPlotInfo(plotTypes, plotIds);
-            System.out.println("数据: " + ExcelPlotInfoList);
             return !ExcelPlotInfoList.isEmpty() ? ExcelPlotInfoList : Collections.emptyList();
 
         } catch (Exception e) {

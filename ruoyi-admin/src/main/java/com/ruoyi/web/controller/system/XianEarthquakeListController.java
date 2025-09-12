@@ -38,7 +38,7 @@ public class XianEarthquakeListController {
     }
     @GetMapping("/getEarthquakeListByKey")
     public List<XianEarthquakeList> getEarthquakeListByKey(@RequestParam(value = "queryValue", required = false) String queryValue) {
-        System.out.println(queryValue);
+
         LambdaQueryWrapper<XianEarthquakeList> queryWrapper = new LambdaQueryWrapper<>();
         // 全局条件
         queryWrapper.eq(XianEarthquakeList::getIsDeleted, 0);

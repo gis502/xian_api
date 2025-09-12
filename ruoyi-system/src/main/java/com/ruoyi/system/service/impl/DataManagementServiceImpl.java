@@ -78,7 +78,6 @@ public class DataManagementServiceImpl implements IDataManagementService {
     private List<String> generatorKey(List<Map<String, String>> primaryKeys){
         List<String> primaryKeyList = new ArrayList<>();
         for(Map<String, String> map : primaryKeys){
-            System.out.println(map);
             String key = map.get("primarykey");
             primaryKeyList.add(key);
         }

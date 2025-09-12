@@ -95,7 +95,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
         Map<String, Object> Result = new HashMap<>();
         xianEarthquakeListMapper.insertDisaster(earthquake);
         int disasterId = earthquake.getDisasterId();
-        log.info("获取到的disasterid为: {}" , disasterId);
+
         double sumGdp = 0;
         int AffectPeople = 0;
         int DeathPeople = 0;
