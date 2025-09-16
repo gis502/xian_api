@@ -6,7 +6,7 @@ import com.ruoyi.system.domain.entity.XianDisasterRain;
 import java.util.List;
 
 public interface IDisasterChainService {
-    public XianDisasterRain getLastRainChain();
+    public List<XianDisasterRain> getAllRainChain();
 
     public List<FactorAnalysis> getAllRainDisasterProbability(Integer DisasterId);
 

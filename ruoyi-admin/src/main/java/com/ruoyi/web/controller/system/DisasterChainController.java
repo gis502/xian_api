@@ -19,7 +19,7 @@ public class DisasterChainController {
     @GetMapping("/getRain")
     @ApiOperation("获取最新暴雨")
     public AjaxResult getRain() {
-        return AjaxResult.success(disasterChainService.getLastRainChain());
+        return AjaxResult.success(disasterChainService.getAllRainChain());
     }
 
     @PostMapping("/getRainProbability")

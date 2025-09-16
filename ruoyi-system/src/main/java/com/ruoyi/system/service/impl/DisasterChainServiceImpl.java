@@ -21,11 +21,10 @@ public class DisasterChainServiceImpl implements IDisasterChainService {
     private FactorAnalysisMapper factorAnalysisMapper;
 
     @Override
-    public XianDisasterRain getLastRainChain() {
+    public List<XianDisasterRain> getAllRainChain() {
         QueryWrapper<XianDisasterRain> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("occurrence_time")  // 按时间降序排列
-                .last("LIMIT 1");               // 只取第一条
-        XianDisasterRain latestRain = xianDisasterRainMapper.selectOne(wrapper);
+        wrapper.orderByDesc("occurrence_time"); // 按时间降序排列
+        List<XianDisasterRain> latestRain = xianDisasterRainMapper.selectList(wrapper);
         // 将XianDisasterRain转换为DisasterRainDTO
         return latestRain;
     }
