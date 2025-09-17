@@ -63,7 +63,6 @@ public class XianDisasterRainImpl extends ServiceImpl<XianDisasterRainMapper, Xi
         log.info("存储暴雨灾害数据成功！");
 //        Long id = disasterRain.getDisasterId();
          Long id = disasterRainMapper.getLatestRainDisasterId();
-        System.out.println("暴雨id"+id);
 
         return id;
     }

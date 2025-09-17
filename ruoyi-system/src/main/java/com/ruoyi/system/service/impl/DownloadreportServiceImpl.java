@@ -220,7 +220,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                         totalRainfall += Double.parseDouble(rain.getPre1h());
                     } catch (NumberFormatException e) {
                         // 如果转换失败，跳过这个值
-                        System.out.println("无法解析降雨量数据: " + rain.getPre1h());
+                        System.out.println("无法解析降雨量数据..." );
                     }
                 }
                 if (lat == 0 && lon == 0) {
@@ -366,7 +366,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 disasterChain = disasterChain + "暴雨-" + item;
             }
         }
-        System.out.println(disasterChain);
 
         /* significantIncreaseArea 风险显著上升区域 */
         String significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
@@ -417,7 +416,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         rainReportEntity.setEvacuateTheCrowdArea(evacuateTheCrowdArea);
         rainReportEntity.setFocusArea(focusArea);
 
-        System.out.println(JSON.toJSONString(rainReportEntity));
         return rainReportEntity;
     }
 
@@ -456,14 +454,13 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* 影响人数 */
         Long influencePeopleQuantity = 0L;
-        System.out.println(JSON.toJSONString(groupedByDisasterType));
+
         for (Map<String, Object> item : groupedByDisasterType.get(type)) {
-            System.out.println(JSON.toJSONString(item));
+
             influencePeopleQuantity = influencePeopleQuantity + xianImpactInAreaMapper.getPeopleByLatLon(item.get("lat").toString(), item.get("lon").toString());
-            System.out.println(influencePeopleQuantity);
+
         }
         secondaryDisasterReportEntity.setInfluencePeopleQuantity(influencePeopleQuantity);
-        System.out.println(influencePeopleQuantity);
 
         /* 中大型区域 */
         List<String> seriousArea;
@@ -490,7 +487,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         System.out.println("文件是否存在: {}" + Files.exists(file));
 
         if (!Files.exists(file)) {
-            System.out.println("文件不存在: {}" + file.toString());
+            System.out.println("文件不存在..." );
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("文件不存在: " + fileName);
             return;
@@ -710,7 +707,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
                     try {
                         List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
-                        System.out.println(JSON.toJSONString(rainOutputDTOS));
                         for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
                             if (rainOutputDTO.getFileName().equals(imageName)) {
                                 DocumentUtils.addRegularParagraph(doc, null);

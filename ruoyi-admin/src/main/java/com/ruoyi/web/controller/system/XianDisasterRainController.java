@@ -48,14 +48,11 @@ public class XianDisasterRainController {
     @PostMapping("/getRainPeriodInfoByDisasterId")
     @ApiOperation(value = "实际降雨")
     public AjaxResult getRainPeriodInfoByDisasterId(@RequestParam(value = "id") String Id) {
-        System.out.println(Id+"getRainPeriodInfo Id");
-        System.out.println(xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id)+"xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id)");
         return AjaxResult.success(xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id));
     }
 
     @GetMapping("/getDisasterRainByKey")
     public List<XianDisasterRain> getDisasterRainByKey(@RequestParam(value = "queryValue", required = false) String queryValue) {
-        System.out.println(queryValue);
         LambdaQueryWrapper<XianDisasterRain> queryWrapper = new LambdaQueryWrapper<>();
         // 全局条件
         queryWrapper.eq(XianDisasterRain::getIsDeleted, 0);
@@ -78,10 +75,8 @@ public class XianDisasterRainController {
     @ApiOperation(value = "保存暴雨灾害信息")
     public AjaxResult saveRain(@RequestBody DisasterRainDTO disasterRainDTO) {
         Long data = disasterRainService.saveDisasterRain(disasterRainDTO);
-        System.out.println("1mdmdmdmdm"+data);
         Map<String,Long> rainDisasterId = new HashMap<>();
         rainDisasterId.put("rainDisasterId",data);
-        System.out.println("data123"+JSON.toJSONString(rainDisasterId));
         return AjaxResult.success(rainDisasterId);
     }
 

@@ -208,7 +208,8 @@ public class FeignServiceImpl implements IFeignService {
             e.printStackTrace();
         }
 
-        throw new ParamsException(XianConstants.RESULT_EMPTY);
+        // throw new ParamsException(XianConstants.RESULT_EMPTY);
+        return null;
     }
 
     // 构建地震请求体

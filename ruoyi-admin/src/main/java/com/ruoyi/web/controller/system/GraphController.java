@@ -47,7 +47,6 @@ public class GraphController {
     public List getGraphBy(
             @RequestParam("eqid") String eqid,
             @RequestParam(value = "disasterType") String disasterType) {
-        System.out.println(eqid+ " " + disasterType);
 
         // 构建基础查询
         String query = "";

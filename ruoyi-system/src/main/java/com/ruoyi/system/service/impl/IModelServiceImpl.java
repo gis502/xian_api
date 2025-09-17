@@ -66,36 +66,32 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Override
     public String impactInsert(List<ImpactAreaRequest> request){
-        System.out.println(request);
-
          
         List<XianImpactInAreaEntity> xianImpactInAreaEntityList = new ArrayList<>();
         for (ImpactAreaRequest area : request) {
             XianImpactInAreaEntity xianImpactInAreaEntity = new XianImpactInAreaEntity();  
             // 将polygon坐标转换为WKT格式
             String polygonWkt = convertPolygonToWkt(area.getPolygon());
-            System.out.println("灾害类型: " + area.getType());
-            System.out.println("实体ID: " + area.getEntityId());
+
 
             // 计算总人口数
             Integer totalPeople = xianImpactInAreaMapper.getTotalPeopleInPolygon(polygonWkt);
-            System.out.println("影响人口数: " + totalPeople);
 
             Integer totalHighway = xianImpactInAreaMapper.getIntersectingHighwayCount(polygonWkt);
-            System.out.println("影响高速公路数: " + totalHighway);
+
 
             Integer nationalRoadCount = xianImpactInAreaMapper.getIntersectingNationalRoadCount(polygonWkt);
-            System.out.println("影响国道数: " + nationalRoadCount);
+
 
             Integer roadCount = xianImpactInAreaMapper.getIntersectingRoadCount(polygonWkt);
-            System.out.println("影响普通道路数: " + roadCount);
+
 
             Integer subwayStationCount = xianImpactInAreaMapper.getSubwayStationCountInPolygon(polygonWkt);
-            System.out.println("影响地铁站数: " + subwayStationCount);
+
 
             // 在impactInsert方法中添加危险源查询
             Integer dangerousSourceCount = xianImpactInAreaMapper.getDangerousSourceCountInPolygon(polygonWkt);
-            System.out.println("影响危险源数: " + dangerousSourceCount);
+
 
             xianImpactInAreaEntity.setDisasterId(area.getDisasterId());
             xianImpactInAreaEntity.setSecondDisasterId(area.getEntityId());
@@ -109,7 +105,6 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
             xianImpactInAreaEntityList.add(xianImpactInAreaEntity);
         }
-        System.out.println(xianImpactInAreaEntityList);
 
         xianImpactInAreaMapper.insertBatch(xianImpactInAreaEntityList);
 

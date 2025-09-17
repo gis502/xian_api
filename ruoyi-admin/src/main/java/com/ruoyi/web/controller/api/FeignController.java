@@ -55,7 +55,7 @@ public class FeignController {
     }
 
     @ApiOperation(value = "暴雨专题图件产出")
-    @GetMapping("/rain/map")
+    @PostMapping("/rain/map")
     public AjaxResult thematicMap(@RequestBody RainQuery query) {
         return AjaxResult.success(feignService.thematicMap(query));
     }
