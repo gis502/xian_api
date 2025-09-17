@@ -25,6 +25,4 @@ public interface IFeignService {
 
     public String downloadReport(ReportDTO reportDTO);
 
-
-
 }
