@@ -592,11 +592,17 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         // 内容
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content = String.format("%s，%s12小时累积降雨量达到%s," +
+        String maxHoursRainfall = "";
+        if(Integer.parseInt(rainReportEntity.getRainAreaQuantity().get(0))>50){
+            maxHoursRainfall = "单小时最大降雨量超过50毫米，";
+        }
+
+        String content = String.format("%s，%s12小时累积降雨量达到%s，%s" +
                         "根据最新实时气象监测数据，降雨主要集中在%s一带。",
                 rainReportEntity.getRainTime(),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaPosition(), null),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
+                maxHoursRainfall,
                 rainReportEntity.getConcentratedAreaPosition(),
 //                rainReportEntity.getConcentratedAreaQuantity(),
 //                rainReportEntity.getConcentratedAreaAverageQuantity(),
@@ -624,8 +630,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         // 第一段
         XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子进行评估，" +
-                        "本次暴雨将形成%s灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+        String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+                        "本次暴雨预计可能形成%s复合灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                 rainReportEntity.getConcentratedAreaPosition(),
                 // DocumentUtils.list2Str(rainReportEntity.getRiskArea(), null),
                 rainReportEntity.getRiskAreaQuantity(),
@@ -704,7 +710,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 }
                 boolean imageFound = false;
                 while (!imageFound) {
-
                     try {
                         List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
                         for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
@@ -750,8 +755,40 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 );
                 XWPFParagraph paragraph3 = DocumentUtils.addRegularParagraph(doc, text);
                 paragraph3.setIndentationFirstLine(0);      // 首行不缩进
+
+
             }
+
+            if((i+1)==rainReportEntity.getSecondaryDisasterReport().size()){
+                RainQuery rainQuery = new RainQuery();
+                rainQuery.setRainId(rainReportEntity.getRainId());
+                rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
+                String shelterImageName = "暴雨避难场所分布图";
+                boolean shelterImageFound = false;
+                while (!shelterImageFound) {
+                    try {
+                        List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
+                        for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
+                            if (rainOutputDTO.getFileName().equals(shelterImageName)) {
+                                DocumentUtils.addRegularParagraph(doc, null);
+                                DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                                DocumentUtils.addRegularParagraph(doc, null);
+                                shelterImageFound = true;
+                                break;
+                            }
+                        }
+                        Thread.sleep(1000);
+                        if (shelterImageFound) {
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
+
     }
 
     /**
