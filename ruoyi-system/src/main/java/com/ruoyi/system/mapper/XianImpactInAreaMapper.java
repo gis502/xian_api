@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ruoyi.system.domain.entity.XianImpactInAreaEntity;
+import com.ruoyi.system.domain.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -20,6 +20,9 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
 
     List<XianImpactInAreaEntity> queryStation(Long disasterId);
 
+
+    @Select("SELECT disaster_name FROM xian_disaster_hide WHERE id = #{id}")
+    String getHideName(@Param("id") Integer id);
 
     @Select("SELECT people_num FROM xian_people WHERE ST_Contains(point, ST_SetSRID(ST_MakePoint(#{lon}::DOUBLE PRECISION, #{lat}::DOUBLE PRECISION), 4490))")
     Long getPeopleByLatLon(@Param("lat") String lat, @Param("lon") String lon);
@@ -55,7 +58,7 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
      * @return 相交的高速公路记录列表
      */
     @Select("SELECT * FROM xian_highway WHERE ST_Intersects(geom, ST_GeomFromText(#{polygonWkt}, 4490))")
-    List<Object> getIntersectingHighways(@Param("polygonWkt") String polygonWkt);
+    List<Highway> getIntersectingHighways(@Param("polygonWkt") String polygonWkt);
 
     /**
      * 计算与多边形相交的高速公路数量
@@ -108,7 +111,7 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
      * @return 相交的普通道路记录列表
      */
     @Select("SELECT * FROM xian_road WHERE ST_Intersects(geom, ST_GeomFromText(#{polygonWkt}, 4490))")
-    List<Object> getIntersectingRoads(@Param("polygonWkt") String polygonWkt);
+    List<Road> getIntersectingRoads(@Param("polygonWkt") String polygonWkt);
 
     /**
      * 计算与多边形相交的普通道路数量
@@ -144,7 +147,7 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
 
     // 查询地铁站点 - 获取与多边形相交的地铁站点记录
     @Select("SELECT * FROM xian_subway_stations_have_attributes WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490))")
-    List<Object> getSubwayStationsInPolygon(@Param("polygonWkt") String polygonWkt);
+    List<XianSubwayStation> getSubwayStationsInPolygon(@Param("polygonWkt") String polygonWkt);
 
     // 查询地铁站点 - 统计与多边形相交的地铁站点数量
     @Select("SELECT COUNT(*) FROM xian_subway_stations_have_attributes WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490))")
@@ -154,11 +157,11 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
     @Select("SELECT station_name, point FROM xian_subway_stations_have_attributes WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490))")
     List<Map<String, Object>> getSubwayStationDetailsInPolygon(@Param("polygonWkt") String polygonWkt);
 
-    // ==================== 地铁站统计方法 ====================
+    // ==================== 危险源统计方法 ====================
 
     // 查询危险源 - 获取与多边形相交的危险源记录
     @Select("SELECT * FROM xian_dangerous_source WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490))")
-    List<Object> getDangerousSourceInPolygon(@Param("polygonWkt") String polygonWkt);
+    List<DangerousSource> getDangerousSourceInPolygon(@Param("polygonWkt") String polygonWkt);
 
     // 查询危险源 - 统计与多边形相交的危险源数量
     @Select("SELECT COUNT(*) FROM xian_dangerous_source WHERE ST_Within(point, ST_GeomFromText(#{polygonWkt}, 4490))")
@@ -178,9 +181,9 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
      * @return 插入成功的记录数
      */
     @Insert({"<script>",
-            "INSERT INTO xian_impact_in_area (disaster_id, second_disaster_id, people, national_road, heightway, street, dangerous_point, station, dangerous_point_pos, station_pos, district) VALUES ",
+            "INSERT INTO xian_impact_in_area (disaster_id, second_disaster_id, people, national_road, heightway, street, dangerous_point, station, dangerous_point_pos, station_pos, district,impact_json) VALUES ",
             "<foreach collection='list' item='item' separator=','>",
-            "(#{item.disasterId}, #{item.secondDisasterId}, #{item.people}, #{item.nationalRoad}, #{item.heightway}, #{item.street}, #{item.dangerousPoint}, #{item.station}, #{item.dangerousPointPos}, #{item.stationPos}, #{item.district})",
+            "(#{item.disasterId}, #{item.secondDisasterId}, #{item.people}, #{item.nationalRoad}, #{item.heightway}, #{item.street}, #{item.dangerousPoint}, #{item.station}, #{item.dangerousPointPos}, #{item.stationPos}, #{item.district},#{item.impactJsonStr})",
             "</foreach>",
             "</script>"})
     int insertBatch(@Param("list") List<XianImpactInAreaEntity> entityList);
