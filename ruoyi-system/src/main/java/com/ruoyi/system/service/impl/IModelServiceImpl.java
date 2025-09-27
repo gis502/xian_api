@@ -91,7 +91,7 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
             List<Object> impactJsonPeopleDatasList = new ArrayList<>();
             Map<String,String> impactJsonPeopleDatas = new HashMap<>();
-            impactJsonPeopleDatas.put("hidePoint",xianImpactInAreaMapper.getHideName(area.getDisasterId()));
+            impactJsonPeopleDatas.put("hidePoint",xianImpactInAreaMapper.getHideName(area.getEntityId()));
             impactJsonPeopleDatas.put("number",totalPeople.toString());
             impactJsonPeopleDatasList.add(impactJsonPeopleDatas);
 
