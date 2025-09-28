@@ -20,6 +20,8 @@ public interface XianImpactInAreaMapper extends BaseMapper<XianImpactInAreaEntit
 
     List<XianImpactInAreaEntity> queryStation(Long disasterId);
 
+    @Select("SELECT impact_json FROM xian_impact_in_area WHERE disaster_id = #{disasterId}")
+    List<Object> tableInfo(Long disasterId);
 
     @Select("SELECT disaster_name FROM xian_disaster_hide WHERE id = #{id}")
     String getHideName(@Param("id") Integer id);

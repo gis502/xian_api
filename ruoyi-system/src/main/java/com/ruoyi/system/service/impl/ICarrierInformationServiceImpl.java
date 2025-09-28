@@ -82,6 +82,11 @@ public class ICarrierInformationServiceImpl implements CarrierInformationService
         return integrateData("受影响数量", queryDatas, "getStation");
     }
 
+    @Override
+    public List<Object> tableInfo(long disasterId) {
+        return xianImpactInAreaMapper.tableInfo(disasterId);
+    }
+
     private Map<String, Object> integrateData(
             String name,
             List<XianImpactInAreaEntity> queryDatas,

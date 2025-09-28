@@ -43,4 +43,9 @@ public class CarrierInformationController {
     public ResponseEntity<?> station(@RequestParam Long disasterId) {
         return ResponseEntity.ok(carrierInformationService.queryStation(disasterId));
     }
+
+    @PostMapping("/table_info")
+    public ResponseEntity<?> tableInfo(@RequestParam Long disasterId) {
+        return ResponseEntity.ok(carrierInformationService.tableInfo(disasterId));
+    }
 }
