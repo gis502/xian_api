@@ -87,6 +87,43 @@
 <!--        WHERE TRIM(BOTH '[]' FROM fa.level) IN ('高' , '中')-->
 <!--        ORDER BY disaster_probability DESC-->
 <!--    </select>-->
+<!--    <select id="queryDisasterEstimationGetAll" resultType="map">-->
+<!--        SELECT-->
+<!--        dh.*,-->
+<!--        fa.*,-->
+<!--        ROUND(-->
+<!--        CAST(-->
+<!--        TRIM(BOTH '[]' FROM fa.probability)-->
+<!--        AS NUMERIC-->
+<!--        ), 2-->
+<!--        ) AS disaster_probability-->
+<!--        FROM-->
+<!--        xian_disaster_hide dh-->
+<!--        INNER JOIN (-->
+<!--        SELECT-->
+<!--        DISTINCT ON (fv.hide_id)-->
+<!--        fv.hide_id,-->
+<!--        fa.probability,-->
+<!--        fa.level-->
+<!--        FROM-->
+<!--        xian_factor_value fv-->
+<!--        INNER JOIN-->
+<!--        xian_factor_analysis fa ON fv.value_id = fa.value_id-->
+<!--        INNER JOIN-->
+<!--        xian_disaster_hide dh_sub ON fv.hide_id = dh_sub.id-->
+<!--        <choose>-->
+<!--            <when test="disasterType.name() == 'RAINSTORM'">-->
+<!--                WHERE fa.rain_disaster_id = #{disasterId}-->
+<!--            </when>-->
+<!--            <when test="disasterType.name() == 'EARTHQUAKE'">-->
+<!--                WHERE fa.eq_disaster_id = #{disasterId}-->
+<!--            </when>-->
+<!--        </choose>-->
+<!--        ORDER BY-->
+<!--        fv.hide_id, fa.value_id-->
+<!--        ) AS fa ON dh.id = fa.hide_id-->
+<!--        WHERE TRIM(BOTH '[]' FROM fa.level) IN ('高' , '中','低')-->
+<!--    </select>-->
     <select id="queryDisasterEstimationGetAll" resultType="map">
         SELECT
         dh.*,
@@ -97,32 +134,36 @@
         AS NUMERIC
         ), 2
         ) AS disaster_probability
-        FROM
-        xian_disaster_hide dh
+        -- dh.position,
+        -- dh.disaster_type,
+        -- dh.lon,
+        -- dh.lat,
+        -- ROUND(CAST(TRIM(BOTH '[]' FROM fa.probability) AS NUMERIC), 2) AS disaster_probability,
+        -- fa.level,
+        -- dh.city,
+        -- dh.village
+        FROM xian_disaster_hide dh
         INNER JOIN (
-        SELECT
-        DISTINCT ON (fv.hide_id)
+        SELECT DISTINCT ON (fv.hide_id)
         fv.hide_id,
         fa.probability,
         fa.level
-        FROM
-        xian_factor_value fv
-        INNER JOIN
-        xian_factor_analysis fa ON fv.value_id = fa.value_id
-        INNER JOIN
-        xian_disaster_hide dh_sub ON fv.hide_id = dh_sub.id
-        <choose>
-            <when test="disasterType.name() == 'RAINSTORM'">
-                WHERE fa.rain_disaster_id = #{disasterId}
-            </when>
-            <when test="disasterType.name() == 'EARTHQUAKE'">
-                WHERE fa.eq_disaster_id = #{disasterId}
-            </when>
-        </choose>
-        ORDER BY
-        fv.hide_id, fa.value_id
+        FROM xian_factor_value fv
+        JOIN xian_factor_analysis fa ON fv.value_id = fa.value_id
+        JOIN xian_disaster_hide dh_sub ON fv.hide_id = dh_sub.id
+        <where>
+            <choose>
+                <when test="disasterType.name() == 'RAINSTORM'">
+                    fa.rain_disaster_id = #{disasterId}
+                </when>
+                <when test="disasterType.name() == 'EARTHQUAKE'">
+                    fa.eq_disaster_id = #{disasterId}
+                </when>
+            </choose>
+        </where>
+        ORDER BY fv.hide_id, fa.value_id
         ) AS fa ON dh.id = fa.hide_id
-        WHERE TRIM(BOTH '[]' FROM fa.level) IN ('高' , '中','低')
+        WHERE fa.level IN ('[高]', '[中]')
+        ORDER BY disaster_probability DESC
     </select>
-
 </mapper>
