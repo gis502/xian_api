@@ -34,8 +34,8 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: debug
-    org.springframework: warn
+    com.ruoyi: warn
+    org.springframework: error
 
 # 用户配置
 user:
@@ -68,6 +68,7 @@ spring:
   # redis 配置
   redis:
     # 地址
+#    host: 10.22.245.246
     host: 47.92.216.173
 #    host: localhost
     #端口，默认为6379
@@ -147,4 +148,4 @@ xss:
 document:
   path:
     rain:
-      report: /data/documents/rain
+      report: /home/output/storm-disaster/reports/

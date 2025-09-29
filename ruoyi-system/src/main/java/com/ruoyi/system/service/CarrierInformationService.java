@@ -20,4 +20,6 @@ public interface CarrierInformationService {
     public Map<String, Object> queryDanger(Long disasterId);
 
     public Map<String, Object> queryStation(Long disasterId);
+
+    public List<Object> tableInfo(long disasterId);
 }

@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.common.config.DocumentConfig;
 import com.alibaba.fastjson2.JSON;
+import com.ruoyi.common.config.DocumentConfig;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.ImagePositionEnum;
 import com.ruoyi.common.enums.ImageTypeEnum;
@@ -13,8 +13,10 @@ import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.service.DownloadreportService;
 import com.ruoyi.system.service.IFeignService;
-import org.apache.poi.xwpf.usermodel.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.ruoyi.system.service.IModelService;
 
@@ -67,16 +68,13 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     private XianFactorAnalysisMapper xianFactorAnalysisMapper;
 
     @Resource
-    private GeologicalDisasterHideMapper  geologicalDisasterHideMapper;
+    private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
 
     @Resource
     private XianImpactInAreaMapper xianImpactInAreaMapper;
 
     @Resource
-    private GeologicalDisasterRiskMapper  geologicalDisasterRiskMapper;
-
-    @Autowired
-    private IFeignService feignService;
+    private GeologicalDisasterRiskMapper geologicalDisasterRiskMapper;
 
     @Resource
 
@@ -84,6 +82,8 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Value("${document.path.rain.report}")
     private String wordPath;
 
+    @Resource
+    private IFeignService feignService;
 
     public DownloadreportServiceImpl(XianDisasterRainMapper xianDisasterRainMapper) {
         this.xianDisasterRainMapper = xianDisasterRainMapper;
@@ -91,9 +91,9 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
     //生成报告
     @Override
-    public R<String> generateRainReport(String rainId,String rainQueueId,Integer rainDisasterId) throws IOException {
+    public R<String> generateRainReport(String rainId, String rainQueueId, Integer rainDisasterId) throws IOException {
         // 获取报告数据
-        RainReportEntity rainReportEntity = generateRainReportEntity(Integer.valueOf(rainDisasterId));
+        RainReportEntity rainReportEntity = generateRainReportEntity(rainDisasterId);
         rainReportEntity.setRainQueueId(rainQueueId);
         rainReportEntity.setRainId(rainId);
 
@@ -102,20 +102,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         if (!Files.exists(wordDir)) {
             Files.createDirectories(wordDir);
         }
-        String wordName = System.currentTimeMillis()+ "评估报告.docx";
+        String wordName = System.currentTimeMillis() + "评估报告.docx";
         String wordPath = wordDir.resolve(wordName).toAbsolutePath().toString();
 
         // 表头宽度
         // int[] widths = {1500, 3000, 8000, 3000};
         try {
-            new CreateRainReport().createRainReport(wordPath, rainReportEntity);
+            createRainReport(wordPath, rainReportEntity);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return R.ok(wordName);
     }
-
 
     public RainReportEntity generateRainReportEntity(Integer disasterId) {
         Long id = Long.valueOf(disasterId);
@@ -221,7 +220,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                         totalRainfall += Double.parseDouble(rain.getPre1h());
                     } catch (NumberFormatException e) {
                         // 如果转换失败，跳过这个值
-                        System.out.println("无法解析降雨量数据: " + rain.getPre1h());
+                        System.out.println("无法解析降雨量数据..." );
                     }
                 }
                 if (lat == 0 && lon == 0) {
@@ -316,12 +315,12 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         // 获取此次灾害所有次生灾害计算的概率
         List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimation(id);
-        List<String> chain =  new ArrayList<>();
+        List<String> chain = new ArrayList<>();
         Map<String, List<Map<String, Object>>> groupedByDisasterType = new HashMap<>();
         // 遍历disasterEstimation列表进行分组
         for (Map<String, Object> item : disasterEstimation) {
             String disasterType = (String) item.get("disaster_type");
-            if(!chain.contains(disasterType)){
+            if (!chain.contains(disasterType)) {
                 chain.add(disasterType);
             }
             // 如果该disaster_type还没有对应的列表，创建一个新的列表
@@ -359,15 +358,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         /* disasterChain 灾害链 */
         String disasterChain = "";
         Integer countChain = 1;
-        for(String item : chain){
+        for (String item : chain) {
             countChain++;
-            if(countChain<=chain.size()){
-                disasterChain = disasterChain+"暴雨-"+item+"、";
-            }else {
-                disasterChain = disasterChain+"暴雨-"+item;
+            if (countChain <= chain.size()) {
+                disasterChain = disasterChain + "暴雨-" + item + "、";
+            } else {
+                disasterChain = disasterChain + "暴雨-" + item;
             }
         }
-        System.out.println(disasterChain);
 
         /* significantIncreaseArea 风险显著上升区域 */
         String significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
@@ -418,7 +416,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         rainReportEntity.setEvacuateTheCrowdArea(evacuateTheCrowdArea);
         rainReportEntity.setFocusArea(focusArea);
 
-        System.out.println(JSON.toJSONString(rainReportEntity));
         return rainReportEntity;
     }
 
@@ -457,14 +454,13 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* 影响人数 */
         Long influencePeopleQuantity = 0L;
-        System.out.println(JSON.toJSONString(groupedByDisasterType));
+
         for (Map<String, Object> item : groupedByDisasterType.get(type)) {
-            System.out.println(JSON.toJSONString(item));
+
             influencePeopleQuantity = influencePeopleQuantity + xianImpactInAreaMapper.getPeopleByLatLon(item.get("lat").toString(), item.get("lon").toString());
-            System.out.println(influencePeopleQuantity);
+
         }
         secondaryDisasterReportEntity.setInfluencePeopleQuantity(influencePeopleQuantity);
-        System.out.println(influencePeopleQuantity);
 
         /* 中大型区域 */
         List<String> seriousArea;
@@ -482,83 +478,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         return secondaryDisasterReportEntity;
     }
 
-
-    public static void main(String[] args) {
-        try {
-            RainReportEntity rainReportEntity = new RainReportEntity();
-            rainReportEntity.setReportTime("08月30日16时24分");
-            rainReportEntity.setRainTime("2025年08月30日17时20分");
-            rainReportEntity.setRainAreaPosition(Arrays.asList("蓝田县", "周至县"));
-            rainReportEntity.setRainAreaQuantity(Arrays.asList("120", "300"));
-            rainReportEntity.setConcentratedAreaPosition("蓝田县");
-            rainReportEntity.setConcentratedAreaQuantity("500");
-            rainReportEntity.setConcentratedAreaAverageQuantity("300");
-            rainReportEntity.setConcentratedAreaDetailStreet(Arrays.asList("第一街道", "第二街道"));
-            rainReportEntity.setConcentratedAreaDetailQuantity(Arrays.asList("234"));
-            rainReportEntity.setConcentratedAreaDetailGrade(Arrays.asList("10"));
-            rainReportEntity.setExtremelyHeavyRainstormStreet(Arrays.asList("x街道", "y街道"));
-            rainReportEntity.setExtremelyHeavyRainQuantity(Arrays.asList("100", "300.6"));
-            rainReportEntity.setRainstormStreet(Arrays.asList("z街道", "d街道"));
-            rainReportEntity.setRainstormQuantity(Arrays.asList("78.89"));
-            rainReportEntity.setRiskArea(Arrays.asList("aba", "abc"));
-            rainReportEntity.setRiskAreaQuantity(596);
-            rainReportEntity.setHideArea(Arrays.asList("aba", "abb"));
-            rainReportEntity.setHideAreaQuantity(296);
-            rainReportEntity.setHazards(Arrays.asList("高程", "坡度", "植被覆盖率"));
-            rainReportEntity.setSignificantIncreaseArea("周至县");
-            rainReportEntity.setSignificantIncreaseAreaStreet(Arrays.asList("a街道", "b街道"));
-            rainReportEntity.setSignificantIncreaseAreaRiskQuantity(123);
-            rainReportEntity.setSignificantIncreaseAreaHideQuantity(78);
-
-            TypesOfSecondaryDisasters[] typesOfSecondaryDisasters = {
-                    TypesOfSecondaryDisasters.LANDSLIDE,
-                    TypesOfSecondaryDisasters.DEBRIS_FLOW,
-                    TypesOfSecondaryDisasters.TORRENTIAL_FLOOD,
-                    TypesOfSecondaryDisasters.WATER_LOGGING
-            };
-            for (int i = 0; i < 4; i++) {
-                RainReportEntity.SecondaryDisasterReportEntity secondaryDisasterReportEntity =
-                        new RainReportEntity().new SecondaryDisasterReportEntity();
-                secondaryDisasterReportEntity.setDisasterType(typesOfSecondaryDisasters[i]);
-                secondaryDisasterReportEntity.setRiskStreet("aaa街道");
-                secondaryDisasterReportEntity.setRiskPointName("www");
-                secondaryDisasterReportEntity.setRiskPointProbability(
-                        (Math.random() * 100) + "%"
-                );
-                secondaryDisasterReportEntity.setInfluencePeopleQuantity(
-                        (long) Math.ceil(Math.random() * 300)
-                );
-                secondaryDisasterReportEntity.setSeriousArea(Arrays.asList("agu", "ijis"));
-                secondaryDisasterReportEntity.setExtraLargeArea("长安区");
-                secondaryDisasterReportEntity.setExtraLargeAreaPoint("aaa");
-                secondaryDisasterReportEntity.setExtraLargeAreaRiskQuantity(100);
-                secondaryDisasterReportEntity.setExtraLargeAreaRiskPeopleQuantity(30);
-                secondaryDisasterReportEntity.setSmallArea("蓝田县");
-                secondaryDisasterReportEntity.setSmallAreaPoint("bbb");
-                secondaryDisasterReportEntity.setSmallAreaRiskPeopleQuantity(44);
-                rainReportEntity.getSecondaryDisasterReport().add(secondaryDisasterReportEntity);
-
-//                if(i == 0 || i == 2) {
-//                    // 创建表格数据
-//                    for (int j = 0; j < 5; j++) {
-//                        RainReportEntity.SecondaryDisasterReportEntity.SecondaryDisasterTableData secondaryDisasterTableData =
-//                                new RainReportEntity().new SecondaryDisasterReportEntity().new SecondaryDisasterTableData();
-//                        secondaryDisasterTableData.setPosition("dshsdid");
-//                        secondaryDisasterTableData.setProbability(Math.random() * 100 + "%");
-//                        secondaryDisasterTableData.setGrade("高");
-//                        secondaryDisasterReportEntity.getDisasterTableData().add(secondaryDisasterTableData);
-//                    }
-//                }
-            }
-            rainReportEntity.setWorkScheduleArea(Arrays.asList("长安区", "蓝田县"));
-            rainReportEntity.setEvacuateTheCrowdArea(Arrays.asList("喂子坪村", "沣峪村"));
-            rainReportEntity.setFocusArea(Arrays.asList("长安区靖宁路与西部大道十字交汇区域", "朱雀市场等"));
-            new CreateRainReport().createRainReport("D:/test.docx", rainReportEntity);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     //下载报告
     @Override
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException {
@@ -568,7 +487,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         System.out.println("文件是否存在: {}" + Files.exists(file));
 
         if (!Files.exists(file)) {
-            System.out.println("文件不存在: {}" + file.toString());
+            System.out.println("文件不存在..." );
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("文件不存在: " + fileName);
             return;
@@ -590,15 +509,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             throw e;
         }
     }
-}
-
-/**
- * word文档生成
- */
-class CreateRainReport {
-
-    @Resource
-    private IFeignService feignService;
 
     /**
      * 创建word文件
@@ -682,11 +592,17 @@ class CreateRainReport {
         // 内容
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content = String.format("%s，%s12小时累积降雨量达到%s," +
+        String maxHoursRainfall = "";
+        if(Integer.parseInt(rainReportEntity.getRainAreaQuantity().get(0))>50){
+            maxHoursRainfall = "单小时最大降雨量超过50毫米，";
+        }
+
+        String content = String.format("%s，%s12小时累积降雨量达到%s，%s" +
                         "根据最新实时气象监测数据，降雨主要集中在%s一带。",
                 rainReportEntity.getRainTime(),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaPosition(), null),
                 DocumentUtils.list2Str(rainReportEntity.getRainAreaQuantity(), "毫米"),
+                maxHoursRainfall,
                 rainReportEntity.getConcentratedAreaPosition(),
 //                rainReportEntity.getConcentratedAreaQuantity(),
 //                rainReportEntity.getConcentratedAreaAverageQuantity(),
@@ -714,8 +630,8 @@ class CreateRainReport {
         // 第一段
         XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);
 
-        String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子进行评估，" +
-                        "本次暴雨将形成%s灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+        String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+                        "本次暴雨预计可能形成%s复合灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                 rainReportEntity.getConcentratedAreaPosition(),
                 // DocumentUtils.list2Str(rainReportEntity.getRiskArea(), null),
                 rainReportEntity.getRiskAreaQuantity(),
@@ -781,31 +697,33 @@ class CreateRainReport {
                 RainQuery rainQuery = new RainQuery();
                 rainQuery.setRainId(rainReportEntity.getRainId());
                 rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
-                List<RainOutputDTO> rainOutputDTOS =  feignService.thematicMap(rainQuery);
 
                 String imageName;
-                if(disasterReport.getDisasterType().getDisasterName().equals("滑坡")){
+                if (disasterReport.getDisasterType().getDisasterName().equals("滑坡")) {
                     imageName = "暴雨滑坡潜在隐患点及人口分布图";
-                }else if(disasterReport.getDisasterType().getDisasterName().equals("泥石流")){
+                } else if (disasterReport.getDisasterType().getDisasterName().equals("泥石流")) {
                     imageName = "暴雨泥石流潜在隐患点及人口分布图";
-                }else if(disasterReport.getDisasterType().getDisasterName().equals("内涝")){
+                } else if (disasterReport.getDisasterType().getDisasterName().equals("内涝")) {
                     imageName = "暴雨内涝潜在隐患点及人口分布图";
-                }else {
+                } else {
                     imageName = "暴雨山洪潜在隐患点及人口分布图";
                 }
                 boolean imageFound = false;
                 while (!imageFound) {
                     try {
+                        List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
                         for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
-
-                            if (rainOutputDTO.getFileName().equals(imageName)){
+                            if (rainOutputDTO.getFileName().equals(imageName)) {
+                                DocumentUtils.addRegularParagraph(doc, null);
                                 DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                                DocumentUtils.addRegularParagraph(doc, null);
                                 imageFound = true;
                                 break;
                             }
                         }
-                        if (!imageFound) {
-                            Thread.sleep(1000);
+                        Thread.sleep(1000);
+                        if (imageFound) {
+                            break;
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -820,7 +738,7 @@ class CreateRainReport {
 
                 // 第三段
                 String text = String.format(
-                        "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。" ,
+                        "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。",
 //                                +
 //                                "%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
 //                        disasterReport.getExtraLargeArea(),
@@ -830,15 +748,47 @@ class CreateRainReport {
                         data2.intValue(),
                         disasterReport.getExtraLargeAreaRiskQuantity(),
 //                        disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
-                        (int)(Math.random() * 400 + 200),
+                        (int) (Math.random() * 400 + 200),
                         disasterReport.getSmallArea(),
                         disasterReport.getSmallAreaPoint(),
                         disasterReport.getSmallAreaRiskPeopleQuantity()
                 );
                 XWPFParagraph paragraph3 = DocumentUtils.addRegularParagraph(doc, text);
                 paragraph3.setIndentationFirstLine(0);      // 首行不缩进
+
+
             }
+
+            if((i+1)==rainReportEntity.getSecondaryDisasterReport().size()){
+                RainQuery rainQuery = new RainQuery();
+                rainQuery.setRainId(rainReportEntity.getRainId());
+                rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
+                String shelterImageName = "暴雨避难场所分布图";
+                boolean shelterImageFound = false;
+                while (!shelterImageFound) {
+                    try {
+                        List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
+                        for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
+                            if (rainOutputDTO.getFileName().equals(shelterImageName)) {
+                                DocumentUtils.addRegularParagraph(doc, null);
+                                DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                                DocumentUtils.addRegularParagraph(doc, null);
+                                shelterImageFound = true;
+                                break;
+                            }
+                        }
+                        Thread.sleep(1000);
+                        if (shelterImageFound) {
+                            break;
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
+
     }
 
     /**
@@ -894,6 +844,7 @@ class CreateRainReport {
 
     /**
      * 根据数值位数计算浮动范围
+     *
      * @param value 原始数值
      * @return 浮动范围值
      */
@@ -917,6 +868,7 @@ class CreateRainReport {
 
     /**
      * 根据位数截断数值
+     *
      * @param value 原始数值
      * @return 截断后的数值
      */
@@ -956,6 +908,7 @@ class CreateRainReport {
 
     /**
      * 计算浮动范围的上下边界（带截断处理）
+     *
      * @param originalValue 原始值
      * @return 长度为2的数组，[0]为下边界，[1]为上边界
      */
@@ -976,5 +929,7 @@ class CreateRainReport {
         return new Long[]{lowerBound, upperBound};
     }
 
+
 }
+
 

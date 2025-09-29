@@ -29,11 +29,11 @@ public class XianFactorAnalysisController {
         if ("暴雨".equals(disasterTrigger)) {
             disasterType = DisasterType.RAINSTORM;
         }
+
         // 2. 字符串转 Long
         Long disasterIdLong = Long.valueOf(disasterId);   // 或 parseLong
-        System.out.println(disasterIdLong+"disasterIdLong"+disasterType+"disasterType");
+//        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(152292L,  DisasterType.RAINSTORM);
         List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(disasterIdLong,  disasterType);
-        System.out.println(disasterEstimation+"queryDisasterEstimationGetAll");
         return disasterEstimation;
     }
 }

@@ -19,6 +19,11 @@ public class XianConstants {
     public static final String AUTH_ERROR = "授权失败!";
     public static final String TRIGGER_ERROR = "地震触发异常!";
     public static final String THEMATIC_EMPTY = "正在生成专题图,请等待...";
+    public static final String RESULT_EMPTY_RAIN = "报告正在生成中，请等待...";
+//    public static String IP1 = "http://10.22.245.246";
+//    public static String IP2 = "http://10.22.245.247";
+    public static String IP1 = "http://localhost";
+    public static String IP2 = "http://localhost";
 
     public static final boolean SEISMIC_TYPE = false;
     public static final boolean STORM_TYPE = true;
@@ -43,32 +48,29 @@ public class XianConstants {
         put("5", "页岩");
     }};
 
-
-
     public static final JSONObject authBody = new JSONObject();
     static {
         authBody.put("username", "admin");
         authBody.put("password", "admin123");
     }
 
-
     // 触发模型接口
-    public static final String BAYES_NET_MODEL_URL = "http://localhost:8085/model/bayes/prediction";
+    public static final String BAYES_NET_MODEL_URL = IP1+":8085/model/bayes/prediction";
     // 修改模型参数接口
-    public static final String BAYES_NET_MODEL_UPDATE_URL = "http://localhost:8085/model/bayes/change";
+    public static final String BAYES_NET_MODEL_UPDATE_URL = IP1+":8085/model/bayes/change";
 
     // 灾评系统授权
-    public static final String AUTH_URL = "http://localhost:18008/api/open/auth";
+    public static final String AUTH_URL = IP2+":18008/api/open/auth";
 
     // 地震触发接口
-    public static final String TRIGGER_EARTHQUAKE_URL = "http://localhost:18008/api/open/eq/trigger";
+    public static final String TRIGGER_EARTHQUAKE_URL = IP2+":18008/api/open/eq/trigger";
     // 暴雨触发接口
-    public static final String TRIGGER_STORM_URL = "http://localhost:18008/api/open/rain/trigger";
+    public static final String TRIGGER_STORM_URL = IP2+":18008/api/open/rain/trigger";
 
     // 专题图接口
-    public static final String THEMATIC_MAP_URL = "http://localhost:18008/api/open/eq/getMap";
+    public static final String THEMATIC_MAP_URL = IP2+":18008/api/open/eq/getMap";
     // 灾情报告接口
-    public static final String DISASTER_REPORT_URL = "http://localhost:18008/api/open/eq/getMap";
+    public static final String DISASTER_REPORT_URL = IP2+":18008/api/open/eq/getMap";
 
 
 

@@ -66,36 +66,74 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
 
     @Override
     public String impactInsert(List<ImpactAreaRequest> request){
-        System.out.println(request);
-
          
         List<XianImpactInAreaEntity> xianImpactInAreaEntityList = new ArrayList<>();
+        
         for (ImpactAreaRequest area : request) {
             XianImpactInAreaEntity xianImpactInAreaEntity = new XianImpactInAreaEntity();  
             // 将polygon坐标转换为WKT格式
             String polygonWkt = convertPolygonToWkt(area.getPolygon());
-            System.out.println("灾害类型: " + area.getType());
-            System.out.println("实体ID: " + area.getEntityId());
 
-            // 计算总人口数
+
             Integer totalPeople = xianImpactInAreaMapper.getTotalPeopleInPolygon(polygonWkt);
-            System.out.println("影响人口数: " + totalPeople);
 
             Integer totalHighway = xianImpactInAreaMapper.getIntersectingHighwayCount(polygonWkt);
-            System.out.println("影响高速公路数: " + totalHighway);
 
             Integer nationalRoadCount = xianImpactInAreaMapper.getIntersectingNationalRoadCount(polygonWkt);
-            System.out.println("影响国道数: " + nationalRoadCount);
 
             Integer roadCount = xianImpactInAreaMapper.getIntersectingRoadCount(polygonWkt);
-            System.out.println("影响普通道路数: " + roadCount);
 
             Integer subwayStationCount = xianImpactInAreaMapper.getSubwayStationCountInPolygon(polygonWkt);
-            System.out.println("影响地铁站数: " + subwayStationCount);
 
-            // 在impactInsert方法中添加危险源查询
             Integer dangerousSourceCount = xianImpactInAreaMapper.getDangerousSourceCountInPolygon(polygonWkt);
-            System.out.println("影响危险源数: " + dangerousSourceCount);
+
+            Map<String,List<Object>> impactJson = new HashMap<>();
+
+            List<Object> impactJsonPeopleDatasList = new ArrayList<>();
+            Map<String,String> impactJsonPeopleDatas = new HashMap<>();
+            impactJsonPeopleDatas.put("hidePoint",xianImpactInAreaMapper.getHideName(area.getEntityId()));
+            impactJsonPeopleDatas.put("number",totalPeople.toString());
+            impactJsonPeopleDatasList.add(impactJsonPeopleDatas);
+
+
+            List<Object> impactJsonTrafficDatasList = new ArrayList<>();
+            List<Highway> highwayName = xianImpactInAreaMapper.getIntersectingHighways(polygonWkt);
+            List<Road> roadName= xianImpactInAreaMapper.getIntersectingRoads(polygonWkt);
+            for(Highway tItem : highwayName){
+                Map<String,String> item = new HashMap<>();
+                item.put("name",tItem.getName());
+                impactJsonTrafficDatasList.add(item);
+            }
+            for(Road tItem : roadName){
+                Map<String,String> item = new HashMap<>();
+                item.put("name",tItem.getRoadName());
+                impactJsonTrafficDatasList.add(item);
+            }
+
+            List<Object> impactJsonDangerDatas = new ArrayList<>();
+            List<DangerousSource> dangerousSourceName = xianImpactInAreaMapper.getDangerousSourceInPolygon(polygonWkt);
+            for(DangerousSource tItem : dangerousSourceName){
+                Map<String,String> item = new HashMap<>();
+                item.put("name",tItem.getName());
+                impactJsonDangerDatas.add(item);
+            }
+
+            List<Object> impactJsonStationDatas = new ArrayList<>();
+            List<XianSubwayStation> stationDatasName = xianImpactInAreaMapper.getSubwayStationsInPolygon(polygonWkt);
+            for(XianSubwayStation tItem : stationDatasName){
+                Map<String,String> item = new HashMap<>();
+                item.put("name",tItem.getStationName());
+                impactJsonStationDatas.add(item);  // 修复：将地铁站数据添加到正确的列表
+            }
+
+
+            impactJson.put("peopleDatas",impactJsonPeopleDatasList);
+            impactJson.put("trafficDatas",impactJsonTrafficDatasList);
+            impactJson.put("dangerDatas",impactJsonDangerDatas);  // 修复：使用正确的危险数据源列表
+            impactJson.put("stationDatas",impactJsonStationDatas);
+
+            // 使用Fastjson2将Map转换为JSON字符串
+            String impactJsonStr = com.alibaba.fastjson2.JSON.toJSONString(impactJson);
 
             xianImpactInAreaEntity.setDisasterId(area.getDisasterId());
             xianImpactInAreaEntity.setSecondDisasterId(area.getEntityId());
@@ -106,10 +144,10 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
             xianImpactInAreaEntity.setStation(subwayStationCount);
             xianImpactInAreaEntity.setDangerousPoint(dangerousSourceCount);
             xianImpactInAreaEntity.setDistrict(area.getCounty());
+            xianImpactInAreaEntity.setImpactJsonStr(impactJsonStr); // 使用新的字符串字段
 
             xianImpactInAreaEntityList.add(xianImpactInAreaEntity);
         }
-        System.out.println(xianImpactInAreaEntityList);
 
         xianImpactInAreaMapper.insertBatch(xianImpactInAreaEntityList);
 

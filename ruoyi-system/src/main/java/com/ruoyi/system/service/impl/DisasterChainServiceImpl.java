@@ -3,8 +3,10 @@ package com.ruoyi.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.entity.XianDisasterRain;
+import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.mapper.FactorAnalysisMapper;
 import com.ruoyi.system.mapper.XianDisasterRainMapper;
+import com.ruoyi.system.mapper.XianEarthquakeListMapper;
 import com.ruoyi.system.service.IDisasterChainService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -19,23 +21,33 @@ public class DisasterChainServiceImpl implements IDisasterChainService {
     private XianDisasterRainMapper xianDisasterRainMapper;
     @Resource
     private FactorAnalysisMapper factorAnalysisMapper;
+    @Resource
+    private XianEarthquakeListMapper xianEarthquakeListMapper;
 
     @Override
-    public XianDisasterRain getLastRainChain() {
+    public List<XianDisasterRain> getAllRainChain() {
         QueryWrapper<XianDisasterRain> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("occurrence_time")  // 按时间降序排列
-                .last("LIMIT 1");               // 只取第一条
-        XianDisasterRain latestRain = xianDisasterRainMapper.selectOne(wrapper);
+        wrapper.orderByDesc("occurrence_time"); // 按时间降序排列
+        List<XianDisasterRain> latestRain = xianDisasterRainMapper.selectList(wrapper);
         // 将XianDisasterRain转换为DisasterRainDTO
         return latestRain;
     }
 
     @Override
-    public List<FactorAnalysis> getAllRainDisasterProbability(Integer disasterId){
+    public List<XianEarthquakeList> getAllEarthquakeList() {
+        QueryWrapper<XianEarthquakeList> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("occurrence_time");
+        List <XianEarthquakeList> earthquakeList = xianEarthquakeListMapper.selectList(wrapper);
+        return earthquakeList;
+    }
+
+    @Override
+    public List<FactorAnalysis> getEarthQuakeProbabilityByType(Long disasterId, String disasterType){
         QueryWrapper<FactorAnalysis> wrapper = new QueryWrapper<>();
-        wrapper.eq("disaster_id",disasterId);
+        wrapper.eq("eq_disaster_id",disasterId);
+        wrapper.eq("disaster_type",disasterType);
         List<FactorAnalysis> list = factorAnalysisMapper.selectList(wrapper);
-        return list;
+        return processProbability(list);
     }
 
     @Override

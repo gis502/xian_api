@@ -44,10 +44,6 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
         this.xianDisasterRealMapper = xianDisasterRealMapper;
         this.mapperRegistry = mapperRegistry;
         this.plotTypeToMapperType = plotTypeToMapperType;
-        System.out.println("In Service Constructor - mapperRegistry contents:");
-        for (Map.Entry<String, BaseMapper<?>> entry : mapperRegistry.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue().getClass().getName());
-        }
     }
 
 //    @Override
@@ -195,15 +191,14 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
                 // 获取 situation_plot 表中的记录
 //                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
                 XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
-                System.out.println("Plot Query result: " + plotInfo);
+
 
                 BaseMapper<?> mapper = mapperRegistry.get(mapperType + "Mapper");
-                System.out.println("mapper: " + mapper);
 
                 if (mapper != null) {
                     // 通过反射获取 Mapper 的泛型实体类型
                     Class<?> entityType = getEntityClass(mapper);
-                    System.out.println("entityType: " + entityType);
+
 
                     // 使用 QueryWrapper 构建查询条件
                     QueryWrapper<Object> wrapper = new QueryWrapper<>();
@@ -211,7 +206,6 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
 
                     // 执行查询
                     Object result = ((BaseMapper<Object>) mapper).selectOne(wrapper);
-                    System.out.println("Query result: " + result);
 
 
                     // 将 plot 表的信息和 plotType 对应表的信息整合在一起
@@ -236,7 +230,7 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
 //                // 获取 situation_plot 表中的记录
 //                XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
                 XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
-                System.out.println("Plot Query result: " + plotInfo);
+
                 Map<String, Object> combinedResult = new HashMap<>();
                 combinedResult.put("plotInfo", plotInfo);
                 return combinedResult;
@@ -266,7 +260,7 @@ public class XianDisasterRealServiceImpl extends ServiceImpl<XianDisasterRealMap
 
 //                    XianDisasterReal plotInfo = xianDisasterRealMapper.selectOne(plotWrapper);
                     XianDisasterReal plotInfo = xianDisasterRealMapper.selectById(plotId);
-                    System.out.println(plotInfo+"plotInfo");
+
                     BaseMapper<?> mapper = mapperRegistry.get(mapperType + "Mapper");
                     if (mapper != null) {
                         // 获取 Mapper 的泛型实体类型

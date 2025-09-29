@@ -1,6 +1,8 @@
 package com.ruoyi.system.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.enums.DataSourceType;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,7 +14,7 @@ import java.time.LocalDateTime;
  * @date: 2025-04-04 11:27
  * @description: 评估图件产出表（从库）
  */
-
+@DataSource(value = DataSourceType.SLAVE)
 @Data
 @TableName("assessment_output")
 public class AssessmentOutput implements Serializable {

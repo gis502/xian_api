@@ -51,4 +51,12 @@ public class XianImpactInAreaEntity {
     
     @TableField("district")
     private String district;
+
+    // 注释掉原来的Map类型字段
+    //@TableField("impact_json")
+    //private Map<String, List<Object>> impactJson;
+    
+    // 添加字符串类型字段来存储JSON字符串
+    @TableField("impact_json")
+    private String impactJsonStr;
 }
