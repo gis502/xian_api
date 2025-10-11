@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @TableName("xian_disaster_real")
 public class XianDisasterReal {
@@ -17,8 +19,10 @@ public class XianDisasterReal {
   private String plotId;
   private String geom;
   private String plotType;
-  private java.sql.Timestamp startTime;
-  private java.sql.Timestamp endTime;
+//  private java.sql.Timestamp startTime;
+  private LocalDateTime startTime;
+//  private java.sql.Timestamp endTime;
+  private LocalDateTime endTime;
   private String drawtype;
   private String angle;
   private java.sql.Timestamp creationTime;

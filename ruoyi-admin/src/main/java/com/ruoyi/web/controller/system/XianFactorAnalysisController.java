@@ -32,11 +32,8 @@ public class XianFactorAnalysisController {
 
         // 2. 字符串转 Long
         Long disasterIdLong = Long.valueOf(disasterId);   // 或 parseLong
-
 //        List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(152292L,  DisasterType.RAINSTORM);
         List<Map<String, Object>> disasterEstimation = xianFactorAnalysisMapper.queryDisasterEstimationGetAll(disasterIdLong,  disasterType);
         return disasterEstimation;
     }
-
-
 }
