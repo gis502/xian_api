@@ -243,9 +243,19 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                         Double.parseDouble(a.get("rainfall"))
                 )
         );
-        String stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")), Float.parseFloat(rainfallSummary.get(0).get("lon")));
-        String stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")), Float.parseFloat(rainfallSummary.get(1).get("lon")));
-        String stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")), Float.parseFloat(rainfallSummary.get(2).get("lon")));
+        String stationStreet1 = "";
+        String stationStreet2 = "";
+        String stationStreet3 = "";
+
+        if(rainfallSummary.isEmpty()){
+            stationStreet1 = "";
+            stationStreet2 = "";
+            stationStreet3 = "";
+        }else{
+            stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")), Float.parseFloat(rainfallSummary.get(0).get("lon")));
+            stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")), Float.parseFloat(rainfallSummary.get(1).get("lon")));
+            stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")), Float.parseFloat(rainfallSummary.get(2).get("lon")));
+        }
 
         concentratedAreaDetailStreet.add(stationStreet1);
         concentratedAreaDetailStreet.add(stationStreet2);
@@ -264,9 +274,16 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* 降雨集中街道雨量 concentratedAreaDetailQuantity */
         List<String> concentratedAreaDetailQuantity = new ArrayList<>();
-        concentratedAreaDetailQuantity.add(rainfallSummary.get(0).get("rainfall"));
-        concentratedAreaDetailQuantity.add(rainfallSummary.get(1).get("rainfall"));
-        concentratedAreaDetailQuantity.add(rainfallSummary.get(2).get("rainfall"));
+        if(rainfallSummary.isEmpty()){
+            concentratedAreaDetailQuantity.add("0");
+            concentratedAreaDetailQuantity.add("0");
+            concentratedAreaDetailQuantity.add("0");
+        }else{
+            concentratedAreaDetailQuantity.add(rainfallSummary.get(0).get("rainfall"));
+            concentratedAreaDetailQuantity.add(rainfallSummary.get(1).get("rainfall"));
+            concentratedAreaDetailQuantity.add(rainfallSummary.get(2).get("rainfall"));
+        }
+
 
         /* 降雨集中街道等级  concentratedAreaDetailGrade */
         List<String> concentratedAreaDetailGrade = new ArrayList<>();
@@ -368,7 +385,12 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         }
 
         /* significantIncreaseArea 风险显著上升区域 */
-        String significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
+        String significantIncreaseArea = "";
+        if(stationStreet1.equals("")){
+            significantIncreaseArea = concentratedAreaPosition;
+        }else{
+            significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
+        }
         /* significantIncreaseAreaRiskQuantity 显著上升区域中重点关注风险点 */
         Integer significantIncreaseAreaRiskQuantity;
         /* significantIncreaseAreaHideQuantity 显著上升区域中重点关注隐患点 */
@@ -593,7 +615,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
 
         String maxHoursRainfall = "";
-        if(Integer.parseInt(rainReportEntity.getRainAreaQuantity().get(0))>50){
+        if(Float.parseFloat(rainReportEntity.getRainAreaQuantity().get(0))>50){
             maxHoursRainfall = "单小时最大降雨量超过50毫米，";
         }
 
