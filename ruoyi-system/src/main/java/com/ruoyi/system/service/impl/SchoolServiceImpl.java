@@ -42,6 +42,8 @@ public class SchoolServiceImpl implements ISchoolService {
             properties.put("isImportant", school.getIsImportant());
             properties.put("students", school.getStudents());
             properties.put("phone", school.getTelephone());
+            properties.put("lon", school.getLon());
+            properties.put("lat", school.getLat());
 
             Map<String, Object> geometry = new HashMap<>();
             List<Double> coordinates = new ArrayList<>();
