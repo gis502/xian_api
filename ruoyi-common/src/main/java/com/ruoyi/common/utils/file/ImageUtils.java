@@ -2,6 +2,7 @@ package com.ruoyi.common.utils.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -61,38 +62,33 @@ public class ImageUtils
      * @param url 地址
      * @return 字节数据
      */
-    public static byte[] readFile(String url)
-    {
-        InputStream in = null;
-        try
-        {
-            if (url.startsWith("http"))
-            {
-                // 网络地址
-                URL urlObj = new URL(url);
-                URLConnection urlConnection = urlObj.openConnection();
-                urlConnection.setConnectTimeout(30 * 1000);
-                urlConnection.setReadTimeout(60 * 1000);
-                urlConnection.setDoInput(true);
-                in = urlConnection.getInputStream();
-            }
-            else
-            {
-                // 本机地址
-                String localPath = RuoYiConfig.getProfile();
-                String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
-                in = new FileInputStream(downloadPath);
-            }
+    public static byte[] readFile(String url) {
+        // try-with-resources 管理 InputStream（网络流或文件流），自动关闭
+        try (InputStream in = getInputStreamByUrl(url)) {
             return IOUtils.toByteArray(in);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("获取文件路径异常 {}", e);
             return null;
         }
-        finally
-        {
-            IOUtils.closeQuietly(in);
+    }
+
+    /**
+     * 提取工具方法：根据URL类型获取对应的InputStream（网络流或文件流）
+     */
+    private static InputStream getInputStreamByUrl(String url) throws IOException {
+        if (url.startsWith("http")) {
+            // 网络地址：创建URL连接并获取输入流
+            URL urlObj = new URL(url);
+            URLConnection urlConnection = urlObj.openConnection();
+            urlConnection.setConnectTimeout(30 * 1000);
+            urlConnection.setReadTimeout(60 * 1000);
+            urlConnection.setDoInput(true);
+            return urlConnection.getInputStream();
+        } else {
+            // 本机地址：创建文件输入流
+            String localPath = RuoYiConfig.getProfile();
+            String downloadPath = localPath + StringUtils.substringAfter(url, Constants.RESOURCE_PREFIX);
+            return new FileInputStream(downloadPath);
         }
     }
 }

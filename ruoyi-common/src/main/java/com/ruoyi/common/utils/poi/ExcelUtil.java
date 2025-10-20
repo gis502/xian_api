@@ -658,26 +658,17 @@ public class ExcelUtil<T>
      * 
      * @return 结果
      */
-    public AjaxResult exportExcel()
-    {
-        OutputStream out = null;
-        try
-        {
-            writeSheet();
-            String filename = encodingFilename(sheetName);
-            out = new FileOutputStream(getAbsoluteFile(filename));
-            wb.write(out);
-            return AjaxResult.success(filename);
-        }
-        catch (Exception e)
-        {
+    public AjaxResult exportExcel() {
+        try (
+                OutputStream out = new FileOutputStream(getAbsoluteFile(encodingFilename(sheetName)));
+                Workbook wb = this.wb;
+        ) {
+            writeSheet(); // 执行写sheet逻辑（确保此时 wb 已初始化）
+            wb.write(out); // 写入Excel内容到输出流
+            return AjaxResult.success(encodingFilename(sheetName));
+        } catch (Exception e) {
             log.error("导出Excel异常{}", e.getMessage());
             throw new UtilException("导出Excel失败，请联系网站管理员！");
-        }
-        finally
-        {
-            IOUtils.closeQuietly(wb);
-            IOUtils.closeQuietly(out);
         }
     }
 

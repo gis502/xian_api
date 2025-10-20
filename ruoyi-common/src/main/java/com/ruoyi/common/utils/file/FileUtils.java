@@ -35,32 +35,23 @@ public class FileUtils
      * @param os 输出流
      * @return
      */
-    public static void writeBytes(String filePath, OutputStream os) throws IOException
-    {
-        FileInputStream fis = null;
-        try
-        {
+    public static void writeBytes(String filePath, OutputStream os) throws IOException {
+        // try-with-resources 管理当前方法创建的 FileInputStream（自动关闭）
+        try (FileInputStream fis = new FileInputStream(new File(filePath))) {
             File file = new File(filePath);
-            if (!file.exists())
-            {
+            if (!file.exists()) {
                 throw new FileNotFoundException(filePath);
             }
-            fis = new FileInputStream(file);
             byte[] b = new byte[1024];
             int length;
-            while ((length = fis.read(b)) > 0)
-            {
+            while ((length = fis.read(b)) > 0) {
                 os.write(b, 0, length);
             }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw e;
-        }
-        finally
-        {
+        } finally {
+            // 保持原逻辑：关闭外部传入的 OutputStream（若需由当前方法负责）
             IOUtils.close(os);
-            IOUtils.close(fis);
         }
     }
 
@@ -84,21 +75,12 @@ public class FileUtils
      * @return 目标文件
      * @throws IOException IO异常
      */
-    public static String writeBytes(byte[] data, String uploadDir) throws IOException
-    {
-        FileOutputStream fos = null;
+    public static String writeBytes(byte[] data, String uploadDir) throws IOException {
         String pathName = "";
-        try
-        {
-            String extension = getFileExtendName(data);
-            pathName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + extension;
-            File file = FileUploadUtils.getAbsoluteFile(uploadDir, pathName);
-            fos = new FileOutputStream(file);
+        try (FileOutputStream fos = new FileOutputStream(
+                FileUploadUtils.getAbsoluteFile(uploadDir, pathName = DateUtils.datePath() + "/" + IdUtils.fastUUID() + "." + getFileExtendName(data))
+        )) {
             fos.write(data);
-        }
-        finally
-        {
-            IOUtils.close(fos);
         }
         return FileUploadUtils.getPathFileName(uploadDir, pathName);
     }

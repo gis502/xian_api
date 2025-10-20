@@ -208,17 +208,22 @@ public class HttpUtils
         return sendSSLPost(url, param, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
     }
 
-    public static String sendSSLPost(String url, String param, String contentType)
-    {
+    public static String sendSSLPost(String url, String param, String contentType) {
         StringBuilder result = new StringBuilder();
         String urlNameString = url + "?" + param;
-        try
-        {
+        HttpsURLConnection conn = null; // 声明连接变量，用于finally中关闭
+
+        try {
             log.info("sendSSLPost - {}", urlNameString);
+            // 初始化SSL上下文
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, new TrustManager[] { new TrustAnyTrustManager() }, new java.security.SecureRandom());
+
+            // 创建URL和连接
             URL console = new URL(urlNameString);
-            HttpsURLConnection conn = (HttpsURLConnection) console.openConnection();
+            conn = (HttpsURLConnection) console.openConnection();
+
+            // 设置请求头
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
@@ -227,39 +232,40 @@ public class HttpUtils
             conn.setDoOutput(true);
             conn.setDoInput(true);
 
+            // 设置SSL和主机验证
             conn.setSSLSocketFactory(sc.getSocketFactory());
             conn.setHostnameVerifier(new TrustAnyHostnameVerifier());
             conn.connect();
-            InputStream is = conn.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String ret = "";
-            while ((ret = br.readLine()) != null)
-            {
-                if (ret != null && !"".equals(ret.trim()))
-                {
-                    result.append(new String(ret.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+
+            // 用try-with-resources管理输入流和缓冲读取器（自动关闭）
+            try (InputStream is = conn.getInputStream();
+                 BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+
+                String ret;
+                while ((ret = br.readLine()) != null) {
+                    if (ret != null && !"".equals(ret.trim())) {
+                        // 处理编码转换
+                        result.append(new String(ret.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                    }
                 }
+                log.info("recv - {}", result);
             }
-            log.info("recv - {}", result);
-            conn.disconnect();
-            br.close();
-        }
-        catch (ConnectException e)
-        {
+
+        } catch (ConnectException e) {
             log.error("调用HttpUtils.sendSSLPost ConnectException, url=" + url + ",param=" + param, e);
-        }
-        catch (SocketTimeoutException e)
-        {
+        } catch (SocketTimeoutException e) {
             log.error("调用HttpUtils.sendSSLPost SocketTimeoutException, url=" + url + ",param=" + param, e);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             log.error("调用HttpUtils.sendSSLPost IOException, url=" + url + ",param=" + param, e);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("调用HttpsUtil.sendSSLPost Exception, url=" + url + ",param=" + param, e);
+        } finally {
+            // 确保连接断开（无论是否发生异常）
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
+
         return result.toString();
     }
 
