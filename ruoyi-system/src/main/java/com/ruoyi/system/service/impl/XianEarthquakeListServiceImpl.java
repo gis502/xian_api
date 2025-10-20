@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.slf4j.Logger;
@@ -29,6 +30,8 @@ import org.slf4j.LoggerFactory;
 @Service
 public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeListMapper, XianEarthquakeList>  implements IXianEarthquakeListService {
     private static final Logger log = LoggerFactory.getLogger(XianEarthquakeListServiceImpl.class);
+
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     @Resource
     private PeopleGDPMapper peopleGDPMapper;
@@ -215,7 +218,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
         // 3. 指数强制限制（核心：确保不会过小导致结果为0）
         double adjustexpont = exponent >= 7.5 ? exponent : 7.5;
         if (AffectPeople>=6*1e5){
-            adjustexpont = 8 + Math.random() * 1;
+            adjustexpont = 8 + secureRandom.nextDouble() * 1;
         }
 
 
@@ -253,7 +256,7 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
 //            );
 
         } else {
-            double randomRatio = 0.07 + Math.random() * 0.05;
+            double randomRatio = 0.07 + secureRandom.nextDouble() * 0.05;
             double casualties = AffectPeople * randomRatio;
             int diePopMinRaw = (int) Math.round(casualties * 0.8);
             int diePopMaxRaw = (int) Math.round(casualties * 1.2);

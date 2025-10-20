@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.ruoyi.common.config.DocumentConfig;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.ImagePositionEnum;
@@ -28,7 +27,6 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -794,24 +792,12 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                 // 第三段
                 String text = String.format(
                         "其中，%s可能的大型灾害，预计影响%d到%d人，附近居民和风险影响区域居民必须撤离。",
-//                                +
-//                                "%s可能的中/小型灾害，预计影响%d人，建议附近居民做好防护，风险影响区域居民建议撤离。",
-//                        disasterReport.getExtraLargeArea(),
                         disasterReport.getDisasterType().getDisasterName(),
-//                        disasterReport.getExtraLargeAreaPoint(),
                         data1.intValue(),
-                        data2.intValue(),
-                        disasterReport.getExtraLargeAreaRiskQuantity(),
-//                        disasterReport.getExtraLargeAreaRiskPeopleQuantity(),
-                        (int) (Math.random() * 400 + 200),
-                        disasterReport.getSmallArea(),
-                        disasterReport.getSmallAreaPoint(),
-                        disasterReport.getSmallAreaRiskPeopleQuantity()
+                        data2.intValue()
                 );
                 XWPFParagraph paragraph3 = DocumentUtils.addRegularParagraph(doc, text);
                 paragraph3.setIndentationFirstLine(0);      // 首行不缩进
-
-
             }
 
             if((i+1)==rainReportEntity.getSecondaryDisasterReport().size()){

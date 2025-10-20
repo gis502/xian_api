@@ -21,13 +21,14 @@ import org.springframework.stereotype.Service;
 
 
 import javax.annotation.Resource;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
 @Service
 public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAnalysis> implements IModelService {
-
+    private static final SecureRandom secureRandom = new SecureRandom();
     @Resource
     private GeologicalDisasterHideMapper geologicalDisasterHideMapper;
     @Resource
@@ -870,9 +871,8 @@ public class IModelServiceImpl extends ServiceImpl<FactorAnalysisMapper,FactorAn
         double PHI_MAX = 28.0; // 内摩擦角最大值(度)
         double WIDTH_MIN_RATIO = 0.5; // 滑坡宽度最小比例
         double WIDTH_MAX_RATIO = 1.2; // 滑坡宽度最大比例
-        Random random = new Random();
-        double phi = PHI_MIN + (PHI_MAX - PHI_MIN) * random.nextDouble();
-        double widthRatio = WIDTH_MIN_RATIO + (WIDTH_MAX_RATIO - WIDTH_MIN_RATIO) * random.nextDouble();
+        double phi = PHI_MIN + (PHI_MAX - PHI_MIN) * secureRandom.nextDouble();
+        double widthRatio = WIDTH_MIN_RATIO + (WIDTH_MAX_RATIO - WIDTH_MIN_RATIO) * secureRandom.nextDouble();
         double theta = (DemSlopeDTO.getSlope() + phi) / 2.0;
         double h = DemSlopeDTO.getDem();
         //计算过程

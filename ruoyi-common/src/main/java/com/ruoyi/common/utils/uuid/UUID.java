@@ -4,7 +4,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import com.ruoyi.common.exception.UtilException;
 
 /**
@@ -77,7 +76,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
 
     /**
      * 获取类型 4（伪随机生成的）UUID 的静态工厂。 使用加密的强伪随机数生成器生成该 UUID。
-     * 
+     *
      * @return 随机生成的 {@code UUID}
      */
     public static UUID randomUUID()
@@ -93,7 +92,7 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
      */
     public static UUID randomUUID(boolean isSecure)
     {
-        final Random ng = isSecure ? Holder.numberGenerator : getRandom();
+        final Random ng = Holder.numberGenerator;
 
         byte[] randomBytes = new byte[16];
         ng.nextBytes(randomBytes);
@@ -469,16 +468,5 @@ public final class UUID implements java.io.Serializable, Comparable<UUID>
         {
             throw new UtilException(e);
         }
-    }
-
-    /**
-     * 获取随机数生成器对象<br>
-     * ThreadLocalRandom是JDK 7之后提供并发产生随机数，能够解决多个线程发生的竞争争夺。
-     * 
-     * @return {@link ThreadLocalRandom}
-     */
-    public static ThreadLocalRandom getRandom()
-    {
-        return ThreadLocalRandom.current();
     }
 }
