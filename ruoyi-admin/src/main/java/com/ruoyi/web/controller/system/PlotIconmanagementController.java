@@ -24,130 +24,166 @@ public class PlotIconmanagementController {
     @Resource
     private PlotIconmanagementService plotIconmanagementService;
 
+    // 定义允许的文件根目录（固定为项目下的logistics/uploads/PlotsPic/）
+    private static final String RELATIVE_ROOT_DIR = "/logistics/uploads/PlotsPic/";
+
+
+    /**
+     * 工具方法：获取安全的文件对象（过滤危险文件名+校验路径在根目录内）
+     * @param rawFileName 用户输入的原始文件名（不含后缀）
+     * @param suffix 文件后缀（如".png"）
+     * @return 安全的File对象
+     * @throws IOException 路径解析异常
+     * @throws SecurityException 路径越界时抛出
+     */
+    private File getSafeFile(String rawFileName, String suffix) throws IOException, SecurityException {
+        // 1. 过滤文件名中的危险字符（只保留字母、数字、下划线、横线、点）
+        String safeFileName = rawFileName.replaceAll("[^a-zA-Z0-9_\\-\\.]", "");
+        if (safeFileName.isEmpty()) {
+            throw new IllegalArgumentException("无效的文件名（包含非法字符或为空）");
+        }
+
+        // 2. 构建完整根目录（项目路径+相对根目录）
+        String projectPath = System.getProperty("user.dir");
+        File rootDir = new File(projectPath + RELATIVE_ROOT_DIR);
+        // 获取根目录的规范路径（解析所有../和符号链接，确保唯一）
+        String rootCanonicalPath = rootDir.getCanonicalPath();
+
+        // 3. 安全拼接文件路径（使用File构造函数，自动处理系统路径分隔符）
+        String fileNameWithSuffix = safeFileName + suffix;
+        File targetFile = new File(rootDir, fileNameWithSuffix);
+
+        // 4. 校验目标文件是否在根目录内（核心防越界逻辑）
+        String targetCanonicalPath = targetFile.getCanonicalPath();
+        if (!targetCanonicalPath.startsWith(rootCanonicalPath)) {
+            throw new SecurityException("检测到路径越界风险，拒绝操作");
+        }
+
+        return targetFile;
+    }
+
+
     @PostMapping("/getploticon")
     public AjaxResult getploticon() {
         return AjaxResult.success(plotIconmanagementService.list());
     }
 
+
     @PostMapping("/deleteploticon/{uuid}")
     @Log(title = "标会图片管理", businessType = BusinessType.DELETE)
     public AjaxResult deletePlotIcon(@PathVariable("uuid") String id) {
-        // 从数据库获取 plotIcon 对象
         PlotIconmanagement plotIcon = plotIconmanagementService.getById(id);
-        if (plotIcon != null) {
-            // 确定文件路径
-            String projectPath = System.getProperty("user.dir");
-            String filePath = projectPath + "/logistics/uploads/PlotsPic/" + plotIcon.getName() + ".png";
-
-            // 删除文件
-            File file = new File(filePath);
-            if (file.exists() && file.delete()) {
-                // 文件删除成功后再删除数据库记录
-                plotIconmanagementService.removeById(id);
-                return AjaxResult.success("File and record deleted successfully.");
-            } else {
-                return AjaxResult.error("Failed to delete file.");
-            }
+        if (plotIcon == null) {
+            return AjaxResult.error("记录不存在");
         }
-        return AjaxResult.error("Record not found.");
+
+        try {
+            // 安全获取待删除文件（文件名是plotIcon.getName()，后缀为.png）
+            File file = getSafeFile(plotIcon.getName(), ".png");
+
+            // 删除文件和数据库记录
+            if (file.exists() && file.delete()) {
+                plotIconmanagementService.removeById(id);
+                return AjaxResult.success("文件和记录删除成功");
+            } else {
+                return AjaxResult.error("文件删除失败（文件不存在或无法删除）");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResult.error("删除失败：" + e.getMessage());
+        }
     }
+
 
     @PostMapping("/updataploticon")
     @Log(title = "标会图片管理", businessType = BusinessType.UPDATE)
     public AjaxResult updataPlotIcon(@RequestBody PlotIconmanagement plotIcon) {
-        // 从数据库获取当前记录
         PlotIconmanagement existingPlotIcon = plotIconmanagementService.getById((Serializable) plotIcon.getUuid());
         if (existingPlotIcon == null) {
-            return AjaxResult.error("Record not found.");
+            return AjaxResult.error("记录不存在");
         }
 
-        // 保存时图片没有变化时，不进行修改
-        boolean isBase64 = plotIcon.getImg().startsWith("data:image/jpeg;base64");
+        // 图片未变化时直接更新数据库
+        boolean isBase64 = plotIcon.getImg() != null && plotIcon.getImg().startsWith("data:image/jpeg;base64");
         if (!isBase64) {
             plotIcon.setImg(null);
             plotIconmanagementService.updateById(plotIcon);
-            return AjaxResult.success("Record updated successfully.");
+            return AjaxResult.success("记录更新成功（图片未变更）");
         }
 
-        // 删除旧图片
-        String projectPath = System.getProperty("user.dir");
-        String oldFilePath = projectPath + "/logistics/uploads/PlotsPic/" + existingPlotIcon.getName();
-        File oldFile = new File(oldFilePath);
-        if (oldFile.exists()) {
-            oldFile.delete();
-        }
-
-        // 保存新图片
         try {
+            // 1. 删除旧图片
+            File oldFile = getSafeFile(existingPlotIcon.getName(), ""); // 旧文件路径可能不带后缀，按实际存储处理
+            if (oldFile.exists()) {
+                oldFile.delete();
+            }
+
+            // 2. 处理新图片Base64数据
             String base64Data = plotIcon.getImg();
             if (base64Data.contains(",")) {
                 base64Data = base64Data.split(",")[1];
             }
             byte[] imageBytes = Base64.getMimeDecoder().decode(base64Data);
 
-            String newFilePath = projectPath + "/logistics/uploads/PlotsPic/" + plotIcon.getName() + ".png";
-            File newFile = new File(newFilePath);
-            newFile.getParentFile().mkdirs();
+            // 3. 安全保存新图片
+            File newFile = getSafeFile(plotIcon.getName(), ".png");
+            newFile.getParentFile().mkdirs(); // 确保父目录存在
             FileUtils.writeByteArrayToFile(newFile, imageBytes);
 
+            // 4. 更新数据库
             plotIcon.setImg(plotIcon.getName());
+            plotIconmanagementService.updateById(plotIcon);
+            return AjaxResult.success("记录和图片更新成功");
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            return AjaxResult.error("Failed to save new image: " + e.getMessage());
+            return AjaxResult.error("更新失败：" + e.getMessage());
         }
-        // 更新数据库中的记录
-        plotIconmanagementService.updateById(plotIcon);
-        return AjaxResult.success("Record updated successfully.");
     }
+
 
     @PostMapping("/searchploticon")
     public List<PlotIconmanagement> searchPloticon(@RequestParam("menuName") String menuName) {
         QueryWrapper<PlotIconmanagement> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name", menuName).or().like("describe", menuName).or().like("type", menuName);
-        List<PlotIconmanagement> list = plotIconmanagementService.list(queryWrapper);
-        return list;
+        queryWrapper.like("name", menuName)
+                .or().like("describe", menuName)
+                .or().like("type", menuName);
+        return plotIconmanagementService.list(queryWrapper);
     }
+
 
     @PostMapping("/addploticon")
     @Log(title = "标会图片管理", businessType = BusinessType.INSERT)
-    public AjaxResult addPlotIcon(@RequestBody PlotIconmanagement plotIcon) throws IOException {
+    public AjaxResult addPlotIcon(@RequestBody PlotIconmanagement plotIcon) {
         String base64Data = plotIcon.getImg();
-        String imageName = plotIcon.getName(); // 获取作为文件名的 name 字段
+        String rawImageName = plotIcon.getName(); // 用户输入的文件名（不含后缀）
+
+        if (base64Data == null || rawImageName == null) {
+            return AjaxResult.error("图片数据或文件名不能为空");
+        }
 
         try {
-            // 检查 Base64 字符串格式并去掉前缀
+            // 1. 处理Base64数据
             if (base64Data.contains(",")) {
                 base64Data = base64Data.split(",")[1];
             }
-
-            // 使用 Base64 MIME 解码器来解码数据
             byte[] imageBytes = Base64.getMimeDecoder().decode(base64Data);
 
-            // 确定文件保存路径
-            String projectPath = System.getProperty("user.dir");
-            String outputPath = projectPath + "/logistics/uploads/PlotsPic/" + imageName + ".png";
-            File outputFile = new File(outputPath);
-
-            // 确保目录存在
-            outputFile.getParentFile().mkdirs();
-
-            // 将字节数组写入文件，生成 PNG 图片
+            // 2. 安全保存图片
+            File outputFile = getSafeFile(rawImageName, ".png");
+            outputFile.getParentFile().mkdirs(); // 确保目录存在
             FileUtils.writeByteArrayToFile(outputFile, imageBytes);
 
-            // 更新 plotIcon 的 img 字段为文件名
-            plotIcon.setImg(imageName);
-
-            // 保存 plotIcon 对象
+            // 3. 保存数据库记录
+            plotIcon.setImg(rawImageName);
             plotIconmanagementService.save(plotIcon);
+            return AjaxResult.success("图片和记录保存成功：" + rawImageName);
 
-            return AjaxResult.success("File saved successfully with name: " + imageName);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return AjaxResult.error("Failed to save image: " + e.getMessage());
         } catch (IllegalArgumentException e) {
+            return AjaxResult.error("Base64解码失败：" + e.getMessage());
+        } catch (Exception e) {
             e.printStackTrace();
-            return AjaxResult.error("Base64 decoding failed: " + e.getMessage());
+            return AjaxResult.error("保存失败：" + e.getMessage());
         }
     }
 
