@@ -247,15 +247,22 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         String stationStreet2 = "";
         String stationStreet3 = "";
 
-        if(rainfallSummary.isEmpty()){
-            stationStreet1 = "";
-            stationStreet2 = "";
-            stationStreet3 = "";
-        }else{
-            stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")), Float.parseFloat(rainfallSummary.get(0).get("lon")));
-            stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")), Float.parseFloat(rainfallSummary.get(1).get("lon")));
-            stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")), Float.parseFloat(rainfallSummary.get(2).get("lon")));
+        // 根据rainfallSummary的实际大小安全地设置各变量值
+        if(rainfallSummary != null && !rainfallSummary.isEmpty()){
+            // 处理第一个元素（如果存在）
+            if(rainfallSummary.size() > 0){
+                stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")), Float.parseFloat(rainfallSummary.get(0).get("lon")));
+            }
+            // 处理第二个元素（如果存在）
+            if(rainfallSummary.size() > 1){
+                stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")), Float.parseFloat(rainfallSummary.get(1).get("lon")));
+            }
+            // 处理第三个元素（如果存在）
+            if(rainfallSummary.size() > 2){
+                stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")), Float.parseFloat(rainfallSummary.get(2).get("lon")));
+            }
         }
+        // 如果rainfallSummary为null或空，变量保持初始值空字符串
 
         concentratedAreaDetailStreet.add(stationStreet1);
         concentratedAreaDetailStreet.add(stationStreet2);
@@ -274,14 +281,26 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* 降雨集中街道雨量 concentratedAreaDetailQuantity */
         List<String> concentratedAreaDetailQuantity = new ArrayList<>();
-        if(rainfallSummary.isEmpty()){
-            concentratedAreaDetailQuantity.add("0");
-            concentratedAreaDetailQuantity.add("0");
-            concentratedAreaDetailQuantity.add("0");
-        }else{
+        // 确保始终添加3个元素，根据rainfallSummary的实际大小设置值
+        // 添加第一个元素
+        if(rainfallSummary != null && !rainfallSummary.isEmpty() && rainfallSummary.size() > 0){
             concentratedAreaDetailQuantity.add(rainfallSummary.get(0).get("rainfall"));
+        } else {
+            concentratedAreaDetailQuantity.add("0");
+        }
+        
+        // 添加第二个元素
+        if(rainfallSummary != null && rainfallSummary.size() > 1){
             concentratedAreaDetailQuantity.add(rainfallSummary.get(1).get("rainfall"));
+        } else {
+            concentratedAreaDetailQuantity.add("0");
+        }
+        
+        // 添加第三个元素
+        if(rainfallSummary != null && rainfallSummary.size() > 2){
             concentratedAreaDetailQuantity.add(rainfallSummary.get(2).get("rainfall"));
+        } else {
+            concentratedAreaDetailQuantity.add("0");
         }
 
 
@@ -386,11 +405,25 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         /* significantIncreaseArea 风险显著上升区域 */
         String significantIncreaseArea = "";
-        if(stationStreet1.equals("")){
-            significantIncreaseArea = concentratedAreaPosition;
-        }else{
-            significantIncreaseArea = concentratedAreaPosition + stationStreet1 + "、" + stationStreet2 + "、" + stationStreet3;
+        StringBuilder sb = new StringBuilder();
+        sb.append(concentratedAreaPosition);
+        // 智能拼接非空的街道名称，避免多余的顿号
+        List<String> validStreets = new ArrayList<>();
+        if(stationStreet1 != null && !stationStreet1.isEmpty()) {
+            validStreets.add(stationStreet1);
         }
+        if(stationStreet2 != null && !stationStreet2.isEmpty()) {
+            validStreets.add(stationStreet2);
+        }
+        if(stationStreet3 != null && !stationStreet3.isEmpty()) {
+            validStreets.add(stationStreet3);
+        }
+        // 如果有非空的街道名称，则拼接它们
+        if(!validStreets.isEmpty()) {
+            sb.append(String.join("、", validStreets));
+        }
+        significantIncreaseArea = sb.toString();
+
         /* significantIncreaseAreaRiskQuantity 显著上升区域中重点关注风险点 */
         Integer significantIncreaseAreaRiskQuantity;
         /* significantIncreaseAreaHideQuantity 显著上升区域中重点关注隐患点 */
