@@ -12,7 +12,7 @@ ruoyi:
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数字计算 char 字符验证
-  captchaType: math
+  captchaType: false
 
 # 开发环境配置
 server:
@@ -79,8 +79,10 @@ spring:
     database: 0
     # 密码
     password: zhangsan
+#    host: localhost
+#    prot: 6379
+#    database: 0
 #    password:
-
     # 连接超时时间
     timeout: 10s
     lettuce:
