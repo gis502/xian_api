@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * @date: 2025-04-04 11:27
  * @description: 评估图件产出表（从库）
  */
-@DataSource(value = DataSourceType.SLAVE)
+// @DataSource(value = DataSourceType.SLAVE)
 @Data
 @TableName("assessment_output")
 public class AssessmentOutput implements Serializable {
