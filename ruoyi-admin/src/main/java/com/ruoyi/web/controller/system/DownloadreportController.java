@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/downloadReport")
+@RequestMapping("/admins/downloadReport")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 public class DownloadreportController {
 

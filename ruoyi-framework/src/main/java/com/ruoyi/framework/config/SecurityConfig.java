@@ -115,6 +115,7 @@ public class SecurityConfig {
                             .antMatchers("/PlotsPic/**").permitAll()   // 放行
 //                            .antMatchers("/downloadReport/saveCanvas").permitAll()  // ← 放行
                             .antMatchers("/downloadReport/file/**").permitAll()  // ← 放行
+                            .antMatchers("/admins/**").permitAll()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();
                 })

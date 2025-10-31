@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 @Slf4j
 @RestController
-@RequestMapping("/feign")
+@RequestMapping("/admins/feign")
 public class FeignController {
 
     @Resource

@@ -25,7 +25,7 @@ import java.util.List;
  * @date 2025-01-25
  */
 @RestController
-@RequestMapping("/radar")
+@RequestMapping("/admins/radar")
 public class XianApiDfPlatformOdsSwjJcsjQxjkDzldController{
 
     @Resource
@@ -73,7 +73,6 @@ public class XianApiDfPlatformOdsSwjJcsjQxjkDzldController{
     /**
      * 导出气象监控电子雷达列表
      */
-    // @PreAuthorize("@ss.hasPermi('system:radar:export')")
     @Log(title = "气象监控电子雷达", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, XianApiDfPlatformOdsSwjJcsjQxjkDzld xianApiDfPlatformOdsSwjJcsjQxjkDzld) {

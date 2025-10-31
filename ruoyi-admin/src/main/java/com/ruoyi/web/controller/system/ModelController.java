@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/model")
+@RequestMapping("/admins/model")
 public class ModelController {
 
     @Resource

@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 
 
 @RestController
-@RequestMapping("/risk")
+@RequestMapping("/admins/risk")
 public class GeologicalDisasterRiskController {
 
     @Resource

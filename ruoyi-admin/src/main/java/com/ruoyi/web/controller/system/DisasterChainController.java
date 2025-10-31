@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/disasterChain")
+@RequestMapping("/admins/disasterChain")
 public class DisasterChainController {
 
     @Resource

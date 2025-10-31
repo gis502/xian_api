@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/graph")
+@RequestMapping("/admins/graph")
 public class GraphController {
 
     private final Neo4jClient neo4jClient;

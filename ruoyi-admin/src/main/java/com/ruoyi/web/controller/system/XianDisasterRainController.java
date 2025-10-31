@@ -23,7 +23,7 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/XianDisasterRain")
+@RequestMapping("/admins/XianDisasterRain")
 
 public class XianDisasterRainController {
 

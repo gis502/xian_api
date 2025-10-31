@@ -20,7 +20,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/XianEarthquakeList")
+@RequestMapping("/admins/XianEarthquakeList")
 
 public class XianEarthquakeListController {
 

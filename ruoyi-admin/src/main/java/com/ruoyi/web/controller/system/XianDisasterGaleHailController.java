@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 * @author xxxxx
 */
 @RestController
-@RequestMapping("/xian_disaster_gale_hail")
+@RequestMapping("/admins/xian_disaster_gale_hail")
 public class XianDisasterGaleHailController {
 /**
 * 服务对象

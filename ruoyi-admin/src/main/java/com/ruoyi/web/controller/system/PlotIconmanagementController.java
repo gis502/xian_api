@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/ploticon")
+@RequestMapping("/admins/ploticon")
 public class PlotIconmanagementController {
 
     @Resource

@@ -17,7 +17,7 @@ import java.util.Map;
  * @author xxxxx
  */
 @RestController
-@RequestMapping("/xian_news")
+@RequestMapping("/admins/xian_news")
 public class XianNewsController {
     /**
      * 服务对象

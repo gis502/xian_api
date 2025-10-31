@@ -31,7 +31,7 @@ import com.ruoyi.system.service.ISysUserService;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/system/user/profile")
+@RequestMapping("/admins/system/user/profile")
 public class SysProfileController extends BaseController
 {
     @Autowired

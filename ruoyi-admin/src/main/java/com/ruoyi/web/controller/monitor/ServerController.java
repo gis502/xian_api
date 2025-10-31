@@ -13,10 +13,9 @@ import com.ruoyi.framework.web.domain.Server;
  * @author ruoyi
  */
 @RestController
-@RequestMapping("/monitor/server")
+@RequestMapping("/admins/monitor/server")
 public class ServerController
 {
-    @PreAuthorize("@ss.hasPermi('monitor:server:list')")
     @GetMapping()
     public AjaxResult getInfo() throws Exception
     {

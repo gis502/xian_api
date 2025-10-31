@@ -12,6 +12,7 @@ import com.ruoyi.common.utils.StringUtils;
  * @author ruoyi
  */
 @RestController
+@RequestMapping("/admins")
 public class SysIndexController
 {
     /** 系统基础配置 */

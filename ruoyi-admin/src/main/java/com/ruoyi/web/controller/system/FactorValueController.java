@@ -16,7 +16,7 @@ import javax.annotation.Resource;
  */
 
 @RestController
-@RequestMapping("/factor")
+@RequestMapping("/admins/factor")
 public class FactorValueController {
 
 

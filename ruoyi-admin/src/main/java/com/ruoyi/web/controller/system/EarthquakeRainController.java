@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/earthquake-rain")
+@RequestMapping("/admins/earthquake-rain")
 public class EarthquakeRainController {
 
     @Resource

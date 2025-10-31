@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/around")
+@RequestMapping("/admins/around")
 public class AroundAnalysisController {
 
     @Resource

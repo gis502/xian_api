@@ -14,7 +14,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @RestController
-@RequestMapping("/HistoricalSimilarityAnalysis")
+@RequestMapping("/admins/HistoricalSimilarityAnalysis")
 public class HistoricalSimilarityAnalysisController {
 
     @Resource

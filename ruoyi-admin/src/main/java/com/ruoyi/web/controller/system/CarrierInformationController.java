@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2025/9/6 下午4:52
  */
 @RestController
-@RequestMapping("carrier_information")
+@RequestMapping("/admins/carrier_information")
 public class CarrierInformationController {
 
     private final CarrierInformationService carrierInformationService;

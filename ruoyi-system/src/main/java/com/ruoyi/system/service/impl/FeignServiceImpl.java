@@ -98,7 +98,7 @@ public class FeignServiceImpl implements IFeignService {
     }
 
     // 专题图产出
-    // @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
+     @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
     @Override
     public List<OutputDTO> thematicMap(ThematicQuery query) {
 
@@ -132,7 +132,7 @@ public class FeignServiceImpl implements IFeignService {
         throw new ParamsException(XianConstants.RESULT_EMPTY);
     }
 
-//    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
+    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
 // 灾情报告产出
     @Override
     public List<OutputDTO> disasterReport(ThematicQuery query) {
@@ -178,7 +178,7 @@ public class FeignServiceImpl implements IFeignService {
     }
 
     // 暴雨专题图产出
-//    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
+    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
     @Override
     public List<RainOutputDTO> thematicMap(RainQuery query) {
         try {
@@ -252,7 +252,7 @@ public class FeignServiceImpl implements IFeignService {
         return requestBody;
     }
 
-//    @DataSource(value = DataSourceType.SLAVE)
+    @DataSource(value = DataSourceType.SLAVE)
     @Override
     public String downloadReport(ReportDTO reportDTO){
         String url = "";

@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 
 
 @RestController
-@RequestMapping("/hide")
+@RequestMapping("/admins/hide")
 public class GeologicalDisasterHideController {
 
     @Resource

@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 * @author xxxxx
 */
 @RestController
-@RequestMapping("/xian_disaster_cold_damage")
+@RequestMapping("/admins/xian_disaster_cold_damage")
 public class XianDisasterColdDamageController {
 /**
 * 服务对象

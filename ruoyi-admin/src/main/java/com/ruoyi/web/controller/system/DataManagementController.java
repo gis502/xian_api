@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @RestController
-@RequestMapping("data_management")
+@RequestMapping("/admins/data_management")
 public class DataManagementController {
 
     @Resource

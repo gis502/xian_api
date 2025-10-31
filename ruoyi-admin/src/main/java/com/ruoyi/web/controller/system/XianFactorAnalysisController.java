@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/XianFactorAnalysis")
+@RequestMapping("/admins/XianFactorAnalysis")
 
 public class XianFactorAnalysisController {
 
