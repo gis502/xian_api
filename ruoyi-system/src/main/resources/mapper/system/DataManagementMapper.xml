@@ -10,8 +10,8 @@
         'pg_class'
         ) AS "remark"
         FROM information_schema.tables
-        WHERE table_type = 'BASE TABLE'
-        AND table_catalog = current_database()
+        WHERE table_catalog = current_database()
+        AND table_schema = 'public'
         <if test="remark != null and remark != ''">
             AND obj_description(('"' || table_schema || '"."' || table_name || '"')::regclass, 'pg_class')
             LIKE CONCAT('%', REPLACE(#{remark}, '"', ''), '%')
