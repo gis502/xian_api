@@ -75,6 +75,18 @@
         SELECT COUNT(*) FROM ${tableName}
     </select>
 
+    <select id="selectDeletedRecords" resultType="java.util.Map">
+        SELECT * FROM ${tableName}
+        WHERE
+        <foreach collection="conditions" item="conditionMap" separator="OR" open="(" close=")">
+            <foreach collection="conditionMap" item="value" index="key" separator="AND" open="(" close=")">
+                <if test='value != null and value != ""'>
+                    ${key} = #{value}
+                </if>
+            </foreach>
+        </foreach>
+    </select>
+
     <delete id="deleteInfo">
         DELETE FROM ${tableName}
         WHERE
@@ -86,5 +98,76 @@
             </foreach>
         </foreach>
     </delete>
+
+    <insert id="addInfo">
+        <!-- 仅当 datas 不为空时执行插入，避免空集合导致 SQL 错误 -->
+        <if test="datas != null and datas.size() > 0">
+            INSERT INTO ${tableName} (
+            <foreach collection="datas[0].keySet()" item="key" separator=",">
+                ${key}
+            </foreach>
+            ) VALUES
+            <!-- 遍历每条数据，生成 values 部分 -->
+            <foreach collection="datas" item="data" separator=",">
+                (
+                <foreach collection="data.entrySet()" item="entry" separator=",">
+                    <!-- 使用 #{} 防止 SQL 注入（value 是具体值） -->
+                    #{entry.value}
+                </foreach>
+                )
+            </foreach>
+        </if>
+    </insert>
+
+    <!-- 1. 按主键ID更新（idName和id匹配） -->
+    <update id="updateInfo1">
+        <!-- 非空校验：避免参数为空导致SQL错误 -->
+        <if test="tableName != null and tableName != ''
+        and idName != null and idName.size() > 0
+        and id != null and id.size() > 0
+        and newData != null and newData.size() > 0
+        and newData[0] != null and !newData[0].isEmpty()">
+
+            UPDATE ${tableName}
+            <set>
+                <foreach collection="newData[0].entrySet()" item="entry" separator=",">
+                    <!-- 字段名用${}，值用#{}防注入 -->
+                    ${entry.key} = #{entry.value}
+                </foreach>
+            </set>
+            <!-- WHERE 部分：idName和id一一对应（如idName[0] = id[0] AND idName[1] = id[1]...） -->
+            WHERE
+            <foreach collection="idName" item="fieldName" index="index" separator="AND">
+                <!-- 校验id对应索引的值非空 -->
+                <if test="id[index] != null and id[index] != ''">
+                    ${fieldName} = #{id[index]}
+                </if>
+            </foreach>
+        </if>
+    </update>
+
+    <!-- 2. 按旧数据匹配更新（oldData作为条件） -->
+    <update id="updateInfo2">
+        <!-- 非空校验：避免参数为空导致SQL错误 -->
+        <if test="tableName != null and tableName != ''
+        and oldData != null and oldData.size() > 0
+        and oldData[0] != null and !oldData[0].isEmpty()
+        and newData != null and newData.size() > 0
+        and newData[0] != null and !newData[0].isEmpty()">
+
+            UPDATE ${tableName}
+            <set>
+                <foreach collection="newData[0].entrySet()" item="entry" separator=",">
+                    ${entry.key} = #{entry.value}
+                </foreach>
+            </set>
+            WHERE
+            <foreach collection="oldData[0].entrySet()" item="entry" separator="AND">
+                <if test="entry.value != null and entry.value != ''">
+                    ${entry.key} = #{entry.value}
+                </if>
+            </foreach>
+        </if>
+    </update>
 
 </mapper>

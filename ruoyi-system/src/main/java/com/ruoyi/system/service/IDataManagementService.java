@@ -18,4 +18,10 @@ public interface IDataManagementService {
     // 根据传来的信息删除数据库表中对应的记录
     boolean deleteInformation(DataManagementVO dataManagementVO);
 
+    // 将前端新增的数据加入到数据库表中
+    boolean addInformation(DataManagementVO dataManagementVO);
+
+    // 将前端修改的数据更新到数据库表中
+    boolean updateInformation(DataManagementVO dataManagementVO);
+
 }

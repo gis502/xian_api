@@ -1,12 +1,19 @@
 package com.ruoyi.system.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.ruoyi.common.exception.base.BaseException;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.ip.IpUtils;
+import com.ruoyi.system.domain.entity.XianDataBackup;
 import com.ruoyi.system.domain.vo.DataManagementVO;
 import com.ruoyi.system.mapper.DataManagementMapper;
+import com.ruoyi.system.mapper.XianDataBackMapper;
 import com.ruoyi.system.service.IDataManagementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +25,9 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
     @Resource
     private DataManagementMapper dataManagementMapper;
+
+    @Resource
+    private XianDataBackMapper xianDataBackupMapper;
 
     @Override
     public List<Map<String, String>> selectTable(String remark) {
@@ -52,8 +62,67 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
     @Override
     public boolean deleteInformation(DataManagementVO dataManagementVO){
-        dataManagementMapper.deleteInfo(dataManagementVO.getTableName(),dataManagementVO.getConditions());
-        return true;
+        String tableName = dataManagementVO.getTableName();
+        log.info("开始删除 {} 表的数据",tableName);
+        List<Map<String, Object> > conditions = dataManagementVO.getConditions();
+        // 先查询待删除的数据
+        List<Map<String, Object>> oldData = dataManagementMapper.selectDeletedRecords(tableName,conditions);
+        // 将待删除的记录存入操作记录表
+        dataManagementVO.setOldData(oldData);
+        OperationRecord("D",dataManagementVO);
+        try {
+            int affectedRows = dataManagementMapper.deleteInfo(tableName, conditions);
+            if (affectedRows <= 0) {
+                throw new BaseException("未找到匹配条件的记录，删除失败");
+            }
+            return true;
+        } catch (Exception e){
+            log.error("删除失败", e);
+            throw new BaseException("删除失败：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean addInformation(DataManagementVO dataManagementVO){
+        log.info("开始添加 {} 表的数据",dataManagementVO.getTableName());
+        OperationRecord("A",dataManagementVO);
+        try {
+            int addRows = dataManagementMapper.addInfo(dataManagementVO.getTableName(), dataManagementVO.getDatas());
+            if (addRows <= 0) {
+                throw new BaseException("添加失败");
+            }
+            return true;
+        } catch (Exception e){
+            log.error("添加失败", e);
+            throw new BaseException("添加失败：" + e.getMessage());
+        }
+
+    }
+
+    @Override
+    public boolean updateInformation(DataManagementVO dataManagementVO){
+        log.info("开始修改 {} 表的数据",dataManagementVO.getTableName());
+        OperationRecord("U",dataManagementVO);
+        try {
+            // 对传入数据进行判断
+            if(dataManagementVO.getIdName()!=null && dataManagementVO.getIdName().isEmpty()){
+                // 如果存在主键，则使用主键进行匹配
+                int updateRows = dataManagementMapper.updateInfo1(dataManagementVO.getTableName(), dataManagementVO.getIdName(), dataManagementVO.getId() ,dataManagementVO.getNewData());
+                if (updateRows <= 0) {
+                    throw new BaseException("修改失败");
+                }
+            }else {
+                // 如果不存在主键，则使用旧数据进行匹配
+                int updateRows = dataManagementMapper.updateInfo2(dataManagementVO.getTableName(), dataManagementVO.getOldData(), dataManagementVO.getNewData());
+                if (updateRows <= 0) {
+                    throw new BaseException("修改失败");
+                }
+            }
+           return true;
+        } catch (Exception e){
+            log.error("修改失败", e);
+            throw new BaseException("修改失败：" + e.getMessage());
+        }
     }
 
     /**
@@ -82,5 +151,19 @@ public class DataManagementServiceImpl implements IDataManagementService {
             primaryKeyList.add(key);
         }
         return primaryKeyList;
+    }
+
+    /**
+     * 操作记录
+     * @param operation 操作类型
+     * @param dataManagementVO 数据管理对象
+     */
+    private void OperationRecord(String operation, DataManagementVO dataManagementVO){
+        XianDataBackup xianDataBackup = new XianDataBackup();
+        xianDataBackup.setType(operation);
+        xianDataBackup.setData(JSON.toJSONString(dataManagementVO));
+        xianDataBackup.setTime(LocalDateTime.now());
+        xianDataBackup.setIp(IpUtils.getIpAddr(ServletUtils.getRequest()));
+        xianDataBackupMapper.insert(xianDataBackup);
     }
 }
