@@ -37,7 +37,7 @@ public class HistoryDisasterServiceImpl implements IHistoryDisasterService {
             Map<String, Object> properties = new HashMap<>();
             properties.put("locateName", historyDisaster.getName());
             properties.put("historyDisasterevent", historyDisaster.getDisasterEvent());
-            properties.put("historyDisastertype", historyDisaster.getDisasterType());
+            properties.put("historyDisastertype", removeBrackets(historyDisaster.getDisasterType()));
             properties.put("disaster_population", historyDisaster.getDisasterPopulation());
             properties.put("missing_persons", historyDisaster.getMissingPersons());
             properties.put("direct_economic_losses", historyDisaster.getEconomicLosses());
@@ -48,5 +48,14 @@ public class HistoryDisasterServiceImpl implements IHistoryDisasterService {
         features.put("features", lists);
 
         return features;
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 }

@@ -43,8 +43,8 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
             properties.put("city", dangerousSource.getCity());
             properties.put("county", dangerousSource.getCounty());
             properties.put("country", dangerousSource.getCountry());
-            properties.put("enterpriseType", dangerousSource.getEnterpriseType());
-            properties.put("level", dangerousSource.getLevel());
+            properties.put("enterpriseType", removeBrackets(dangerousSource.getEnterpriseType()));
+            properties.put("level", removeBrackets(dangerousSource.getLevel()));
             properties.put("lon", dangerousSource.getLongitude());
             properties.put("lat", dangerousSource.getLatitude());
             properties.put("unitHead", dangerousSource.getUnitHead());
@@ -66,5 +66,14 @@ public class DangerousSourceServiceImpl implements IDangerousSourceService {
         features.put("features", lists);
 
         return features;
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 }

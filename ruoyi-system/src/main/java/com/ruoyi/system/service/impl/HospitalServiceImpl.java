@@ -37,9 +37,9 @@ public class HospitalServiceImpl implements IHospitalService {
             properties.put("hospitalName", hospital.getName());
             properties.put("position", hospital.getAddress());
             properties.put("hospitalTypeCode", hospital.getTypeCode());
-            properties.put("hospitalType", hospital.getType());
-            properties.put("level", hospital.getLevel());
-            properties.put("institutionNature", hospital.getInstitutionNature());
+            properties.put("hospitalType", removeBrackets(hospital.getType()));
+            properties.put("level", removeBrackets(hospital.getLevel()));
+            properties.put("institutionNature", removeBrackets(hospital.getInstitutionNature()));
             properties.put("devices", hospital.getHospitalDevices());
             properties.put("workers", hospital.getHospitalWorkers());
             properties.put("sumPeople", hospital.getSumPeople());
@@ -68,5 +68,14 @@ public class HospitalServiceImpl implements IHospitalService {
         features.put("features", lists);
 
         return features;
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 }

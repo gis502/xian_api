@@ -98,7 +98,7 @@ public class FeignServiceImpl implements IFeignService {
     }
 
     // 专题图产出
-     @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
+    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
     @Override
     public List<OutputDTO> thematicMap(ThematicQuery query) {
 
