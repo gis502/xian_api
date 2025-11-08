@@ -11,7 +11,6 @@ import com.ruoyi.system.domain.entity.XianEarthquakeList;
 import com.ruoyi.system.mapper.XianDisasterRainMapper;
 import com.ruoyi.system.mapper.XianRainfallDuringPeriodMapper;
 import com.ruoyi.system.service.IXianDisasterRainService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,19 +33,16 @@ public class XianDisasterRainController {
 
 
     @GetMapping("/getAllDisasterRain")
-    @ApiOperation(value = "获取所有暴雨灾害事件")
     public AjaxResult selectAllEq() {
         return AjaxResult.success(disasterRainService.selectAllEq());
     }
 
     @PostMapping("/getDisasterRainById")
-    @ApiOperation(value = "根据Id获取暴雨灾害事件")
     public AjaxResult getDisasterRainById(@RequestParam(value = "id") Long Id) {
         return AjaxResult.success(disasterRainService.getDisasterRainById(Id));
     }
 
     @PostMapping("/getRainPeriodInfoByDisasterId")
-    @ApiOperation(value = "实际降雨")
     public AjaxResult getRainPeriodInfoByDisasterId(@RequestParam(value = "id") String Id) {
         return AjaxResult.success(xianRainfallDuringPeriodMapper.getRainPeriodInfoByDisasterId(Id));
     }
@@ -72,7 +68,6 @@ public class XianDisasterRainController {
     }
 
     @PostMapping("/saver/rain")
-    @ApiOperation(value = "保存暴雨灾害信息")
     public AjaxResult saveRain(@RequestBody DisasterRainDTO disasterRainDTO) {
         Long data = disasterRainService.saveDisasterRain(disasterRainDTO);
         Map<String,Long> rainDisasterId = new HashMap<>();

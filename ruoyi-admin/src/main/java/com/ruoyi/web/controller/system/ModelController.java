@@ -8,7 +8,6 @@ import com.ruoyi.system.domain.vo.ImpactAreaRequest;
 import com.ruoyi.system.domain.vo.TriggerRequest;
 import com.ruoyi.system.domain.vo.TriggerUpdate;
 import com.ruoyi.system.service.IModelService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import com.ruoyi.system.domain.dto.LatLonDTO;
 
@@ -68,7 +67,6 @@ public class ModelController {
     }
 
 
-    @ApiOperation(value = "暴雨触发接口")
     @PostMapping("/rain/trigger")
     public AjaxResult rainTrigger(@RequestBody TriggerRequest request)
     {
@@ -76,21 +74,20 @@ public class ModelController {
     }
 
 
-    @ApiOperation(value = "地震触发接口")
     @PostMapping("/eq/trigger")
     public AjaxResult eqTrigger(@RequestBody TriggerRequest request)
     {
         return AjaxResult.success(modelService.eqTrigger(request));
     }
 
-    @ApiOperation(value = "模型因子修改接口")
+
     @PostMapping("/factor/update")
     public AjaxResult rainFactorUpdate(@RequestBody TriggerUpdate request)
     {
         return AjaxResult.success(modelService.rainFactorUpdate(request));
     }
 
-    @ApiOperation(value = "插入impact_in_area数据")
+
     @PostMapping("/impactinsert")
     public AjaxResult impactInsert(@RequestBody List<ImpactAreaRequest> request)
 
