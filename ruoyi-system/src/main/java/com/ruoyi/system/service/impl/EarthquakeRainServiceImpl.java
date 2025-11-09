@@ -37,10 +37,10 @@ public class EarthquakeRainServiceImpl implements EarthquakeRainService {
     }
 
     @Override
-    public String getInfoByName(String name){
-        XianEarthquakeList earthquakeList = xianEarthquakeListMapper.selectOne(new QueryWrapper<XianEarthquakeList>().eq("disaster_name",name));
+    public String getInfoById(Integer Id){
+        XianEarthquakeList earthquakeList = xianEarthquakeListMapper.selectOne(new QueryWrapper<XianEarthquakeList>().eq("disaster_id",Id));
         if(earthquakeList==null){
-            XianDisasterRain xianDisasterRain = xianDisasterRainMapper.selectOne(new QueryWrapper<XianDisasterRain>().eq("disaster_name",name));
+            XianDisasterRain xianDisasterRain = xianDisasterRainMapper.selectOne(new QueryWrapper<XianDisasterRain>().eq("disaster_id",Id));
             if(xianDisasterRain==null){
                 return null;
             }

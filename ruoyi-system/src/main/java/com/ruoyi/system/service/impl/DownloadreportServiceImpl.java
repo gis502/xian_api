@@ -525,7 +525,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
             RainReportEntity.SecondaryDisasterReportEntity.SecondaryDisasterTableData secondaryDisasterTableData = new RainReportEntity().new SecondaryDisasterReportEntity().new SecondaryDisasterTableData();
             secondaryDisasterTableData.setPosition(item.get("position").toString());
             secondaryDisasterTableData.setProbability(item.get("disaster_probability").toString());
-            secondaryDisasterTableData.setGrade(item.get("level").toString());
+            secondaryDisasterTableData.setGrade(removeBrackets(item.get("level").toString()));
             secondaryDisasterReportEntity.getDisasterTableData().add(secondaryDisasterTableData);
         }
         return secondaryDisasterReportEntity;
@@ -968,6 +968,15 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         upperBound = truncateByDigits(upperBound);
 
         return new Long[]{lowerBound, upperBound};
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 
 

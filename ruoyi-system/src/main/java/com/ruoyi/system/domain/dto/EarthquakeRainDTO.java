@@ -13,6 +13,9 @@ public class EarthquakeRainDTO {
     private Timestamp occurTime;            // 发生时间
     private String disasterType;            // 灾害类型（earthquake、rain、collapse、landslide...）
 
+    private String magnitude;
+    private String rainfall;
+
     /** 各灾害类型专属 ID */
     private String earthquakeDisasterId;   // 地震
     private String rainDisasterId;         // 暴雨

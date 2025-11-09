@@ -9,5 +9,5 @@ public interface EarthquakeRainService {
 
     int getTotalCount(List<String> disasterTypes);
 
-    String getInfoByName(String disasterName);
+    String getInfoById(Integer disasterId);
 }
