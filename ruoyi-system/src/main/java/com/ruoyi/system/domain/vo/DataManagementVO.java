@@ -18,4 +18,5 @@ public class DataManagementVO implements Serializable {
     private List<Map<String, Object>> datas; // 新增数据列表
     private List<Map<String, Object>> newData; // 修改数据新列表
     private List<Map<String, Object>> oldData; // 修改数据旧列表（数据库表没有主键时通过旧数据匹配）
+    private Map<String, String> fieldTypes;         // 字敦类型
 }

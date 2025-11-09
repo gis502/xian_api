@@ -51,7 +51,7 @@ public class DataManagementServiceImpl implements IDataManagementService {
         List<String> fieldList = new ArrayList<>();
         setFieldList(fieldList, keyInfo);
 
-        List<Map<String, Object>> InfoList = dataManagementMapper.selectTableList(dataManagementVO.getTableName(),dataManagementVO.getPageSize(),offset,dataManagementVO.getQueryInfo(), fieldList);
+        List<Map<String, Object>> InfoList = dataManagementMapper.selectTableList(dataManagementVO.getTableName(),dataManagementVO.getPageSize(),offset,dataManagementVO.getQueryInfo(), fieldList, primaryKey);
 
         datas.put("allPage",Math.ceil((allPage * 1.0) / dataManagementVO.getPageSize()));
         datas.put("primaryKey",primaryKey);
@@ -85,9 +85,14 @@ public class DataManagementServiceImpl implements IDataManagementService {
     @Override
     public boolean addInformation(DataManagementVO dataManagementVO){
         log.info("开始添加 {} 表的数据",dataManagementVO.getTableName());
+        // 过滤null值：只保留value不为null的字段
+        for (int i = 0; i < dataManagementVO.getDatas().size(); i++) {
+            dataManagementVO.getDatas().set(i, removeNull(dataManagementVO.getDatas().get(i)));
+        }
+
         OperationRecord("A",dataManagementVO);
         try {
-            int addRows = dataManagementMapper.addInfo(dataManagementVO.getTableName(), dataManagementVO.getDatas());
+            int addRows = dataManagementMapper.addInfo(dataManagementVO.getTableName(), dataManagementVO.getDatas(), dataManagementVO.getFieldTypes());
             if (addRows <= 0) {
                 throw new BaseException("添加失败");
             }
@@ -101,19 +106,31 @@ public class DataManagementServiceImpl implements IDataManagementService {
 
     @Override
     public boolean updateInformation(DataManagementVO dataManagementVO){
+        // 过滤null值：只保留value不为null的字段
+        dataManagementVO.getNewData().set(0, removeNull(dataManagementVO.getNewData().get(0)));
+        if(!dataManagementVO.getOldData().isEmpty()) {
+            dataManagementVO.getOldData().set(0, removeNull(dataManagementVO.getOldData().get(0)));
+        }
         log.info("开始修改 {} 表的数据",dataManagementVO.getTableName());
+
         OperationRecord("U",dataManagementVO);
+
         try {
+            List<String> fieldNames1 = new ArrayList<>(dataManagementVO.getNewData().get(0).keySet());
+            List<Object> fieldValues1 = new ArrayList<>(dataManagementVO.getNewData().get(0).values());
+
             // 对传入数据进行判断
-            if(dataManagementVO.getIdName()!=null && dataManagementVO.getIdName().isEmpty()){
+            if(dataManagementVO.getIdName()!=null && !dataManagementVO.getIdName().isEmpty()){
                 // 如果存在主键，则使用主键进行匹配
-                int updateRows = dataManagementMapper.updateInfo1(dataManagementVO.getTableName(), dataManagementVO.getIdName(), dataManagementVO.getId() ,dataManagementVO.getNewData());
+                int updateRows = dataManagementMapper.updateInfo1(dataManagementVO.getTableName(), dataManagementVO.getIdName(), dataManagementVO.getId(), fieldNames1, fieldValues1, dataManagementVO.getFieldTypes());
                 if (updateRows <= 0) {
                     throw new BaseException("修改失败");
                 }
             }else {
+                List<String> fieldNames2 = new ArrayList<>(dataManagementVO.getOldData().get(0).keySet());
+                List<Object> fieldValues2 = new ArrayList<>(dataManagementVO.getOldData().get(0).values());
                 // 如果不存在主键，则使用旧数据进行匹配
-                int updateRows = dataManagementMapper.updateInfo2(dataManagementVO.getTableName(), dataManagementVO.getOldData(), dataManagementVO.getNewData());
+                int updateRows = dataManagementMapper.updateInfo2(dataManagementVO.getTableName(), fieldNames1, fieldValues1, fieldNames2, fieldValues2, dataManagementVO.getFieldTypes());
                 if (updateRows <= 0) {
                     throw new BaseException("修改失败");
                 }
@@ -123,6 +140,23 @@ public class DataManagementServiceImpl implements IDataManagementService {
             log.error("修改失败", e);
             throw new BaseException("修改失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 删除null
+     * @param newData
+     * @return
+     */
+    private Map<String, Object> removeNull(Map<String, Object> newData) {
+        Map<String, Object> updateMap = new HashMap<>();
+        if (newData != null && !newData.isEmpty()) {
+            for (Map.Entry<String, Object> entry : newData.entrySet()) {
+                if (entry.getValue() != null) {
+                    updateMap.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return updateMap;
     }
 
     /**

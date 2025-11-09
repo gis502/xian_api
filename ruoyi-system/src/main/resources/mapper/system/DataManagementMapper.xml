@@ -32,6 +32,14 @@
                 </foreach>
             </if>
         </where>
+        <!-- 动态添加排序：主键列表非空时按主键排序 -->
+        <if test="primaryKey != null and primaryKey.size() > 0">
+            ORDER BY
+            <foreach collection="primaryKey" item="pk" separator=",">
+                ${pk}
+            </foreach>
+            DESC
+        </if>
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
@@ -100,74 +108,143 @@
     </delete>
 
     <insert id="addInfo">
-        <!-- 仅当 datas 不为空时执行插入，避免空集合导致 SQL 错误 -->
-        <if test="datas != null and datas.size() > 0">
-            INSERT INTO ${tableName} (
-            <foreach collection="datas[0].keySet()" item="key" separator=",">
-                ${key}
+        INSERT INTO ${tableName} (
+        <foreach collection="datas[0].keySet()" item="field" separator=",">
+            ${field}
+        </foreach>
+        ) VALUES
+        <foreach collection="datas" item="data" separator=",">
+            (
+            <!-- 关键修复：用index对应Map的key，item对应value，移除无效的key属性 -->
+            <foreach collection="data.entrySet()" index="entryKey" item="entryValue" separator=",">
+                <choose>
+                    <!-- 数字类型判断：用index对应的entryKey获取字段类型 -->
+                    <when test="fieldTypes[entryKey].matches('.*(int4|int8|float4|float8|numeric|decimal).*')">
+                        #{entryValue, jdbcType=NUMERIC}
+                    </when>
+                    <!-- 时间类型判断 -->
+                    <when test="fieldTypes[entryKey].matches('.*timestamp.*')">
+                        to_timestamp(#{entryValue}, 'yyyy-MM-dd HH24:mi:ss')
+                    </when>
+                    <!-- 地理信息类型判断 -->
+                    <when test="fieldTypes[entryKey].matches('.*geometry.*')">
+                        <choose>
+                            <when test="entryValue.toString().matches('.*(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON).*')">
+                                ST_GeomFromText(#{entryValue}, 4490)
+                            </when>
+                            <otherwise>
+                                ST_GeomFromWKB(decode(#{entryValue}, 'hex'), 4490)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <!-- 其他类型默认处理 -->
+                    <otherwise>
+                        #{entryValue}
+                    </otherwise>
+                </choose>
             </foreach>
-            ) VALUES
-            <!-- 遍历每条数据，生成 values 部分 -->
-            <foreach collection="datas" item="data" separator=",">
-                (
-                <foreach collection="data.entrySet()" item="entry" separator=",">
-                    <!-- 使用 #{} 防止 SQL 注入（value 是具体值） -->
-                    #{entry.value}
-                </foreach>
-                )
-            </foreach>
-        </if>
+            )
+        </foreach>
     </insert>
 
     <!-- 1. 按主键ID更新（idName和id匹配） -->
     <update id="updateInfo1">
-        <!-- 非空校验：避免参数为空导致SQL错误 -->
-        <if test="tableName != null and tableName != ''
-        and idName != null and idName.size() > 0
-        and id != null and id.size() > 0
-        and newData != null and newData.size() > 0
-        and newData[0] != null and !newData[0].isEmpty()">
-
-            UPDATE ${tableName}
-            <set>
-                <foreach collection="newData[0].entrySet()" item="entry" separator=",">
-                    <!-- 字段名用${}，值用#{}防注入 -->
-                    ${entry.key} = #{entry.value}
-                </foreach>
-            </set>
-            <!-- WHERE 部分：idName和id一一对应（如idName[0] = id[0] AND idName[1] = id[1]...） -->
-            WHERE
-            <foreach collection="idName" item="fieldName" index="index" separator="AND">
-                <!-- 校验id对应索引的值非空 -->
-                <if test="id[index] != null and id[index] != ''">
-                    ${fieldName} = #{id[index]}
-                </if>
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="fieldNames" item="fieldName" index="index" separator=",">
+                <choose>
+                    <!-- 适配WKB十六进制字符串格式（优先推荐） -->
+                    <when test='fieldTypes[fieldName] == "geometry"'>
+                        ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues[${index}]}, 'hex'), 4490)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int4"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS INTEGER)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int8"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS BIGINT)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                        ${fieldName} = TO_TIMESTAMP(#{fieldValues[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss.MSXXX')
+                        + INTERVAL '8 hours'
+                    </when>
+                    <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS NUMERIC)
+                    </when>
+                    <otherwise>
+                        ${fieldName} = #{fieldValues[${index}]}
+                    </otherwise>
+                </choose>
             </foreach>
-        </if>
+        </set>
+        WHERE
+        <foreach collection="idName" item="idCol" index="index" separator="AND">
+            <choose>
+                <when test='fieldTypes[idCol] == "int4"'>
+                    ${idCol} = CAST(#{id[${index}]} AS INTEGER)
+                </when>
+                <when test='fieldTypes[idCol] == "int8"'>
+                    ${idCol} = CAST(#{id[${index}]} AS BIGINT)
+                </when>
+                <otherwise>
+                    ${idCol} = #{id[${index}]}
+                </otherwise>
+            </choose>
+        </foreach>
     </update>
 
     <!-- 2. 按旧数据匹配更新（oldData作为条件） -->
     <update id="updateInfo2">
-        <!-- 非空校验：避免参数为空导致SQL错误 -->
-        <if test="tableName != null and tableName != ''
-        and oldData != null and oldData.size() > 0
-        and oldData[0] != null and !oldData[0].isEmpty()
-        and newData != null and newData.size() > 0
-        and newData[0] != null and !newData[0].isEmpty()">
-
-            UPDATE ${tableName}
-            <set>
-                <foreach collection="newData[0].entrySet()" item="entry" separator=",">
-                    ${entry.key} = #{entry.value}
-                </foreach>
-            </set>
-            WHERE
-            <foreach collection="oldData[0].entrySet()" item="entry" separator="AND">
-                <if test="entry.value != null and entry.value != ''">
-                    ${entry.key} = #{entry.value}
-                </if>
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="fieldNames1" item="fieldName" index="index" separator=",">
+                <choose>
+                    <when test='fieldTypes[fieldName] == "geometry"'>
+                        ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues1[${index}]}, 'hex'), 4490)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int4"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS INTEGER)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int8"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS BIGINT)
+                    </when>
+                    <!-- 关键修改：格式参数添加"T"，适配2024-05-20T14:30:00格式 -->
+                    <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                        ${fieldName} = TO_TIMESTAMP(#{fieldValues1[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss.MSXXX')
+                        + INTERVAL '8 hours'
+                    </when>
+                    <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS NUMERIC)
+                    </when>
+                    <otherwise>
+                        ${fieldName} = #{fieldValues1[${index}]}
+                    </otherwise>
+                </choose>
             </foreach>
-        </if>
+        </set>
+        WHERE
+        <foreach collection="fieldNames2" item="fieldName" index="index" separator="AND">
+            <choose>
+                <when test='fieldTypes[fieldName] == "geometry"'>
+                    ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues2[${index}]}, 'hex'), 4490)
+                </when>
+                <when test='fieldTypes[fieldName] == "int4"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS INTEGER)
+                </when>
+                <when test='fieldTypes[fieldName] == "int8"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS BIGINT)
+                </when>
+                <!-- WHERE条件同步修改格式参数 -->
+                <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                    ${fieldName} = TO_TIMESTAMP(#{fieldValues2[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss')
+                </when>
+                <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS NUMERIC)
+                </when>
+                <otherwise>
+                    ${fieldName} = #{fieldValues2[${index}]}
+                </otherwise>
+            </choose>
+        </foreach>
     </update>
 
 </mapper>
