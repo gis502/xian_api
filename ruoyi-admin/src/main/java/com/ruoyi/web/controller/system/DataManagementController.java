@@ -36,6 +36,18 @@ public class DataManagementController {
 
     @DeleteMapping("/deleteTableInfo")
     public AjaxResult deleteTableInfo(@RequestBody DataManagementVO dataManagementVO) {
-        return AjaxResult.success(dataManagementService.deleteInformation(dataManagementVO));
+        boolean isSuccess = dataManagementService.deleteInformation(dataManagementVO);
+        return AjaxResult.success("删除成功", isSuccess);
+    }
+
+    @PostMapping("/add")
+    public AjaxResult addTableInfo(@RequestBody DataManagementVO dataManagementVO) {
+        boolean isSuccess = dataManagementService.addInformation(dataManagementVO);
+        return AjaxResult.success("插入成功", isSuccess);
+    }
+    @PostMapping("/update")
+    public AjaxResult updateTableInfo(@RequestBody DataManagementVO dataManagementVO) {
+        boolean isSuccess = dataManagementService.updateInformation(dataManagementVO);
+        return AjaxResult.success("更新成功", isSuccess);
     }
 }
