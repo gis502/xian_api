@@ -116,6 +116,8 @@ public class SecurityConfig {
 //                            .antMatchers("/downloadReport/saveCanvas").permitAll()  // ← 放行
                             .antMatchers("/downloadReport/file/**").permitAll()  // ← 放行
                             .antMatchers("/admins/**").permitAll()
+                            .antMatchers("/imgs/**").permitAll()
+                            .antMatchers("/docs/**").permitAll()
                             // 除上面外的所有请求全部需要鉴权认证
                             .anyRequest().authenticated();
                 })
