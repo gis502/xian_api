@@ -42,7 +42,6 @@ public class GraphController {
     }
 
 
-
     @GetMapping("/getGraphBy")
     public List getGraphBy(
             @RequestParam("eqid") String eqid,

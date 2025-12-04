@@ -29,7 +29,7 @@
         #{earthquake.name},
         #{earthquake.fullName},
         #{earthquake.position},
-        ST_SetSRID(ST_MakePoint(#{earthquake.longitude}, #{earthquake.latitude}), 4326),
+        ST_SetSRID(ST_MakePoint(#{earthquake.longitude}, #{earthquake.latitude}), 4490),
         #{earthquake.longitude,jdbcType=DOUBLE},
         #{earthquake.latitude,jdbcType=DOUBLE},
         #{earthquake.depth, jdbcType=VARCHAR},
