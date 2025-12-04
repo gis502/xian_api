@@ -37,10 +37,10 @@ public class StorePointsServiceImpl implements IStorePointsService {
             Map<String, Object> properties = new HashMap<>();
             properties.put("storeName", storePoints.getName());
             properties.put("position", storePoints.getAddress());
-            properties.put("storeType", storePoints.getType());
-            properties.put("level", storePoints.getLevel());
+            properties.put("storeType", removeBrackets(storePoints.getType()));
+            properties.put("level", removeBrackets(storePoints.getLevel()));
             properties.put("storeVolume", storePoints.getVolume());
-            properties.put("department", storePoints.getDepartment());
+            properties.put("department", removeBrackets(storePoints.getDepartment()));
             properties.put("tent", storePoints.getTent());
             properties.put("rubberBoat", storePoints.getRubberBoat());
             properties.put("egenerator", storePoints.getGenerator());
@@ -70,5 +70,14 @@ public class StorePointsServiceImpl implements IStorePointsService {
         features.put("features", lists);
 
         return features;
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 }

@@ -36,8 +36,8 @@ public class FireFighterServiceImpl implements IFireFighterService {
 
             Map<String, Object> properties = new HashMap<>();
             properties.put("teamName", fireFighter.getTeamName());
-            properties.put("teamType", fireFighter.getTeamType());
-            properties.put("fireType", fireFighter.getFireType());
+            properties.put("teamType", removeBrackets(fireFighter.getTeamType()));
+            properties.put("fireType", removeBrackets(fireFighter.getFireType()));
             properties.put("teamSumNum", fireFighter.getTeamNum());
             properties.put("fireCars", fireFighter.getFireCars());
             properties.put("fireDevices", fireFighter.getFireDevices());
@@ -67,6 +67,13 @@ public class FireFighterServiceImpl implements IFireFighterService {
 
         return features;
     }
-
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
+    }
 
 }

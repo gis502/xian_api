@@ -32,6 +32,14 @@
                 </foreach>
             </if>
         </where>
+        <!-- 动态添加排序：主键列表非空时按主键排序 -->
+        <if test="primaryKey != null and primaryKey.size() > 0">
+            ORDER BY
+            <foreach collection="primaryKey" item="pk" separator=",">
+                ${pk}
+            </foreach>
+            DESC
+        </if>
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
@@ -75,6 +83,18 @@
         SELECT COUNT(*) FROM ${tableName}
     </select>
 
+    <select id="selectDeletedRecords" resultType="java.util.Map">
+        SELECT * FROM ${tableName}
+        WHERE
+        <foreach collection="conditions" item="conditionMap" separator="OR" open="(" close=")">
+            <foreach collection="conditionMap" item="value" index="key" separator="AND" open="(" close=")">
+                <if test='value != null and value != ""'>
+                    ${key} = #{value}
+                </if>
+            </foreach>
+        </foreach>
+    </select>
+
     <delete id="deleteInfo">
         DELETE FROM ${tableName}
         WHERE
@@ -86,5 +106,145 @@
             </foreach>
         </foreach>
     </delete>
+
+    <insert id="addInfo">
+        INSERT INTO ${tableName} (
+        <foreach collection="datas[0].keySet()" item="field" separator=",">
+            ${field}
+        </foreach>
+        ) VALUES
+        <foreach collection="datas" item="data" separator=",">
+            (
+            <!-- 关键修复：用index对应Map的key，item对应value，移除无效的key属性 -->
+            <foreach collection="data.entrySet()" index="entryKey" item="entryValue" separator=",">
+                <choose>
+                    <!-- 数字类型判断：用index对应的entryKey获取字段类型 -->
+                    <when test="fieldTypes[entryKey].matches('.*(int4|int8|float4|float8|numeric|decimal).*')">
+                        #{entryValue, jdbcType=NUMERIC}
+                    </when>
+                    <!-- 时间类型判断 -->
+                    <when test="fieldTypes[entryKey].matches('.*timestamp.*')">
+                        to_timestamp(#{entryValue}, 'yyyy-MM-dd HH24:mi:ss')
+                    </when>
+                    <!-- 地理信息类型判断 -->
+                    <when test="fieldTypes[entryKey].matches('.*geometry.*')">
+                        <choose>
+                            <when test="entryValue.toString().matches('.*(POINT|LINESTRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON).*')">
+                                ST_GeomFromText(#{entryValue}, 4490)
+                            </when>
+                            <otherwise>
+                                ST_GeomFromWKB(decode(#{entryValue}, 'hex'), 4490)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <!-- 其他类型默认处理 -->
+                    <otherwise>
+                        #{entryValue}
+                    </otherwise>
+                </choose>
+            </foreach>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 1. 按主键ID更新（idName和id匹配） -->
+    <update id="updateInfo1">
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="fieldNames" item="fieldName" index="index" separator=",">
+                <choose>
+                    <!-- 适配WKB十六进制字符串格式（优先推荐） -->
+                    <when test='fieldTypes[fieldName] == "geometry"'>
+                        ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues[${index}]}, 'hex'), 4490)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int4"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS INTEGER)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int8"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS BIGINT)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                        ${fieldName} = TO_TIMESTAMP(#{fieldValues[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss.MSXXX')
+                        + INTERVAL '8 hours'
+                    </when>
+                    <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                        ${fieldName} = CAST(#{fieldValues[${index}]} AS NUMERIC)
+                    </when>
+                    <otherwise>
+                        ${fieldName} = #{fieldValues[${index}]}
+                    </otherwise>
+                </choose>
+            </foreach>
+        </set>
+        WHERE
+        <foreach collection="idName" item="idCol" index="index" separator="AND">
+            <choose>
+                <when test='fieldTypes[idCol] == "int4"'>
+                    ${idCol} = CAST(#{id[${index}]} AS INTEGER)
+                </when>
+                <when test='fieldTypes[idCol] == "int8"'>
+                    ${idCol} = CAST(#{id[${index}]} AS BIGINT)
+                </when>
+                <otherwise>
+                    ${idCol} = #{id[${index}]}
+                </otherwise>
+            </choose>
+        </foreach>
+    </update>
+
+    <!-- 2. 按旧数据匹配更新（oldData作为条件） -->
+    <update id="updateInfo2">
+        UPDATE ${tableName}
+        <set>
+            <foreach collection="fieldNames1" item="fieldName" index="index" separator=",">
+                <choose>
+                    <when test='fieldTypes[fieldName] == "geometry"'>
+                        ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues1[${index}]}, 'hex'), 4490)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int4"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS INTEGER)
+                    </when>
+                    <when test='fieldTypes[fieldName] == "int8"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS BIGINT)
+                    </when>
+                    <!-- 关键修改：格式参数添加"T"，适配2024-05-20T14:30:00格式 -->
+                    <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                        ${fieldName} = TO_TIMESTAMP(#{fieldValues1[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss.MSXXX')
+                        + INTERVAL '8 hours'
+                    </when>
+                    <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                        ${fieldName} = CAST(#{fieldValues1[${index}]} AS NUMERIC)
+                    </when>
+                    <otherwise>
+                        ${fieldName} = #{fieldValues1[${index}]}
+                    </otherwise>
+                </choose>
+            </foreach>
+        </set>
+        WHERE
+        <foreach collection="fieldNames2" item="fieldName" index="index" separator="AND">
+            <choose>
+                <when test='fieldTypes[fieldName] == "geometry"'>
+                    ${fieldName} = ST_GeomFromWKB(decode(#{fieldValues2[${index}]}, 'hex'), 4490)
+                </when>
+                <when test='fieldTypes[fieldName] == "int4"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS INTEGER)
+                </when>
+                <when test='fieldTypes[fieldName] == "int8"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS BIGINT)
+                </when>
+                <!-- WHERE条件同步修改格式参数 -->
+                <when test='fieldTypes[fieldName] == "timestamp" or fieldTypes[fieldName] == "timestamp without time zone"'>
+                    ${fieldName} = TO_TIMESTAMP(#{fieldValues2[${index}]}, 'yyyy-MM-dd"T"HH24:mi:ss')
+                </when>
+                <when test='fieldTypes[fieldName] == "numeric" or fieldTypes[fieldName] == "decimal" or fieldTypes[fieldName] == "float8"'>
+                    ${fieldName} = CAST(#{fieldValues2[${index}]} AS NUMERIC)
+                </when>
+                <otherwise>
+                    ${fieldName} = #{fieldValues2[${index}]}
+                </otherwise>
+            </choose>
+        </foreach>
+    </update>
 
 </mapper>

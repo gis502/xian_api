@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.system.domain.XianNews;
 import com.ruoyi.system.service.XianNewsService;
-import io.swagger.models.auth.In;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

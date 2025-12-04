@@ -2,7 +2,6 @@ package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.service.IGeologicalDisasterHideService;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,53 +23,45 @@ public class GeologicalDisasterHideController {
     private IGeologicalDisasterHideService geologicalDisasterHideService;
 
     @GetMapping("/slide")
-    @ApiOperation(value = "获取滑坡隐患点数据")
     public AjaxResult getGeologicalDisasterHideByLandSlideList()
     {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideByLandSlideList());
     }
 
     @GetMapping("/flow")
-    @ApiOperation(value = "获取泥石流隐患点数据")
     public AjaxResult getGeologicalDisasterHideByFlowList()
     {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterHideByFlowList());
     }
 
     @GetMapping("/allslide")
-    @ApiOperation(value = "获取全部滑坡隐患点数据")
     public AjaxResult getAllGeologicalDisasterHideByLandSlideList()
     {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalAllDisasterHideByLandSlideList());
     }
 
     @GetMapping("/allflow")
-    @ApiOperation(value = "获取全部泥石流点数据")
     public AjaxResult getAllGeologicalDisasterHideByFlowList()
     {
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalAllDisasterHideByFlowList());
     }
 
     @GetMapping("/getSlide")
-    @ApiOperation(value = "获取全部的滑坡隐患点")
     public AjaxResult getGeologicalDisasterAllSlideList(){
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterBySlideList());
     }
 
     @GetMapping("/getFlow")
-    @ApiOperation(value = "获取全部的泥石流隐患点")
     public AjaxResult getGeologicalDisasterAllFlowList(){
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByFlowList());
     }
 
     @GetMapping("/getFlashFlood")
-    @ApiOperation("获取全部山洪隐患点")
     public AjaxResult getGeologicalDisasterAllFlashFloodList(){
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByFlashFloodList());
     }
 
     @GetMapping("/getWater")
-    @ApiOperation("获取全部内涝点")
     public AjaxResult getGeologicalDisasterAllWaterList(){
         return AjaxResult.success(geologicalDisasterHideService.getGeologicalDisasterByWaterLogging());
     }

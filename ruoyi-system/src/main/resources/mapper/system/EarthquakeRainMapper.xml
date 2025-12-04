@@ -26,7 +26,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 e.disaster_name::text AS disasterName,
                 e.occurrence_time AS occurTime,
-                'earthquake'::text AS disasterType
+                'earthquake'::text AS disasterType,
+                e.magnitude::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_earthquake_list e
                 WHERE e.is_deleted = 0 AND e.eq_type = 'Z'
                 UNION ALL
@@ -51,7 +53,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 r.disaster_name::text AS disasterName,
                 r.occurrence_time AS occurTime,
-                'rain'::text AS disasterType
+                'rain'::text AS disasterType,
+                NULL::text AS magnitude,
+                r.rainfall::text AS rainfall
                 FROM xian_disaster_rain r
                 WHERE r.is_deleted = 0 AND r.rain_type = 'Z'
                 UNION ALL
@@ -76,7 +80,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 sn.disaster_name::text AS disasterName,
                 sn.occurrence_time AS occurTime,
-                'snow'::text AS disasterType
+                'snow'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_snow_disaster sn
                 WHERE sn.is_deleted = 0 AND sn.type = 'Z'
                 UNION ALL
@@ -101,7 +107,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 c.disaster_name::text AS disasterName,
                 c.occurrence_time AS occurTime,
-                'coldDamage'::text AS disasterType
+                'coldDamage'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_cold_damage c
                 WHERE c.is_deleted = 0 AND c.type = 'Z'
                 UNION ALL
@@ -126,7 +134,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 col.disaster_name::text AS disasterName,
                 col.occurrence_time AS occurTime,
-                'collapse'::text AS disasterType
+                'collapse'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_collapse col
                 WHERE col.is_deleted = 0 AND col.type = 'Z'
                 UNION ALL
@@ -151,7 +161,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 l.disaster_name::text AS disasterName,
                 l.occurrence_time AS occurTime,
-                'landslide'::text AS disasterType
+                'landslide'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_landslide l
                 WHERE l.is_deleted = 0 AND l.type = 'Z'
                 UNION ALL
@@ -176,7 +188,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 d.disaster_name::text AS disasterName,
                 d.occurrence_time AS occurTime,
-                'debrisFlow'::text AS disasterType
+                'debrisFlow'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_debris_flow d
                 WHERE d.is_deleted = 0 AND d.type = 'Z'
                 UNION ALL
@@ -201,7 +215,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 g.disaster_name::text AS disasterName,
                 g.occurrence_time AS occurTime,
-                'galeHail'::text AS disasterType
+                'galeHail'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_gale_hail g
                 WHERE g.is_deleted = 0 AND g.type = 'Z'
                 UNION ALL
@@ -226,7 +242,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 sd.disaster_name::text AS disasterName,
                 sd.occurrence_time AS occurTime,
-                'sandstorm'::text AS disasterType
+                'sandstorm'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_sandstorm sd
                 WHERE sd.is_deleted = 0 AND sd.type = 'Z'
                 UNION ALL
@@ -251,7 +269,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 dr.disaster_name::text AS disasterName,
                 dr.occurrence_time AS occurTime,
-                'drought'::text AS disasterType
+                'drought'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_drought dr
                 WHERE dr.is_deleted = 0 AND dr.type = 'Z'
                 UNION ALL
@@ -276,7 +296,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 hw.disaster_name::text AS disasterName,
                 hw.occurrence_time AS occurTime,
-                'heatwave'::text AS disasterType
+                'heatwave'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_heatwave hw
                 WHERE hw.is_deleted = 0 AND hw.type = 'Z'
                 UNION ALL
@@ -301,7 +323,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 wf.disaster_name::text AS disasterName,
                 wf.occurrence_time AS occurTime,
-                'wildfire'::text AS disasterType
+                'wildfire'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_forest_fire wf
                 WHERE wf.is_deleted = 0 AND wf.type = 'Z'
                 UNION ALL
@@ -326,7 +350,9 @@
                 NULL::text AS safetyAccidentDisasterId,
                 b.disaster_name::text AS disasterName,
                 b.occurrence_time AS occurTime,
-                'bioDisaster'::text AS disasterType
+                'bioDisaster'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_biological b
                 WHERE b.is_deleted = 0 AND b.type = 'Z'
                 UNION ALL
@@ -351,7 +377,9 @@
                 sf.disaster_id::text AS safetyAccidentDisasterId,
                 sf.disaster_name::text AS disasterName,
                 sf.occurrence_time AS occurTime,
-                'safetyAccident'::text AS disasterType
+                'safetyAccident'::text AS disasterType,
+                NULL::text AS magnitude,
+                NULL::text AS rainfall
                 FROM xian_disaster_safety_accident sf
                 WHERE sf.is_deleted = 0 AND sf.type = 'Z'
             </if>

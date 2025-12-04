@@ -37,9 +37,9 @@ public class SchoolServiceImpl implements ISchoolService {
             Map<String, Object> properties = new HashMap<>();
             properties.put("schoolName", school.getSchoolName());
             properties.put("schoolAddress", school.getSchoolAddress());
-            properties.put("schoolType", school.getSchoolType());
+            properties.put("schoolType", removeBrackets(school.getSchoolType()));
             properties.put("schoolArea", school.getSchoolArea());
-            properties.put("isImportant", school.getIsImportant());
+            properties.put("isImportant", removeBrackets(school.getIsImportant()));
             properties.put("students", school.getStudents());
             properties.put("phone", school.getTelephone());
             properties.put("lon", school.getLon());
@@ -60,5 +60,14 @@ public class SchoolServiceImpl implements ISchoolService {
         features.put("features", lists);
 
         return features;
+    }
+
+    // 去除中括号的辅助方法
+    private String removeBrackets(String str) {
+        if (str == null) {
+            return null;
+        }
+        // 去除字符串开头和结尾的中括号
+        return str.replaceAll("^\\[|\\]$", "");
     }
 }
