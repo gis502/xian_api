@@ -2,11 +2,12 @@
 spring:
     neo4j:
 #        uri: bolt://10.22.245.246:7687
-        uri: bolt://47.92.216.173:7687
+#        uri: bolt://47.92.216.173:7687
+        uri: bolt://10.7.71.1:7687
         # 必须启用认证（之前被注释了，导致连接可能被拒绝或权限不足）
 #        authentication:
 #            username: neo4j
-#            password: Zzw.0401
+#            password: zaihailian@123
         pool:
             metrics-enabled: true
             # 核心：解决待机闲置断连的连接池参数
@@ -32,13 +33,15 @@ spring:
 #                url: jdbc:postgresql://10.22.245.247:5432/xian0907?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: zhangsan
-                url: jdbc:postgresql://47.92.216.173:7654/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                url: jdbc:postgresql://172.17.130.189:5432/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: zhangsan
+                url: jdbc:postgresql://10.7.71.1:5432/xian20251212?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
-                password: zhangsan
+                password: zaihailian@123
 #                url: jdbc:postgresql://10.22.245.138:54321/xianDC?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: zaihailian
 #                password: Zhyj@2025
-
 #                url: jdbc:postgresql://localhost:5432/xian20250825?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: Zzw.0401
@@ -49,9 +52,12 @@ spring:
 #                url: jdbc:postgresql://10.22.245.247:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: zhangsan
-                url: jdbc:postgresql://47.92.216.173:7654/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                url: jdbc:postgresql://172.17.130.189:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: zhangsan
+                url: jdbc:postgresql://10.7.71.1:5432/xian20251212?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
                 username: postgres
-                password: zhangsan
+                password: zaihailian@123
 #                url: jdbc:postgresql://10.22.245.138:54321/xianDCAccess?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: zaihailian
 #                password: Zhyj@2025
@@ -84,7 +90,7 @@ spring:
             webStatFilter:
                 enabled: true
             statViewServlet:
-                enabled: true
+                enabled: false
                 # 设置白名单，不填则允许所有访问
                 allow:
                 url-pattern: /druid/*

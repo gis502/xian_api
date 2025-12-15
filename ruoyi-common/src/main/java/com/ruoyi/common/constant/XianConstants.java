@@ -22,8 +22,8 @@ public class XianConstants {
     public static final String RESULT_EMPTY_RAIN = "报告正在生成中，请等待...";
 //    public static String IP1 = "http://10.22.245.246";
 //    public static String IP2 = "http://10.22.245.247";
-    public static String IP1 = "http://localhost";
-    public static String IP2 = "http://localhost";
+    public static String IP1 = "http://10.7.71.1";
+    public static String IP2 = "http://10.7.71.1";
 
     public static final boolean SEISMIC_TYPE = false;
     public static final boolean STORM_TYPE = true;
