@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
@@ -37,44 +38,49 @@ public class IFleRemoveServiceImpl implements FileRemoveService {
 
 
     /**
-     * 下载单个HTTP资源到本地对应目录
+     * 移动单个HTTP资源到本地对应目录
+     * 根据URL自动提取文件夹路径和文件名，创建目标目录并移动文件
      * @param httpUrl HTTP资源链接
      */
     public void removeFile(String httpUrl) {
         try{
             httpUrl = smartDecodeUrl(httpUrl);
-            // 1. 从URL中提取文件名（处理中文和特殊字符）
+            
+            // 1. 从URL中提取文件名和文件夹路径
             String fileName = extractFileNameFromUrl(httpUrl);
+            String folderPath = extractFolderPathFromUrl(httpUrl);
+            
             if (fileName == null || fileName.isEmpty()) {
                 System.err.println("无法提取文件名：" + httpUrl);
                 return;
             }
-
+            
             // 2. 根据文件后缀确定目标存储目录
-            String targetDir = getTargetDirByFileExt(fileName);
-            // 创建目标目录（不存在则自动创建，包括多级目录）
-            Files.createDirectories(Paths.get(targetDir));
-
-            // 3. 构建本地文件完整路径
-            String localFilePath = targetDir + File.separator + fileName;
-            File localFile = new File(localFilePath);
-
-            // 4. 检查文件是否已存在，存在则直接返回成功
-            if (localFile.exists()) {
-                System.out.println("📁 文件已存在，跳过下载：" + localFilePath);
-                return;
+            String baseTargetDir = getTargetDirByFileExt(fileName);
+            
+            // 3. 构建完整的本地目标路径
+            String localTargetDir = baseTargetDir;
+            if (folderPath != null && !folderPath.isEmpty()) {
+                localTargetDir = baseTargetDir + folderPath;
             }
-
-            // 5. 发起HTTP请求下载资源
+            
+            // 4. 创建目标目录（包括多级目录）
+            Files.createDirectories(Paths.get(localTargetDir));
+            
+            // 5. 构建本地文件完整路径
+            String localFilePath = localTargetDir + File.separator + fileName;
+            File localFile = new File(localFilePath);
+            
+            // 6. 发起HTTP请求下载资源
             URL url = new URL(httpUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
+            
             // 配置HTTP请求参数
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(CONNECT_TIMEOUT);
             connection.setReadTimeout(READ_TIMEOUT);
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-
+            
             // 检查响应状态（200=成功）
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
@@ -82,11 +88,11 @@ public class IFleRemoveServiceImpl implements FileRemoveService {
                 connection.disconnect();
                 return;
             }
-
-            // 6. 读取HTTP响应流，写入本地文件
+            
+            // 7. 读取HTTP响应流，写入本地文件（同名文件会覆盖）
             try (InputStream in = connection.getInputStream();
                  OutputStream out = new FileOutputStream(localFile)) {
-
+                
                 byte[] buffer = new byte[1024 * 8]; // 8KB缓冲区，提升下载效率
                 int len;
                 while ((len = in.read(buffer)) != -1) {
@@ -96,8 +102,8 @@ public class IFleRemoveServiceImpl implements FileRemoveService {
             } finally {
                 connection.disconnect(); // 关闭连接，释放资源
             }
-
-            System.out.println("📥 下载成功，保存路径：" + localFilePath);
+            
+            System.out.println("📥 文件移动成功，保存路径：" + localFilePath);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -110,7 +116,6 @@ public class IFleRemoveServiceImpl implements FileRemoveService {
      */
     private String extractFileNameFromUrl(String url) {
         try {
-
             // 截取URL中最后一个"/"后的部分（即文件名）
             int lastSlashIndex = url.lastIndexOf("/");
             if (lastSlashIndex == -1 || lastSlashIndex == url.length() - 1) {
@@ -123,6 +128,83 @@ public class IFleRemoveServiceImpl implements FileRemoveService {
         } catch (Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+    
+    /**
+     * 从HTTP URL中提取文件夹路径（最后四层目录结构）
+     * @param url HTTP资源链接
+     * @return 文件夹路径（以/开头）
+     */
+    private String extractFolderPathFromUrl(String url) {
+        try {
+            // 移除协议部分（http:// 或 https://）
+            String path = url;
+            if (path.startsWith("http://")) {
+                path = path.substring(7);
+            } else if (path.startsWith("https://")) {
+                path = path.substring(8);
+            }
+            
+            // 找到最后一个"/"的位置（文件名位置）
+            int lastSlashIndex = path.lastIndexOf("/");
+            if (lastSlashIndex == -1) {
+                return ""; // 没有路径信息
+            }
+            
+            // 获取文件名之前的路径部分
+            String pathPart = path.substring(0, lastSlashIndex);
+            
+            // 找到主机名结束位置（第一个"/"）
+            int hostEndIndex = pathPart.indexOf("/");
+            if (hostEndIndex == -1) {
+                return ""; // 只有主机名，没有路径
+            }
+            
+            // 提取路径部分（去掉主机名）
+            String folderPath = pathPart.substring(hostEndIndex);
+            
+            // 如果路径为空或只有根目录
+            if (folderPath.isEmpty() || folderPath.equals("/")) {
+                return "";
+            }
+            
+            // 确保路径以"/"开头
+            if (!folderPath.startsWith("/")) {
+                folderPath = "/" + folderPath;
+            }
+            
+            // 提取最后四层目录
+            String[] pathSegments = folderPath.split("/");
+            int segmentCount = pathSegments.length;
+            
+            // 过滤空字符串
+            java.util.List<String> validSegments = new java.util.ArrayList<>();
+            for (String segment : pathSegments) {
+                if (!segment.isEmpty()) {
+                    validSegments.add(segment);
+                }
+            }
+            
+            if (validSegments.isEmpty()) {
+                return "";
+            }
+            
+            // 取最后最多4个有效段
+            int startIndex = Math.max(0, validSegments.size() - 4);
+            java.util.List<String> lastFourSegments = validSegments.subList(startIndex, validSegments.size());
+            
+            // 重新组合路径
+            StringBuilder result = new StringBuilder();
+            for (String segment : lastFourSegments) {
+                result.append("/").append(segment);
+            }
+            
+            return result.toString();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 
