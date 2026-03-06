@@ -1,8 +1,9 @@
 # 数据源配置
 spring:
     neo4j:
-#        uri: bolt://10.22.245.246:7687
-        uri: bolt://47.92.216.173:7687
+        uri: bolt://10.22.245.246:7687
+#        uri: bolt://47.92.216.173:7687
+#        uri: bolt://localhost:7687
         # 必须启用认证（之前被注释了，导致连接可能被拒绝或权限不足）
 #        authentication:
 #            username: neo4j
