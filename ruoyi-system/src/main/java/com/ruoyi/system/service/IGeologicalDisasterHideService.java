@@ -15,6 +15,24 @@ public interface IGeologicalDisasterHideService {
     // 获取泥石流隐患点数据
     public List<HideVO> getGeologicalDisasterHideByFlowList();
 
+    public List<HideVO> getGeologicalDisasterByFlashFloodList();
+
+    public List<HideVO> getGeologicalDisasterByWaterLogging();
+
+    /**
+     * 根据区县名称查询隐患点（包含因子数据）
+     * @param countyName 区县名称
+     * @return 隐患点 VO 列表
+     */
+    List<HideVO> getHiddenDisasterPointsByCounty(String countyName);
+
+    /**
+     * 批量根据区县名称查询隐患点
+     * @param countyNames 区县名称列表
+     * @return 隐患点 VO 列表（按区县分组）
+     */
+    Map<String, List<HideVO>> getHiddenDisasterPointsByCounties(List<String> countyNames);
+
     // 获取全部滑坡点数据
     public List<GeologicalDisasterHide> getGeologicalAllDisasterHideByLandSlideList();
 
@@ -24,10 +42,6 @@ public interface IGeologicalDisasterHideService {
     public HashMap<String, List> getGeologicalDisasterBySlideList();
 
     public HashMap<String, List> getGeologicalDisasterByFlowList();
-
-    public List<HideVO> getGeologicalDisasterByFlashFloodList();
-
-    public List<HideVO> getGeologicalDisasterByWaterLogging();
 
     public HashMap<String, List> getGeologicalDisasterByFloodList();
 

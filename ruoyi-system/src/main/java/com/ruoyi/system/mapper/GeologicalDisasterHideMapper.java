@@ -46,4 +46,11 @@ public interface GeologicalDisasterHideMapper extends BaseMapper<GeologicalDisas
 
     @Select("SELECT count(*) FROM xian_disaster_risk where county = #{county}")
     Integer getRiskNumByCounty(String county);
+
+    /**
+     * 根据区县名称查询隐患点
+     * @param countyName 区县名称
+     * @return 隐患点列表
+     */
+    List<GeologicalDisasterHide> selectByCounty(@Param("county") String countyName);
 }
