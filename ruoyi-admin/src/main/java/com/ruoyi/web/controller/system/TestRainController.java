@@ -2,32 +2,29 @@ package com.ruoyi.web.controller.system;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.domain.dto.DisasterPointDTO;
 import com.ruoyi.system.domain.dto.DisasterRainDTO;
 import com.ruoyi.system.domain.dto.RainComprehensiveTriggerDTO;
 import com.ruoyi.system.domain.dto.RainComprehensiveTriggerVO;
 import com.ruoyi.system.domain.dto.RainTriggerDTO;
-import com.ruoyi.system.domain.entity.GeologicalDisasterRisk;
+import com.ruoyi.system.domain.entity.FactorAnalysis;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.domain.vo.HideVO;
 import com.ruoyi.system.domain.vo.TriggerRequest;
 import com.ruoyi.system.domain.vo.TriggerVO;
-import com.ruoyi.system.service.IFeignService;
-import com.ruoyi.system.service.IGeologicalDisasterHideService;
-import com.ruoyi.system.service.IGeologicalDisasterRiskService;
-import com.ruoyi.system.service.IModelService;
-import com.ruoyi.system.service.IXianDisasterRainService;
+import com.ruoyi.system.service.*;
+import com.ruoyi.system.service.impl.FactorAnalysisServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
-@RequestMapping("/disaster")
+@RequestMapping("/admins/disaster")
 public class TestRainController extends BaseController {
 
     @Resource
@@ -43,7 +40,7 @@ public class TestRainController extends BaseController {
     private IGeologicalDisasterHideService geologicalDisasterHideService;
 
     @Resource
-    private IGeologicalDisasterRiskService geologicalDisasterRiskService;
+    private FactorAnalysisServiceImpl factorAnalysisService;
 
     @PostMapping("/testRain/trigger")
     public AjaxResult rainComprehensiveTrigger(@RequestBody RainComprehensiveTriggerDTO triggerDTO) {
@@ -59,7 +56,7 @@ public class TestRainController extends BaseController {
             saveDTO.setPosition(triggerDTO.getPosition());
             saveDTO.setRainType(triggerDTO.getRainType());
             saveDTO.setDisasterName(triggerDTO.getDisasterName());
-            saveDTO.setOccurrenceTime(triggerDTO.getOccurrenceTime());
+            saveDTO.setOccurrenceTime(LocalDateTime.now());
 
             Long rainDisasterId = disasterRainService.saveDisasterRain(saveDTO);
             result.setRainDisasterId(rainDisasterId);
@@ -73,7 +70,7 @@ public class TestRainController extends BaseController {
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 
             // 3. 执行模型计算（隐患点匹配和风险计算）- 集成 model/rain/trigger 功能
-            List<TriggerVO> modelResults = new ArrayList<>();
+            List<TriggerVO> modelResults;
             if (triggerDTO.getModelDataList() != null && !triggerDTO.getModelDataList().isEmpty()) {
                 // 将前端的 modelDataList 转换为 TriggerRequest 格式
                 TriggerRequest triggerRequest = convertToTriggerRequest(triggerDTO.getModelDataList());
@@ -85,8 +82,8 @@ public class TestRainController extends BaseController {
                 // 解析区县名称列表
                 List<String> countyNames = parseCountyNames(triggerDTO.getPosition());
 
-                // 从数据库查询所有区县的隐患点和风险区域
-                List<DisasterPointDTO> allPoints = getAllDisasterPointsByCounties(countyNames);
+                // 从数据库查询所有区县的隐患点
+                List<HideVO> allPoints = getAllDisasterPointsByCounties(countyNames);
 
                 // 将灾害点数据转换为 TriggerRequest 格式，并设置对应的降雨量
                 TriggerRequest triggerRequest = buildTriggerRequestFromDatabase(
@@ -96,6 +93,7 @@ public class TestRainController extends BaseController {
                 modelResults = modelService.rainTrigger(triggerRequest);
             }
             result.setModelResults(modelResults);
+//            System.out.println(modelResults);
 
             return AjaxResult.success(result);
         } catch (Exception e) {
@@ -184,70 +182,22 @@ public class TestRainController extends BaseController {
     }
 
     /**
-     * 批量根据区县名称查询灾害点（包括隐患点和风险区域）
+     * 批量根据区县名称查询灾害点（仅隐患点）
      * @param countyNames 区县名称列表
-     * @return 灾害点 DTO 列表
+     * @return 灾害点 VO 列表
      */
-    private List<DisasterPointDTO> getAllDisasterPointsByCounties(List<String> countyNames) {
-        List<DisasterPointDTO> allPoints = new ArrayList<>();
+    private List<HideVO> getAllDisasterPointsByCounties(List<String> countyNames) {
+        List<HideVO> allPoints = new ArrayList<>();
 
-        // 1. 查询隐患点（滑坡、泥石流、山洪、内涝）
+        // 查询隐患点（滑坡、泥石流、山洪、内涝）
         for (String countyName : countyNames) {
             List<HideVO> countyPoints = geologicalDisasterHideService.getHiddenDisasterPointsByCounty(countyName);
-            for (HideVO hidePoint : countyPoints) {
-                DisasterPointDTO dto = DisasterPointDTO.fromHideDTO(hidePoint.getGeologicalDisasterHideDTO());
-                if (dto != null) {
-                    allPoints.add(dto);
-                }
+            if (countyPoints != null && !countyPoints.isEmpty()) {
+                allPoints.addAll(countyPoints);
             }
         }
 
-        // 2. 查询风险区域
-        for (String countyName : countyNames) {
-            List<DisasterPointDTO> riskPoints = getRiskAreasByCounty(countyName);
-            allPoints.addAll(riskPoints);
-        }
-
         return allPoints;
-    }
-
-    /**
-     * 根据区县名称查询风险区域，并转换为 DisasterPointDTO 格式
-     * @param countyName 区县名称
-     * @return 风险区域 DTO 列表
-     */
-    private List<DisasterPointDTO> getRiskAreasByCounty(String countyName) {
-        List<DisasterPointDTO> riskDTOList = new ArrayList<>();
-
-        // 查询该区县的风险区域
-        List<GeologicalDisasterRisk> riskList = geologicalDisasterRiskService.selectByCounty(countyName);
-
-        if (riskList == null || riskList.isEmpty()) {
-            return riskDTOList;
-        }
-
-        // 转换为 DisasterPointDTO
-        for (GeologicalDisasterRisk risk : riskList) {
-            DisasterPointDTO dto = new DisasterPointDTO();
-            dto.setId(risk.getId());
-            dto.setCode(risk.getUnitCode());  // 风险区域使用 unitCode
-            dto.setCounty(risk.getCounty());
-            dto.setCountyId(null);  // 风险区域可能没有 countyId
-            dto.setVillage(risk.getVillage());
-            dto.setDisasterName(risk.getDisasterName());
-            dto.setLatitude(risk.getLat().toString());
-            dto.setLongitude(risk.getLon().toString());
-            dto.setLon(risk.getLon());
-            dto.setLat(risk.getLat());
-            dto.setPosition(risk.getPosition());
-            dto.setDisasterType("风险区域");
-            dto.setScaleGrade(risk.getRiskLevel());  // 风险区域使用 riskLevel
-            dto.setRiskGrade(null);
-
-            riskDTOList.add(dto);
-        }
-
-        return riskDTOList;
     }
 
     /**
@@ -257,7 +207,7 @@ public class TestRainController extends BaseController {
      * @param countyNames 区县名称列表
      */
     private TriggerRequest buildTriggerRequestFromDatabase(
-            List<DisasterPointDTO> allPoints,
+            List<HideVO> allPoints,
             String rainfallStr,
             List<String> countyNames) {
 
@@ -268,16 +218,16 @@ public class TestRainController extends BaseController {
         String[] rainfalls = rainfallStr.split(",");
 
         // 按区县分组灾害点
-        Map<String, List<DisasterPointDTO>> pointsByCounty = new HashMap<>();
-        for (DisasterPointDTO point : allPoints) {
-            String county = point.getCounty();
+        Map<String, List<HideVO>> pointsByCounty = new HashMap<>();
+        for (HideVO point : allPoints) {
+            String county = point.getGeologicalDisasterHideDTO().getCounty();
             pointsByCounty.computeIfAbsent(county, k -> new ArrayList<>()).add(point);
         }
 
         // 遍历每个区县的灾害点
         for (int i = 0; i < countyNames.size(); i++) {
             String countyName = countyNames.get(i);
-            List<DisasterPointDTO> points = pointsByCounty.getOrDefault(countyName, new ArrayList<>());
+            List<HideVO> points = pointsByCounty.getOrDefault(countyName, new ArrayList<>());
 
             // 获取当前区县的降雨量（如果降雨量数量少于区县数量，使用最后一个）
             double currentRainfall = 0;
@@ -288,24 +238,38 @@ public class TestRainController extends BaseController {
             }
 
             // 为该区县的所有灾害点设置降雨量因子
-            for (DisasterPointDTO point : points) {
+            for (HideVO point : points) {
                 TriggerVO triggerVO = new TriggerVO();
 
                 // 设置 entityId（与前端逻辑一致）
                 String entityId = buildEntityId(point);
                 triggerVO.setEntityId(entityId);
 
-                triggerVO.setDisasterType(point.getDisasterType());
-                triggerVO.setLon(point.getLon());
-                triggerVO.setLat(point.getLat());
+                triggerVO.setDisasterType(point.getGeologicalDisasterHideDTO().getDisasterType());
+                triggerVO.setLon(point.getGeologicalDisasterHideDTO().getLon());
+                triggerVO.setLat(point.getGeologicalDisasterHideDTO().getLat());
 
                 // 处理因子列表，更新降雨量
-                List<FactorVO> factors = new ArrayList<>();
-                // TODO: 如果需要为风险区域添加因子，可以在这里处理
-                // 目前只有隐患点有因子数据
+                List<FactorVO> factors = point.getFactorVoList();
+//                System.out.println("factors: " + factors);
+                if (factors != null) {
+                    for (FactorVO factor : factors) {
+                        if ("rainfall".equals(factor.getAttributeNameAlias())) {
+                            factor.setFactorValue(String.valueOf(currentRainfall));
+//                            System.out.println("更新降雨量：" + factor.getFactorValue());
+                            break;
+                        }
+                    }
+                }else{
+                    factors = new ArrayList<>();
+                }
 
                 triggerVO.setFactors(factors);
                 triggerVOList.add(triggerVO);
+                // 初始化概率、等级、灾害类型列表
+                triggerVO.setProbability(new ArrayList<>());
+                triggerVO.setLevel(new ArrayList<>());
+                triggerVO.setDisaster(new ArrayList<>());
             }
         }
 
@@ -316,19 +280,18 @@ public class TestRainController extends BaseController {
     /**
      * 构建实体 ID（与前端逻辑一致）
      */
-    private String buildEntityId(DisasterPointDTO point) {
-        String disasterType = point.getDisasterType();
-        if ("风险区域".equals(disasterType)) {
-            return "风险区域" + point.getCode();
-        } else if ("滑坡".equals(disasterType)) {
-            return "滑坡隐患点" + point.getId();
+    private String buildEntityId(HideVO point) {
+        String disasterType = point.getGeologicalDisasterHideDTO().getDisasterType();
+        Integer id = point.getGeologicalDisasterHideDTO().getId();
+        if ("滑坡".equals(disasterType)) {
+            return "滑坡隐患点" + id;
         } else if ("泥石流".equals(disasterType)) {
-            return "泥石流隐患点" + point.getId();
+            return "泥石流隐患点" + id;
         } else if ("内涝".equals(disasterType)) {
-            return "内涝隐患点" + point.getId();
+            return "内涝隐患点" + id;
         } else if ("山洪".equals(disasterType)) {
-            return "山洪隐患点" + point.getId();
+            return "山洪隐患点" + id;
         }
-        return "隐患点" + point.getId();
+        return "隐患点" + id;
     }
 }

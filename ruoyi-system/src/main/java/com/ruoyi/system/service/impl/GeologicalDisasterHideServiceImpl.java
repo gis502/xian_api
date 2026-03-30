@@ -375,7 +375,7 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
             List<FactorVO> factorVOs = factorValueMap.getOrDefault(hideDTO.getId(), Collections.emptyList());
             String disasterType = hideDTO.getDisasterType();
-            HideVO merged = mergeData(hideDTO, factorVOs, disasterType);
+            HideVO merged = mergeDatas(hideDTO, factorVOs, disasterType);
             hideVOlist.add(merged);
         }
 
@@ -407,6 +407,21 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         // TODO 目前只有滑坡有分析值
         hideVO.setGeologicalDisasterHideDTO(hideDTO);
         hideVO.setFactorVoList(valueDTOList);
+
+        return hideVO;
+    }
+
+    private HideVO mergeDatas(GeologicalDisasterHideDTO hideDTO,List<FactorVO> valueDTOList,String type){
+
+        HideVO hideVO = new HideVO();
+        hideVO.setGeologicalDisasterHideDTO(hideDTO);
+
+        // 修改：泥石流也需要因子数据进行模型计算
+        if ("泥石流".equals(type) || "滑坡".equals(type)) {
+            hideVO.setFactorVoList(valueDTOList);
+        } else {
+            hideVO.setFactorVoList(valueDTOList);
+        }
 
         return hideVO;
     }
