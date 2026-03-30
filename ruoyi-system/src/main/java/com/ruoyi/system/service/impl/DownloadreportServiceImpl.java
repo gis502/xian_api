@@ -125,7 +125,6 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         output.setType(2);
         output.setCreateTime(LocalDateTime.now());
         output.setIsDeleted(0);
-        System.out.println("准备插入数据 - rainId: " + rainId + ", path: " + wordPath);
 
         try {
             rainAssessmentOutputMybatisMapper.insertRainAssessmentOutput(output);

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RestController
@@ -40,7 +41,7 @@ public class TestRainController extends BaseController {
     private IGeologicalDisasterHideService geologicalDisasterHideService;
 
     @Resource
-    private FactorAnalysisServiceImpl factorAnalysisService;
+    private DownloadreportService downloadreportService;
 
     @PostMapping("/testRain/trigger")
     public AjaxResult rainComprehensiveTrigger(@RequestBody RainComprehensiveTriggerDTO triggerDTO) {
@@ -55,8 +56,8 @@ public class TestRainController extends BaseController {
             saveDTO.setLatitude(triggerDTO.getLatitude());
             saveDTO.setPosition(triggerDTO.getPosition());
             saveDTO.setRainType(triggerDTO.getRainType());
-            saveDTO.setDisasterName(triggerDTO.getDisasterName());
-            saveDTO.setOccurrenceTime(LocalDateTime.now());
+            saveDTO.setDisasterName(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + "长安区暴雨");
+            saveDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             Long rainDisasterId = disasterRainService.saveDisasterRain(saveDTO);
             result.setRainDisasterId(rainDisasterId);
@@ -67,6 +68,10 @@ public class TestRainController extends BaseController {
 
             result.setRainId(rainQuery.getRainId());
             result.setRainQueueId(rainQuery.getRainQueueId());
+
+            Thread.sleep(20000);
+            downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), Integer.parseInt(rainDisasterId.toString()));
+            System.out.println(rainQuery);
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 
             // 3. 执行模型计算（隐患点匹配和风险计算）- 集成 model/rain/trigger 功能
