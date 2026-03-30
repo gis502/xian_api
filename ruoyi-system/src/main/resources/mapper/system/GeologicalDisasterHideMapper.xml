@@ -45,4 +45,11 @@
         ]]>
     </select>
 
+    <select id="selectByCounty" resultType="com.ruoyi.system.domain.entity.GeologicalDisasterHide">
+        SELECT id, field_code, province, province_id, city, city_id, county, county_id,
+               village, disaster_name, latitude, longitude, lon, lat, position,
+               disaster_type, scale_grade, risk_grade
+        FROM xian_disaster_hide
+        WHERE county = #{county}
+    </select>
 </mapper>

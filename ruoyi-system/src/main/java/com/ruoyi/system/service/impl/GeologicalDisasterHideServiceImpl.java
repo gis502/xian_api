@@ -334,6 +334,68 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         return features;
     }
 
+    @Override
+    public List<HideVO> getHiddenDisasterPointsByCounty(String countyName) {
+        // 查询该区县的所有隐患点
+        List<GeologicalDisasterHide> disasters = geologicalDisasterHideMapper.selectByCounty(countyName);
+
+        if (disasters == null || disasters.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 获取因子值表中所有的 hideId
+        Set<Integer> hideIds = factorValueService.getAllHideId();
+
+        // 筛选出所有存在因子的 hideId
+        List<GeologicalDisasterHideDTO> hideDTOlist = new ArrayList<>();
+        List<Integer> qualifiedIds = new ArrayList<>();
+
+        for (GeologicalDisasterHide disaster : disasters) {
+            Integer disasterId = disaster.getId();
+            if (disasterId != null && hideIds.contains(disasterId)) {
+                GeologicalDisasterHideDTO hideDTO = new GeologicalDisasterHideDTO();
+                BeanUtils.copyProperties(disaster, hideDTO);
+                hideDTOlist.add(hideDTO);
+                qualifiedIds.add(disasterId);
+            }
+        }
+
+        // 批量查询所有因子值
+        Map<Integer, List<FactorVO>> factorValueMap = new HashMap<>();
+        if (!qualifiedIds.isEmpty()) {
+            List<FactorVO> factorValuesByHideIds = factorValueService.getFactorValuesByHideIds(qualifiedIds);
+            for (FactorVO factorVO : factorValuesByHideIds) {
+                factorValueMap.computeIfAbsent(factorVO.getHideId(), k -> new ArrayList<>())
+                        .add(factorVO);
+            }
+        }
+
+        // 合并数据
+        List<HideVO> hideVOlist = new ArrayList<>();
+        for (GeologicalDisasterHideDTO hideDTO : hideDTOlist) {
+            List<FactorVO> factorVOs = factorValueMap.getOrDefault(hideDTO.getId(), Collections.emptyList());
+            String disasterType = hideDTO.getDisasterType();
+            HideVO merged = mergeDatas(hideDTO, factorVOs, disasterType);
+            hideVOlist.add(merged);
+        }
+
+        return hideVOlist;
+    }
+
+    @Override
+    public Map<String, List<HideVO>> getHiddenDisasterPointsByCounties(List<String> countyNames) {
+        Map<String, List<HideVO>> resultMap = new HashMap<>();
+
+        for (String countyName : countyNames) {
+            List<HideVO> points = getHiddenDisasterPointsByCounty(countyName);
+            if (!points.isEmpty()) {
+                resultMap.put(countyName, points);
+            }
+        }
+
+        return resultMap;
+    }
+
     private HideVO mergeData(GeologicalDisasterHideDTO hideDTO,List<FactorVO> valueDTOList,String type){
 
         HideVO hideVO = new HideVO();
@@ -349,5 +411,18 @@ public class GeologicalDisasterHideServiceImpl implements IGeologicalDisasterHid
         return hideVO;
     }
 
+    private HideVO mergeDatas(GeologicalDisasterHideDTO hideDTO,List<FactorVO> valueDTOList,String type){
 
+        HideVO hideVO = new HideVO();
+        hideVO.setGeologicalDisasterHideDTO(hideDTO);
+
+        // 修改：泥石流也需要因子数据进行模型计算
+        if ("泥石流".equals(type) || "滑坡".equals(type)) {
+            hideVO.setFactorVoList(valueDTOList);
+        } else {
+            hideVO.setFactorVoList(valueDTOList);
+        }
+
+        return hideVO;
+    }
 }

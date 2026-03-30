@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.system.domain.entity.GeologicalDisasterHide;
 import com.ruoyi.system.domain.entity.GeologicalDisasterRisk;
 import com.ruoyi.system.mapper.GeologicalDisasterRiskMapper;
@@ -45,6 +46,18 @@ public class GeologicalDisasterRiskServiceImpl implements IGeologicalDisasterRis
 
         return (HashMap<String, List>) processedList;
     }
+
+    /**
+     * 根据区县名称查询风险区域
+     * @param countyName 区县名称
+     * @return 风险区域列表
+     */
+    public List<GeologicalDisasterRisk> selectByCounty(String countyName) {
+        return geologicalDisasterRiskMapper.selectList(
+                new QueryWrapper<GeologicalDisasterRisk>().eq("county", countyName)
+        );
+    }
+
 
 
     // 格式化数据
