@@ -37,11 +37,48 @@ public class DisasterFileServiceImpl implements IDisasterFileService {
      *
      * @param disasterId 灾害 ID
      * @param disasterType 灾害类型
+     * @param occurrenceTime 灾害发生时间（用于生成模糊匹配的 ID）
      * @return 文件列表
      */
     @Override
-    public List<DisasterFileVO> selectFilesByDisasterId(String disasterId, String disasterType) {
-        return disasterFileMapper.selectFilesByDisasterId(disasterId, disasterType);
+    public List<DisasterFileVO> selectFilesByDisasterId(String disasterId, String disasterType, String occurrenceTime) {
+        // 在 Java 层处理时间字符串，计算前后 3 秒的时间范围
+        String[] timeRange = calculateTimeRange(occurrenceTime);
+        return disasterFileMapper.selectFilesByDisasterId(disasterId, disasterType, timeRange[0], timeRange[1]);
+    }
+
+    /**
+     * 计算前后 3 秒的时间范围
+     * @param occurrenceTime 原始时间字符串（格式：yyyy-MM-dd HH:mm:ss）
+     * @return 时间范围数组 [startTime, endTime]
+     */
+    private String[] calculateTimeRange(String occurrenceTime) {
+        if (occurrenceTime == null || occurrenceTime.isEmpty()) {
+            return new String[]{"", ""};
+        }
+        try {
+            // 解析时间字符串
+            java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(
+                occurrenceTime.replace(" ", "T"), 
+                java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            );
+            
+            // 计算前后 3 秒
+            java.time.LocalDateTime startTime = dateTime.minusSeconds(3);
+            java.time.LocalDateTime endTime = dateTime.plusSeconds(3);
+            
+            // 格式化为不带特殊字符的格式
+            java.time.format.DateTimeFormatter formatter = 
+                java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            
+            return new String[]{
+                startTime.format(formatter),
+                endTime.format(formatter)
+            };
+        } catch (Exception e) {
+            // 如果解析失败，返回空范围
+            return new String[]{"", ""};
+        }
     }
 
     /**

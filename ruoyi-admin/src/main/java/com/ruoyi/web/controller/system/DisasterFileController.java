@@ -44,13 +44,15 @@ public class DisasterFileController extends BaseController {
      *
      * @param disasterId 灾害 ID
      * @param disasterType 灾害类型
+     * @param occurrenceTime 灾害发生时间（用于生成模糊匹配的 ID）
      * @return 文件列表
      */
     @GetMapping("/fileList")
     public AjaxResult selectFilesByDisasterId(
             @RequestParam String disasterId,
-            @RequestParam String disasterType) {
-        List<DisasterFileVO> list = disasterFileService.selectFilesByDisasterId(disasterId, disasterType);
+            @RequestParam String disasterType,
+            @RequestParam String occurrenceTime) {
+        List<DisasterFileVO> list = disasterFileService.selectFilesByDisasterId(disasterId, disasterType, occurrenceTime);
         return success(list);
     }
 

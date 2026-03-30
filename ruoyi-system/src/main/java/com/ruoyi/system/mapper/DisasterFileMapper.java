@@ -1,5 +1,7 @@
 package com.ruoyi.system.mapper;
 
+import com.ruoyi.common.annotation.DataSource;
+import com.ruoyi.common.enums.DataSourceType;
 import com.ruoyi.system.domain.dto.DisasterInfoDTO;
 import com.ruoyi.system.domain.vo.DisasterFileVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,10 +31,15 @@ public interface DisasterFileMapper {
      *
      * @param disasterId 灾害 ID
      * @param disasterType 灾害类型
+     * @param startTime 开始时间（用于模糊匹配，前后 3 秒）
+     * @param endTime 结束时间（用于模糊匹配，前后 3 秒）
      * @return 文件列表
      */
+    @DataSource(DataSourceType.SLAVE)
     List<DisasterFileVO> selectFilesByDisasterId(@Param("disasterId") String disasterId,
-                                                  @Param("disasterType") String disasterType);
+                                                  @Param("disasterType") String disasterType,
+                                                  @Param("startTime") String startTime,
+                                                  @Param("endTime") String endTime);
 
     /**
      * 删除灾害记录（逻辑删除）
@@ -42,6 +49,7 @@ public interface DisasterFileMapper {
      * @param disasterType 灾害类型
      * @return 结果
      */
+
     int deleteDisasterById(@Param("disasterId") String disasterId,
                            @Param("disasterType") String disasterType);
 }

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.RainAssessmentOutputMybatisMapper">
+    
+    <resultMap type="com.ruoyi.system.domain.entity.RainAssessmentOutput" id="RainAssessmentOutputResult">
+        <result property="id"    column="id"    />
+        <result property="rainId"    column="rain_id"    />
+        <result property="rainQueueId"    column="rain_queue_id"    />
+        <result property="code"    column="code"    />
+        <result property="fileType"    column="file_type"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="fileExtension"    column="file_extension"    />
+        <result property="fileSize"    column="file_size"    />
+        <result property="sourceFile"    column="source_file"    />
+        <result property="localSourceFile"    column="local_source_file"    />
+        <result property="remark"    column="remark"    />
+        <result property="size"    column="size"    />
+        <result property="type"    column="type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="isDeleted"    column="is_deleted"    />
+    </resultMap>
+
+    <!-- 插入暴雨评估产出物 -->
+    <insert id="insertRainAssessmentOutput" parameterType="com.ruoyi.system.domain.entity.RainAssessmentOutput">
+        INSERT INTO rain_assessment_output
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="output.id != null and output.id != ''">id,</if>
+            <if test="output.rainId != null and output.rainId != ''">rain_id,</if>
+            <if test="output.rainQueueId != null and output.rainQueueId != ''">rain_queue_id,</if>
+            <if test="output.code != null and output.code != ''">code,</if>
+            <if test="output.fileType != null and output.fileType != ''">file_type,</if>
+            <if test="output.fileName != null and output.fileName != ''">file_name,</if>
+            <if test="output.fileExtension != null and output.fileExtension != ''">file_extension,</if>
+            <if test="output.fileSize != null">file_size,</if>
+            <if test="output.sourceFile != null">source_file,</if>
+            <if test="output.localSourceFile != null">local_source_file,</if>
+            <if test="output.remark != null and output.remark != ''">remark,</if>
+            <if test="output.size != null and output.size != ''">size,</if>
+            <if test="output.type != null">type,</if>
+            <if test="output.createTime != null">create_time,</if>
+            <if test="output.updateTime != null">update_time,</if>
+            <if test="output.isDeleted != null">is_deleted,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="output.id != null and output.id != ''">#{output.id},</if>
+            <if test="output.rainId != null and output.rainId != ''">#{output.rainId},</if>
+            <if test="output.rainQueueId != null and output.rainQueueId != ''">#{output.rainQueueId},</if>
+            <if test="output.code != null and output.code != ''">#{output.code},</if>
+            <if test="output.fileType != null and output.fileType != ''">#{output.fileType},</if>
+            <if test="output.fileName != null and output.fileName != ''">#{output.fileName},</if>
+            <if test="output.fileExtension != null and output.fileExtension != ''">#{output.fileExtension},</if>
+            <if test="output.fileSize != null">#{output.fileSize},</if>
+            <if test="output.sourceFile != null">#{output.sourceFile},</if>
+            <if test="output.localSourceFile != null">#{output.localSourceFile},</if>
+            <if test="output.remark != null and output.remark != ''">#{output.remark},</if>
+            <if test="output.size != null and output.size != ''">#{output.size},</if>
+            <if test="output.type != null">#{output.type},</if>
+            <if test="output.createTime != null">#{output.createTime},</if>
+            <if test="output.updateTime != null">#{output.updateTime},</if>
+            <if test="output.isDeleted != null">#{output.isDeleted},</if>
+        </trim>
+    </insert>
+
+</mapper>

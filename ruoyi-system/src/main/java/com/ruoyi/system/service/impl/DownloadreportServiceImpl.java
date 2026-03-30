@@ -83,6 +83,9 @@ public class DownloadreportServiceImpl implements DownloadreportService {
     @Resource
     private IFeignService feignService;
 
+    @Resource
+    private RainAssessmentOutputMybatisMapper rainAssessmentOutputMybatisMapper;
+
     public DownloadreportServiceImpl(XianDisasterRainMapper xianDisasterRainMapper) {
         this.xianDisasterRainMapper = xianDisasterRainMapper;
     }
@@ -108,6 +111,26 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         try {
             createRainReport(wordPath, rainReportEntity);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // word 文档存库
+        RainAssessmentOutput output = new RainAssessmentOutput();
+        output.setId(UUID.randomUUID().toString());
+        output.setRainId(rainId);
+        output.setFileType("文档");
+        output.setFileName(wordName);
+        output.setFileExtension(".docx");
+        output.setLocalSourceFile(wordPath.replace("\\", "/"));
+        output.setType(2);
+        output.setCreateTime(LocalDateTime.now());
+        output.setIsDeleted(0);
+        System.out.println("准备插入数据 - rainId: " + rainId + ", path: " + wordPath);
+
+        try {
+            rainAssessmentOutputMybatisMapper.insertRainAssessmentOutput(output);
+        } catch (Exception e) {
+            System.err.println("数据库插入异常：" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -286,14 +309,14 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         } else {
             concentratedAreaDetailQuantity.add("0");
         }
-        
+
         // 添加第二个元素
         if(rainfallSummary != null && rainfallSummary.size() > 1){
             concentratedAreaDetailQuantity.add(rainfallSummary.get(1).get("rainfall"));
         } else {
             concentratedAreaDetailQuantity.add("0");
         }
-        
+
         // 添加第三个元素
         if(rainfallSummary != null && rainfallSummary.size() > 2){
             concentratedAreaDetailQuantity.add(rainfallSummary.get(2).get("rainfall"));

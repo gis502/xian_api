@@ -26,9 +26,10 @@ public interface IDisasterFileService {
      *
      * @param disasterId 灾害 ID
      * @param disasterType 灾害类型
+     * @param occurrenceTime 灾害发生时间（用于生成模糊匹配的 ID）
      * @return 文件列表
      */
-    List<DisasterFileVO> selectFilesByDisasterId(String disasterId, String disasterType);
+    List<DisasterFileVO> selectFilesByDisasterId(String disasterId, String disasterType, String occurrenceTime);
 
     /**
      * 删除灾害记录（逻辑删除）

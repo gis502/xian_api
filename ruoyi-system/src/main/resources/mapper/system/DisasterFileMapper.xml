@@ -45,14 +45,14 @@
         FROM (
             <!-- 暴雨数据 -->
             SELECT
-                rl.rain_id AS disaster_id,
+                CAST(rl.disaster_id AS VARCHAR) AS disaster_id,
                 rl.disaster_name,
                 'rain' AS disaster_type,
                 rl.occurrence_time,
                 rl.position,
                 rl.rainfall AS extra_info,
                 rl.create_time
-            FROM rain_list rl
+            FROM xian_disaster_rain rl
             WHERE (rl.is_deleted = 0 OR rl.is_deleted IS NULL)
 
             UNION ALL
@@ -99,7 +99,8 @@
                 rao.update_time,
                 rao.is_deleted
             FROM rain_assessment_output rao
-            WHERE rao.rain_id = #{disasterId}
+            WHERE rao.rain_id &gt;= CONCAT('R', #{startTime})
+              AND rao.rain_id &lt;= CONCAT(CONCAT('R', #{endTime}), '999999')
               AND (rao.is_deleted = 0 OR rao.is_deleted IS NULL)
             ORDER BY rao.create_time DESC
         </if>
@@ -123,28 +124,23 @@
                 ao.update_time,
                 ao.is_deleted
             FROM assessment_output ao
-            WHERE ao.eq_id = #{disasterId}
+            WHERE ao.eq_id &gt;= CONCAT('T', #{startTime})
+              AND ao.eq_id &lt;= CONCAT(CONCAT('T', #{endTime}), '999999')
               AND (ao.is_deleted = 0 OR ao.is_deleted IS NULL)
             ORDER BY ao.create_time DESC
         </if>
     </select>
 
-    <!-- 删除灾害文件记录（逻辑删除） -->
-    <update id="deleteDisasterById">
+    <!-- 删除灾害文件记录 -->
+    <delete id="deleteDisasterById">
         <if test="disasterType == 'rain'">
-            UPDATE rain_assessment_output
-            SET is_deleted = 1,
-                update_time = NOW()
-            WHERE rain_id = #{disasterId}
-              AND (is_deleted = 0 OR is_deleted IS NULL)
+            DELETE FROM xian_disaster_rain
+            WHERE disaster_id = CAST(#{disasterId} AS INTEGER)
         </if>
         <if test="disasterType == 'earthquake'">
-            UPDATE assessment_output
-            SET is_deleted = 1,
-                update_time = NOW()
-            WHERE eq_id = #{disasterId}
-              AND (is_deleted = 0 OR is_deleted IS NULL)
+            DELETE FROM xian_earthquake_list
+            WHERE disaster_id = #{disasterId}
         </if>
-    </update>
+    </delete>
 
 </mapper>
