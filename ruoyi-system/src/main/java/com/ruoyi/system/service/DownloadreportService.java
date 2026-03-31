@@ -16,5 +16,5 @@ public interface DownloadreportService {
 
     public void downloadReport(String fileName, HttpServletResponse resp) throws IOException;
 
-//    public RainReportEntity generateRainReportEntity(Integer disasterId);
+    public RainReportEntity generateRainReportEntity(Integer disasterId);
 }

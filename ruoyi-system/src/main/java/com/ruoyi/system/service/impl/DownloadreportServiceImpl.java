@@ -800,7 +800,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
                         if (imageFound) {
                             break;
                         }
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

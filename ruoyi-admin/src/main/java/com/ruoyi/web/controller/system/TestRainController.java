@@ -6,14 +6,13 @@ import com.ruoyi.system.domain.dto.DisasterRainDTO;
 import com.ruoyi.system.domain.dto.RainComprehensiveTriggerDTO;
 import com.ruoyi.system.domain.dto.RainComprehensiveTriggerVO;
 import com.ruoyi.system.domain.dto.RainTriggerDTO;
-import com.ruoyi.system.domain.entity.FactorAnalysis;
+import com.ruoyi.system.domain.entity.RainReportEntity;
 import com.ruoyi.system.domain.params.RainQuery;
 import com.ruoyi.system.domain.vo.FactorVO;
 import com.ruoyi.system.domain.vo.HideVO;
 import com.ruoyi.system.domain.vo.TriggerRequest;
 import com.ruoyi.system.domain.vo.TriggerVO;
 import com.ruoyi.system.service.*;
-import com.ruoyi.system.service.impl.FactorAnalysisServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +58,7 @@ public class TestRainController extends BaseController {
             saveDTO.setDisasterName(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + "长安区暴雨");
             saveDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-            Long rainDisasterId = disasterRainService.saveDisasterRain(saveDTO);
+            Integer rainDisasterId = Integer.parseInt(disasterRainService.saveDisasterRain(saveDTO).toString());
             result.setRainDisasterId(rainDisasterId);
 
             // 2. 调用第三方服务生成专题图（取降雨量最大的区县）
@@ -70,7 +69,32 @@ public class TestRainController extends BaseController {
             result.setRainQueueId(rainQuery.getRainQueueId());
 
             Thread.sleep(20000);
-            downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), Integer.parseInt(rainDisasterId.toString()));
+
+            // 异步产生报告
+            new Thread(() -> {
+                boolean flag = true;
+                while(flag) {
+                    try {
+                        downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), rainDisasterId);
+                        flag = false;
+                    }catch (Exception e){}
+                }
+            }).start();
+
+            RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
+            String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+                            "本次暴雨预计可能形成%s复合灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+                    rainReportEntity.getConcentratedAreaPosition(),
+                    rainReportEntity.getRiskAreaQuantity(),
+                    rainReportEntity.getHideAreaQuantity(),
+                    rainReportEntity.getDisasterChain(),
+                    rainReportEntity.getSignificantIncreaseArea(),
+                    rainReportEntity.getSignificantIncreaseAreaHideQuantity()
+            );
+            result.setDocument(content1);
+
+            System.out.println(rainReportEntity);
+
             System.out.println(rainQuery);
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 
@@ -97,7 +121,7 @@ public class TestRainController extends BaseController {
                 // 调用 modelService.rainTrigger() 进行模型计算
                 modelResults = modelService.rainTrigger(triggerRequest);
             }
-            result.setModelResults(modelResults);
+            result.setModelResults(null);
 //            System.out.println(modelResults);
 
             return AjaxResult.success(result);
