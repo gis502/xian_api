@@ -82,7 +82,7 @@ public class TestRainController extends BaseController {
             }).start();
 
             RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
-            String content1 = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+            String content = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
                             "本次暴雨预计可能形成%s复合灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                     rainReportEntity.getConcentratedAreaPosition(),
                     rainReportEntity.getRiskAreaQuantity(),
@@ -91,7 +91,7 @@ public class TestRainController extends BaseController {
                     rainReportEntity.getSignificantIncreaseArea(),
                     rainReportEntity.getSignificantIncreaseAreaHideQuantity()
             );
-            result.setDocument(content1);
+            result.setContent(content);
 
             System.out.println(rainReportEntity);
 
