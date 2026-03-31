@@ -67,35 +67,8 @@ public class TestRainController extends BaseController {
 
             result.setRainId(rainQuery.getRainId());
             result.setRainQueueId(rainQuery.getRainQueueId());
+//            Thread.sleep(20000);
 
-            Thread.sleep(20000);
-
-            // 异步产生报告
-            new Thread(() -> {
-                boolean flag = true;
-                while(flag) {
-                    try {
-                        downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), rainDisasterId);
-                        flag = false;
-                    }catch (Exception e){}
-                }
-            }).start();
-
-            RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
-            String content = String.format("受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%s%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
-                            "本次暴雨预计可能形成%s复合灾害链，并评估得到%s%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
-                    rainReportEntity.getConcentratedAreaPosition(),
-                    rainReportEntity.getRiskAreaQuantity(),
-                    rainReportEntity.getHideAreaQuantity(),
-                    rainReportEntity.getDisasterChain(),
-                    rainReportEntity.getSignificantIncreaseArea(),
-                    rainReportEntity.getSignificantIncreaseAreaHideQuantity()
-            );
-            result.setContent(content);
-
-            System.out.println(rainReportEntity);
-
-            System.out.println(rainQuery);
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 
             // 3. 执行模型计算（隐患点匹配和风险计算）- 集成 model/rain/trigger 功能
@@ -121,8 +94,35 @@ public class TestRainController extends BaseController {
                 // 调用 modelService.rainTrigger() 进行模型计算
                 modelResults = modelService.rainTrigger(triggerRequest);
             }
-            result.setModelResults(null);
+            result.setModelResults(modelResults);
+
+            RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
+            String content = String.format(
+                    "受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+                            "本次暴雨预计可能形成%s复合灾害链，并评估得到%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
+                    rainReportEntity.getConcentratedAreaPosition(),                    // %s
+                    rainReportEntity.getRiskAreaQuantity(),                           // %d
+                    rainReportEntity.getHideAreaQuantity(),                           // %d (注意这里改了)
+                    rainReportEntity.getHazards() != null ?
+                            String.join("、", rainReportEntity.getHazards()) : "",         // %s - 手动转换List
+                    rainReportEntity.getDisasterChain(),                              // %s
+                    rainReportEntity.getSignificantIncreaseArea(),                    // %s
+                    rainReportEntity.getSignificantIncreaseAreaHideQuantity()         // %d
+            );
+            result.setContent(content);
 //            System.out.println(modelResults);
+
+            // 异步产生报告
+            new Thread(() -> {
+                boolean flag = true;
+                while(flag) {
+                    try {
+                        Thread.sleep(5000);
+                        downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), rainDisasterId);
+                        flag = false;
+                    }catch (Exception e){}
+                }
+            }).start();
 
             return AjaxResult.success(result);
         } catch (Exception e) {
