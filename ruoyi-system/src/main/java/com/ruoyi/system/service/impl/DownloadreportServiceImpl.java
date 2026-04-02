@@ -103,7 +103,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         if (!Files.exists(wordDir)) {
             Files.createDirectories(wordDir);
         }
-        String wordName = System.currentTimeMillis() + "评估报告.docx";
+        String wordName = rainId + "评估报告.docx";
         String wordPath = wordDir.resolve(wordName).toAbsolutePath().toString();
 
         // 表头宽度

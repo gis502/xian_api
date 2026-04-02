@@ -277,4 +277,24 @@ public class FeignServiceImpl implements IFeignService {
         }
         return url;
     }
+
+    @DataSource(value = DataSourceType.SLAVE)   // 使用从库数据源
+    @Override
+    public Integer getGraphCount(RainQuery query) {
+        try {
+            QueryWrapper<RainAssessmentOutput> wrapper = new QueryWrapper<>();
+            wrapper.eq("rain_id", query.getRainId());
+            wrapper.eq("rain_queue_id", query.getRainQueueId());
+            wrapper.eq("type", 1); // 1:专题图
+            wrapper.eq("is_deleted", 0);
+
+            List<RainAssessmentOutput> outputs = slaveRainAssessmentOutputMapper.selectList(wrapper);
+
+            return outputs.size();
+
+        } catch (Exception e) {
+        }
+        // throw new ParamsException(XianConstants.RESULT_EMPTY);
+        return null;
+    }
 }

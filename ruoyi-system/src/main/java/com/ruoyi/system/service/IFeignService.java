@@ -25,4 +25,6 @@ public interface IFeignService {
 
     public String downloadReport(ReportDTO reportDTO);
 
+    public Integer getGraphCount(RainQuery query);
+
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import com.ruoyi.common.constant.XianConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.dto.DisasterRainDTO;
@@ -69,6 +70,8 @@ public class TestRainController extends BaseController {
             result.setRainQueueId(rainQuery.getRainQueueId());
 //            Thread.sleep(20000);
 
+            result.setReportDownloadUrl(XianConstants.IP2 + "/home/output/storm-disaster/reports/" + rainQuery.getRainId() + "评估报告.docx");
+
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 
             // 3. 执行模型计算（隐患点匹配和风险计算）- 集成 model/rain/trigger 功能
@@ -98,13 +101,13 @@ public class TestRainController extends BaseController {
 
             RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
             String content = String.format(
-                    "受持续强降雨影响，基于线性回归和贝叶斯模型构建的灾害风险评估模型在%s%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
+                    "受持续强降雨影响，在%s%d个地质灾害风险区、%d个地质灾害在测隐患点的范围内，结合了%s和近年来历史灾害数据共11类致灾因子的632条数据进行评估，" +
                             "本次暴雨预计可能形成%s复合灾害链，并评估得到%s的地质灾害风险显著上升，需高度警惕其中%d个地质灾害在测隐患点发生山洪、泥石流等次生灾害发生的可能性。",
                     rainReportEntity.getConcentratedAreaPosition(),                    // %s
                     rainReportEntity.getRiskAreaQuantity(),                           // %d
-                    rainReportEntity.getHideAreaQuantity(),                           // %d (注意这里改了)
+                    rainReportEntity.getHideAreaQuantity(),                           // %d
                     rainReportEntity.getHazards() != null ?
-                            String.join("、", rainReportEntity.getHazards()) : "",         // %s - 手动转换List
+                            String.join("、", rainReportEntity.getHazards()) : "",         //手动转换List
                     rainReportEntity.getDisasterChain(),                              // %s
                     rainReportEntity.getSignificantIncreaseArea(),                    // %s
                     rainReportEntity.getSignificantIncreaseAreaHideQuantity()         // %d
@@ -114,13 +117,15 @@ public class TestRainController extends BaseController {
 
             // 异步产生报告
             new Thread(() -> {
-                boolean flag = true;
-                while(flag) {
+                while(true) {
                     try {
-                        Thread.sleep(5000);
-                        downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), rainDisasterId);
-                        flag = false;
-                    }catch (Exception e){}
+                        Thread.sleep(1000);
+                        int count = feignService.getGraphCount(rainQuery);
+                        if(count == 15){
+                            downloadreportService.generateRainReport(rainQuery.getRainId(),rainQuery.getRainQueueId(), rainDisasterId);
+                            break;
+                        }
+                    }catch (Exception ignored){}
                 }
             }).start();
 
