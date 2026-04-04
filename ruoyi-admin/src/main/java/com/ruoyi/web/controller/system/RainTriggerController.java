@@ -56,7 +56,8 @@ public class RainTriggerController extends BaseController {
             saveDTO.setLatitude(triggerDTO.getLatitude());
             saveDTO.setPosition(triggerDTO.getPosition());
             saveDTO.setRainType(triggerDTO.getRainType());
-            saveDTO.setDisasterName(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + "长安区暴雨");
+            saveDTO.setDisasterName(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + triggerDTO.getPosition() + "暴雨");
+            triggerDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
             saveDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             Integer rainDisasterId = Integer.parseInt(disasterRainService.saveDisasterRain(saveDTO).toString());
@@ -97,7 +98,7 @@ public class RainTriggerController extends BaseController {
                 // 调用 modelService.rainTrigger() 进行模型计算
                 modelResults = modelService.rainTrigger(triggerRequest);
             }
-            result.setModelResults(modelResults);
+//            result.setModelResults(modelResults);
 
             RainReportEntity rainReportEntity = downloadreportService.generateRainReportEntity(rainDisasterId);
             String content = String.format(
