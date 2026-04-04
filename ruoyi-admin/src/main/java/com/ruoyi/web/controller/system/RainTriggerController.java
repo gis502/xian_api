@@ -25,8 +25,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RestController
-@RequestMapping("/admins/disaster")
-public class TestRainController extends BaseController {
+@RequestMapping("/admins/rain")
+public class RainTriggerController extends BaseController {
 
     @Resource
     private IXianDisasterRainService disasterRainService;
@@ -43,7 +43,7 @@ public class TestRainController extends BaseController {
     @Resource
     private DownloadreportService downloadreportService;
 
-    @PostMapping("/testRain/trigger")
+    @PostMapping("/trigger")
     public AjaxResult rainComprehensiveTrigger(@RequestBody RainComprehensiveTriggerDTO triggerDTO) {
         try {
             RainComprehensiveTriggerVO result = new RainComprehensiveTriggerVO();
