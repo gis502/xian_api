@@ -169,7 +169,6 @@ public class XianEarthquakeListServiceImpl extends ServiceImpl<XianEarthquakeLis
         log.info("影响人口范围 {}-{}",affectPopMin,affectPopMax);
         earthquakeDamage.put("diePopMin", Result.get("diePopMin"));
         earthquakeDamage.put("diePopMax", Result.get("diePopMax"));
-        log.info("45645687: {}", earthquakeDamage);
         return earthquakeDamage;
     }
     /**

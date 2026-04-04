@@ -70,7 +70,7 @@ public class RainTriggerController extends BaseController {
             result.setRainQueueId(rainQuery.getRainQueueId());
 //            Thread.sleep(20000);
 
-            result.setReportDownloadUrl(XianConstants.IP2 + "/home/output/storm-disaster/reports/" + rainQuery.getRainId() + "评估报告.docx");
+            result.setReportDownloadUrl(XianConstants.IP3 + "/docs/output/storm-disaster/reports/" + rainQuery.getRainId() + "评估报告.docx");
 
             result.setRainFullName(thematicDTO.getPosition() + thematicDTO.getRainfall() + "毫米降雨量");
 

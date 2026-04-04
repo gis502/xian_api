@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.config.DocumentConfig;
+import com.ruoyi.common.constant.XianConstants;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.enums.ImagePositionEnum;
 import com.ruoyi.common.enums.ImageTypeEnum;
@@ -121,7 +122,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         output.setFileType("文档");
         output.setFileName(wordName);
         output.setFileExtension(".docx");
-        output.setLocalSourceFile(wordPath.replace("\\", "/"));
+        output.setLocalSourceFile(XianConstants.IP3 + wordPath.replace("\\", "/").substring(wordPath.indexOf("/docs")));
         output.setType(2);
         output.setCreateTime(LocalDateTime.now());
         output.setIsDeleted(0);

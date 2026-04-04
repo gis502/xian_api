@@ -68,7 +68,7 @@ public class FileRemoveServiceImpl implements FileRemoveService {
                 return;
             }
 
-            // 6. 提取URL中/home/后的目录层级（如output/storm-disaster/thematic/...）
+            // 6. 提取URL中/data/后的目录层级（如output/storm-disaster/thematic/...）
             String folderPath = extractFolderPathAfterHome(decodedUrl);
 
             // 7. 构建完整的本地存储目录（imgs根目录 + 提取的层级）
@@ -162,7 +162,7 @@ public class FileRemoveServiceImpl implements FileRemoveService {
             String fullPath = path.substring(hostEndIndex + 1);
 
             // 第二步：找到/home/的位置
-            String homeFlag = "home/";
+            String homeFlag = "data/";
             int homeIndex = fullPath.indexOf(homeFlag);
             if (homeIndex == -1) {
                 return ""; // 无/home/目录则返回空
