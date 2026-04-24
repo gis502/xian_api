@@ -14,5 +14,5 @@ public class RainComprehensiveTriggerVO {
     private String rainFullName;      // 完整的雨名
     private String content;        // 初步描述
     private String reportDownloadUrl;      // 报告下载链接
-    private List<TriggerVO> modelResults; // 模型计算结果（隐患点风险分析）
+//    private List<TriggerVO> modelResults; // 模型计算结果（隐患点风险分析）
 }

@@ -49,6 +49,10 @@ public class RainTriggerController extends BaseController {
             RainComprehensiveTriggerVO result = new RainComprehensiveTriggerVO();
 
             // 1. 保存暴雨灾害数据
+            LocalDateTime time = triggerDTO.getOccurrenceTime() == null ?
+                    LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
+                    triggerDTO.getOccurrenceTime();
+
             DisasterRainDTO saveDTO = new DisasterRainDTO();
             saveDTO.setRainfall(triggerDTO.getRainfall());
             saveDTO.setDuration(triggerDTO.getDuration());
@@ -56,9 +60,9 @@ public class RainTriggerController extends BaseController {
             saveDTO.setLatitude(triggerDTO.getLatitude());
             saveDTO.setPosition(triggerDTO.getPosition());
             saveDTO.setRainType(triggerDTO.getRainType());
-            saveDTO.setDisasterName(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + triggerDTO.getPosition() + "暴雨");
-            triggerDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            saveDTO.setOccurrenceTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            saveDTO.setDisasterName(time + triggerDTO.getPosition() + "暴雨");
+            triggerDTO.setOccurrenceTime(time);
+            saveDTO.setOccurrenceTime(time);
 
             Integer rainDisasterId = Integer.parseInt(disasterRainService.saveDisasterRain(saveDTO).toString());
             result.setRainDisasterId(rainDisasterId);
@@ -165,7 +169,7 @@ public class RainTriggerController extends BaseController {
         }
 
         dto.setPosition(positions[maxIndex]);
-        dto.setRainfall(String.valueOf(maxRainfall));
+        dto.setRainfall(String.valueOf((int) Math.ceil(maxRainfall)));
 
         // 确保索引不越界
         int lonIndex = Math.min(maxIndex, longitudes.length - 1);

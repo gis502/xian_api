@@ -270,17 +270,32 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         // 根据rainfallSummary的实际大小安全地设置各变量值
         if(rainfallSummary != null && !rainfallSummary.isEmpty()){
-            // 处理第一个元素（如果存在）
+            // 处理第一个元素
             if(rainfallSummary.size() > 0){
-                stationStreet1 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(0).get("lat")), Float.parseFloat(rainfallSummary.get(0).get("lon")));
+                // 修改点：接收 List，取第一个
+                List<String> list1 = xianStreetMapper.inStreet(
+                        Float.parseFloat(rainfallSummary.get(0).get("lat")),
+                        Float.parseFloat(rainfallSummary.get(0).get("lon"))
+                );
+                stationStreet1 = (list1 != null && !list1.isEmpty()) ? list1.get(0) : "未知";
             }
-            // 处理第二个元素（如果存在）
+
+            // 处理第二个元素
             if(rainfallSummary.size() > 1){
-                stationStreet2 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(1).get("lat")), Float.parseFloat(rainfallSummary.get(1).get("lon")));
+                List<String> list2 = xianStreetMapper.inStreet(
+                        Float.parseFloat(rainfallSummary.get(1).get("lat")),
+                        Float.parseFloat(rainfallSummary.get(1).get("lon"))
+                );
+                stationStreet2 = (list2 != null && !list2.isEmpty()) ? list2.get(0) : "未知";
             }
-            // 处理第三个元素（如果存在）
+
+            // 处理第三个元素
             if(rainfallSummary.size() > 2){
-                stationStreet3 = xianStreetMapper.inStreet(Float.parseFloat(rainfallSummary.get(2).get("lat")), Float.parseFloat(rainfallSummary.get(2).get("lon")));
+                List<String> list3 = xianStreetMapper.inStreet(
+                        Float.parseFloat(rainfallSummary.get(2).get("lat")),
+                        Float.parseFloat(rainfallSummary.get(2).get("lon"))
+                );
+                stationStreet3 = (list3 != null && !list3.isEmpty()) ? list3.get(0) : "未知";
             }
         }
         // 如果rainfallSummary为null或空，变量保持初始值空字符串

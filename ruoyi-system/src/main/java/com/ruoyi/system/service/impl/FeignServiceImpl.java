@@ -270,7 +270,7 @@ public class FeignServiceImpl implements IFeignService {
                 throw new ParamsException(XianConstants.RESULT_EMPTY);
             }
 
-            url = output.getSourceFile();
+            url = output.getLocalSourceFile();
         } catch (Exception e) {
             log.error("获取报告失败：{}", e.getMessage());
             e.printStackTrace();

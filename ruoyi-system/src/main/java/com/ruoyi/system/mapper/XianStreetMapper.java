@@ -5,6 +5,8 @@ import com.ruoyi.system.domain.entity.XianStreet;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 
 public interface XianStreetMapper extends BaseMapper<XianStreet> {
 
@@ -15,5 +17,5 @@ public interface XianStreetMapper extends BaseMapper<XianStreet> {
                 "st.geometry_wkt,"+
                 "ST_SetSRID(ST_MakePoint(#{lon}, #{lat}), 4490)"+
             ")")
-    String inStreet(@Param("lat") float lat, @Param("lon") float lon);
+    List<String> inStreet(@Param("lat") float lat, @Param("lon") float lon);
 }

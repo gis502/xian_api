@@ -79,7 +79,7 @@ spring:
     database: 0
     # 密码
     password: XAYJ@gis2603
-#    password:
+#    password: zhangsan
 
     # 连接超时时间
     timeout: 10s

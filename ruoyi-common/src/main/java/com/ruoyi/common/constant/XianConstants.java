@@ -25,6 +25,7 @@ public class XianConstants {
     public static String IP3 = "https://10.22.245.209:10246";
 //    public static String IP1 = "http://localhost";
 //    public static String IP2 = "http://localhost";
+//    public static String IP3 = "http://localhost";
 
     public static final boolean SEISMIC_TYPE = false;
     public static final boolean STORM_TYPE = true;

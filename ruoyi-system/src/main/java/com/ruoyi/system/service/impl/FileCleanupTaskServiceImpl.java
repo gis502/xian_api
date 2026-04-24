@@ -27,7 +27,6 @@ public class FileCleanupTaskServiceImpl {
 
     // 本地存储根目录
     private static final String ROOT_DIR = "/home/xian/dist/";
-    private static final String DOCS_DIR = ROOT_DIR + "docs/";
     private static final String IMGS_DIR = ROOT_DIR + "imgs/";
 
     // 文件过期时间
@@ -67,7 +66,6 @@ public class FileCleanupTaskServiceImpl {
     public void cleanupExpiredFiles() {
         try {
             log.info("开始执行文件清理任务...");
-            cleanupDirectory(new File(DOCS_DIR));
             cleanupDirectory(new File(IMGS_DIR));
             log.info("文件清理任务执行完成");
         } catch (Exception e) {
@@ -127,7 +125,6 @@ public class FileCleanupTaskServiceImpl {
     private void checkAndDeleteEmptyDirectory(File directory) {
         // 排除根目录，避免误删
         if (directory.getAbsolutePath().equals(ROOT_DIR)
-                || directory.getAbsolutePath().equals(DOCS_DIR)
                 || directory.getAbsolutePath().equals(IMGS_DIR)) {
             return;
         }
