@@ -20,10 +20,10 @@ public class XianConstants {
     public static final String TRIGGER_ERROR = "地震触发异常!";
     public static final String THEMATIC_EMPTY = "正在生成专题图,请等待...";
     public static final String RESULT_EMPTY_RAIN = "报告正在生成中，请等待...";
-    public static String IP1 = "http://10.22.245.246";
-    public static String IP2 = "http://10.22.245.247";
+//    public static String IP1 = "http://10.17.132.40";
+    public static String IP2 = "http://10.17.132.47";
     public static String IP3 = "https://10.22.245.209:10246";
-//    public static String IP1 = "http://localhost";
+    public static String IP1 = "http://localhost";
 //    public static String IP2 = "http://localhost";
 //    public static String IP3 = "http://localhost";
 
@@ -52,8 +52,8 @@ public class XianConstants {
 
     public static final JSONObject authBody = new JSONObject();
     static {
-        authBody.put("username", "admin");
-        authBody.put("password", "admin123");
+        authBody.put("username", "super_map");
+        authBody.put("password", "XAYJ@gis2603");
     }
 
     // 触发模型接口

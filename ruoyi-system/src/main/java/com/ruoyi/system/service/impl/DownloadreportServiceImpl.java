@@ -122,7 +122,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
         output.setFileType("文档");
         output.setFileName(wordName);
         output.setFileExtension(".docx");
-        output.setLocalSourceFile(XianConstants.IP3 + wordPath.replace("\\", "/").substring(wordPath.indexOf("/docs")));
+//        output.setLocalSourceFile(XianConstants.IP3 + wordPath.replace("\\", "/").substring(wordPath.indexOf("/docs")));
         output.setType(2);
         output.setCreateTime(LocalDateTime.now());
         output.setIsDeleted(0);
@@ -678,7 +678,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
      */
     private void createRainfallOverview(XWPFDocument doc, RainReportEntity rainReportEntity) {
         // 标题
-        DocumentUtils.addRegularParagraph(doc, "一、降雨概况");
+        DocumentUtils.addRegularParagraph(doc, "一、灾情概览");
 
         // 内容
         XWPFParagraph paragraph = DocumentUtils.addRegularParagraph(doc, null);
@@ -706,6 +706,32 @@ public class DownloadreportServiceImpl implements DownloadreportService {
 
         // 添加普通段落
         DocumentUtils.addRegularRun(paragraph, content);
+
+        RainQuery rainQuery = new RainQuery();
+        rainQuery.setRainId(rainReportEntity.getRainId());
+        rainQuery.setRainQueueId(rainReportEntity.getRainQueueId());
+        String disasterName = "暴雨地质灾害风险区分布图";
+        boolean disasterImageFound = false;
+        while (!disasterImageFound) {
+            try {
+                List<RainOutputDTO> rainOutputDTOS = feignService.thematicMap(rainQuery);
+                for (RainOutputDTO rainOutputDTO : rainOutputDTOS) {
+                    if (rainOutputDTO.getFileName().equals(disasterName)) {
+                        DocumentUtils.addRegularParagraph(doc, null);
+                        DocumentUtils.insertImageWithCaption(doc, rainOutputDTO.getSourceFile(), ImageTypeEnum.JPEG, null, null, "", ImagePositionEnum.AFTER);
+                        DocumentUtils.addRegularParagraph(doc, null);
+                        disasterImageFound = true;
+                        break;
+                    }
+                }
+                Thread.sleep(1000);
+                if (disasterImageFound) {
+                    break;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -716,7 +742,7 @@ public class DownloadreportServiceImpl implements DownloadreportService {
      */
     private void createRiskAssessment(XWPFDocument doc, RainReportEntity rainReportEntity) {
         // 标题
-        DocumentUtils.addRegularParagraph(doc, "二、风险评估");
+        DocumentUtils.addRegularParagraph(doc, "二、灾害态势评估");
 
         // 第一段
         XWPFParagraph paragraph1 = DocumentUtils.addRegularParagraph(doc, null);

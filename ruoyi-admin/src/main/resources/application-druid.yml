@@ -1,9 +1,9 @@
 # 数据源配置
 spring:
     neo4j:
-        uri: bolt://10.22.245.246:7687
+#        uri: bolt://10.22.245.246:7687
 #        uri: bolt://47.92.216.173:7687
-#        uri: bolt://localhost:7687
+        uri: bolt://localhost:7687
         # 必须启用认证（之前被注释了，导致连接可能被拒绝或权限不足）
 #        authentication:
 #            username: neo4j
@@ -30,15 +30,18 @@ spring:
         druid:
             # 主库数据源
             master:
-                url: jdbc:postgresql://10.22.245.247:5432/xian0907?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-                username: postgres
-                password: zhangsan
+#                url: jdbc:postgresql://10.22.245.247:5432/xian0907?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: zhangsan
 #                url: jdbc:postgresql://47.92.216.173:7654/xian20250822?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: zhangsan
 #                url: jdbc:postgresql://10.22.245.138:54321/xianDC?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: zaihailian
 #                password: XAYJ@gis2603
+                url: jdbc:postgresql://10.17.132.34:54321/xianDC?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                username: system
+                password: 9sK&p7D!z2Q@8
 
 #                url: jdbc:postgresql://localhost:5432/xian20250825?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
@@ -47,15 +50,15 @@ spring:
             slave:
                 # 从数据源开关/默认关闭
                 enabled: true
-                url: jdbc:postgresql://10.22.245.247:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-                username: postgres
-                password: zhangsan
+#                url: jdbc:postgresql://10.22.245.247:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+#                username: postgres
+#                password: zhangsan
 #                url: jdbc:postgresql://47.92.216.173:7654/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: zhangsan
-#                url: jdbc:postgresql://10.22.245.138:54321/xianDCAccess?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-#                username: zaihailian
-#                password: XAYJ@gis2603
+                url: jdbc:postgresql://10.17.132.34:54321/xianDCAccess?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+                username: system
+                password: 9sK&p7D!z2Q@8
 #                url: jdbc:postgresql://localhost:5432/assess_disaster?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
 #                username: postgres
 #                password: Zzw.0401
